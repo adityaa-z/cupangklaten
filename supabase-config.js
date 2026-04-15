@@ -1,3 +1,3 @@
 // Supabase Configuration
 // Values are loaded from env.js
-const supabaseClient = supabase.createClient(ENV.SUPABASE_URL, ENV.SUPABASE_KEY);
+const supabaseClient = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
