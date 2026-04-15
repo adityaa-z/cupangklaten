@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
-        if (user === 'admin' && pass === 'admin') {
+        if (user === ENV.ADMIN_USERNAME && pass === ENV.ADMIN_PASSWORD) {
             localStorage.setItem('adminLoggedIn', 'true');
             document.body.classList.add('logged-in');
             loginError.style.display = 'none';
