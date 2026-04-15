@@ -6,25 +6,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryDropdown = document.getElementById('categoryDropdown');
     const categoryOptions = document.querySelectorAll('.filter-option');
 
-    // 1. Unified Database Layer (Single Source of Truth)
-    function initDatabase() {
-        let db = localStorage.getItem('productsData');
-        if (!db) {
-            // Default Dummy Data
-            const defaultProducts = [
-                { id: 1, img: 'assets/pk-001.png', code: 'CK-001', category: 'Plakat', variant: 'Multicolour', gender: 'Jantan', age: '4', size: 'M', price: 150000, shopee: 'https://shopee.co.id/product/dummy/1', isAvailable: true, stock: 1 },
-                { id: 2, img: 'assets/hm-012.png', code: 'CK-002', category: 'Halfmoon', variant: 'Blue Rim', gender: 'Betina', age: '3', size: 'S+', price: 100000, shopee: 'https://shopee.co.id/product/dummy/2', isAvailable: true, stock: 1 },
-                { id: 3, img: 'assets/hm-012.png', code: 'CK-003', category: 'HMPK', variant: 'Galaxy', gender: 'Jantan', age: '4.5', size: 'M', price: 200000, shopee: 'https://shopee.co.id/product/dummy/3', isAvailable: false, stock: 0 },
-                { id: 4, img: 'assets/pk-001.png', code: 'CK-004', category: 'Crowntail', variant: 'Black Orchid', gender: 'Jantan', age: '5', size: 'L', price: 175000, shopee: 'https://shopee.co.id/product/dummy/4', isAvailable: true, stock: 1 },
-                { id: 5, img: 'assets/gt-005.png', code: 'CK-005', category: 'Giant', variant: 'Yellow Koi', gender: 'Betina', age: '4', size: 'XL', price: 350000, shopee: 'https://shopee.co.id/product/dummy/5', isAvailable: true, stock: 8 }
-            ];
-            localStorage.setItem('productsData', JSON.stringify(defaultProducts));
-            return defaultProducts;
+    // 1. Unified Database Layer (Supabase)
+    async function fetchProducts() {
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            return data || [];
+        } catch (err) {
+            console.error('Error fetching products:', err);
+            return [];
         }
-        return JSON.parse(db);
     }
 
-    let products = initDatabase();
+    let products = [];
     let currentCategoryFilter = 'all';
 
     // 2. Format Currency
@@ -101,7 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Events binding ---
 
     // Initial render
-    renderProducts();
+    async function init() {
+        products = await fetchProducts();
+        renderProducts();
+    }
+    init();
 
     // Search bar listener
     searchInput.addEventListener('input', (e) => {
@@ -145,12 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Read real-time updates (if Admin changes it in another tab, this refreshes the frontend automatically if focus returns)
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'productsData') {
-            products = JSON.parse(e.newValue);
-            renderProducts(searchInput.value);
-        }
+    // Real-time update fallback (refetch when window focused)
+    window.addEventListener('focus', async () => {
+        products = await fetchProducts();
+        renderProducts(searchInput.value);
     });
 
     // Smooth Scroll

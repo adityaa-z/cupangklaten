@@ -1,11 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     
     // --- 1. Authenticaton Logic ---
     const loginForm = document.getElementById('loginForm');
     const loginError = document.getElementById('loginError');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Check session
     if (localStorage.getItem('adminLoggedIn') === 'true') {
         document.body.classList.add('logged-in');
     }
@@ -14,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
-        
-        // Hardcoded simple auth for demo purposes
         if (user === 'admin' && pass === 'admin') {
             localStorage.setItem('adminLoggedIn', 'true');
             document.body.classList.add('logged-in');
@@ -31,25 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('logged-in');
     });
 
-    // --- 2. Database (Simulated) ---
-    // Initial Dummy Data based on instructions
-    let products = JSON.parse(localStorage.getItem('productsData')) || [
-        { id: 1, img: 'assets/pk-001.png', code: 'CK-001', category: 'Plakat', variant: 'Multicolour', gender: 'Jantan', age: '4', size: 'M', price: 150000, shopee: 'https://shopee.co.id/product/dummy/1', isAvailable: true, stock: 1 },
-        { id: 2, img: 'assets/hm-012.png', code: 'CK-002', category: 'Halfmoon', variant: 'Blue Rim', gender: 'Betina', age: '3', size: 'S+', price: 100000, shopee: 'https://shopee.co.id/product/dummy/2', isAvailable: true, stock: 1 },
-        { id: 3, img: 'assets/hm-012.png', code: 'CK-003', category: 'HMPK', variant: 'Galaxy', gender: 'Jantan', age: '4.5', size: 'M', price: 200000, shopee: 'https://shopee.co.id/product/dummy/3', isAvailable: false, stock: 0 },
-        { id: 4, img: 'assets/pk-001.png', code: 'CK-004', category: 'Crowntail', variant: 'Black Orchid', gender: 'Jantan', age: '5', size: 'L', price: 175000, shopee: 'https://shopee.co.id/product/dummy/4', isAvailable: true, stock: 1 },
-        { id: 5, img: 'assets/gt-005.png', code: 'CK-005', category: 'Giant', variant: 'Yellow Koi', gender: 'Betina', age: '4', size: 'XL', price: 350000, shopee: 'https://shopee.co.id/product/dummy/5', isAvailable: true, stock: 8 }
-    ];
+    // --- 2. Database (Supabase) ---
+    let products = [];
+    let faqs = [];
 
-    let faqs = JSON.parse(localStorage.getItem('faqData')) || [
-        { id: 1, q: "Apakah ikan yang dikirim Real Picture?", a: "Iya, 100% ikan yang Anda terima sama persis dengan kode dan foto yang dipajang." },
-        { id: 2, q: "Bagaimana jika ikan mati dalam perjalanan?", a: "Kami memberikan garansi DOA (Death on Arrival) 100% uang kembali dengan syarat video unboxing." }
-    ];
+    async function fetchData() {
+        try {
+            const { data: pData, error: pError } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+            const { data: fData, error: fError } = await supabaseClient.from('faqs').select('*').order('created_at', { ascending: true });
+            
+            if (pError) throw pError;
+            if (fError) throw fError;
 
-    function saveToStorage() {
-        localStorage.setItem('productsData', JSON.stringify(products));
-        localStorage.setItem('faqData', JSON.stringify(faqs));
-        if (typeof renderTable === 'function') renderTable();
+            products = pData || [];
+            faqs = fData || [];
+            
+            renderTable();
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
     }
 
     // --- 3. Rendering Logic ---
@@ -61,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTable(searchTerm = '') {
+        if (!tableBody) return;
         tableBody.innerHTML = '';
         
         let filteredProducts = products;
@@ -80,11 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filteredProducts.forEach(product => {
             const tr = document.createElement('tr');
+            const isSoldOut = (!product.is_available || product.stock <= 0);
             
-            // Computed status based on stock and manual toggle
-            const isSoldOut = (!product.isAvailable || product.stock <= 0);
-            
-            // Stock Toggle HTML
             const stockHTML = `
                 <div class="stock-controls">
                     <div class="toggle-section">
@@ -104,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            const mediaTag = product.isVideo 
+            const mediaTag = product.is_video 
                 ? `<video src="${product.img}" autoplay loop muted playsinline style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></video>` 
                 : `<img src="${product.img}" alt="${product.code}">`;
 
@@ -138,14 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isShowingArchive = false;
 
-    // --- RENDER TABLE PESANAN ---
     window.renderPesananTable = function(searchTerm = '') {
         const tbodyPesanan = document.getElementById('tablePesananBody');
         const pesananTitle = document.getElementById('pesananTitle');
         const toggleText = document.getElementById('toggleText');
         
         if (!tbodyPesanan) return;
-        
         tbodyPesanan.innerHTML = '';
 
         if (isShowingArchive) {
@@ -156,10 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleText.innerText = "Lihat Sudah Kirim";
         }
         
-        // Filter based on state
         let filteredProducts = products.filter(p => {
-            const isSold = (!p.isAvailable || p.stock <= 0);
-            return isSold && (isShowingArchive ? p.isArchived : !p.isArchived);
+            const isSold = (!p.is_available || p.stock <= 0);
+            return isSold && (isShowingArchive ? p.is_archived : !p.is_archived);
         });
         
         if (searchTerm) {
@@ -179,12 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filteredProducts.forEach(product => {
             const tr = document.createElement('tr');
-            
-            const mediaTag = product.isVideo 
+            const mediaTag = product.is_video 
                 ? `<video src="${product.img}" autoplay loop muted playsinline style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;"></video>`
                 : `<img src="${product.img}" alt="${product.code}">`;
 
-            const dateToUse = isShowingArchive ? product.archivedAt : product.soldAt;
+            const dateToUse = isShowingArchive ? product.archived_at : product.sold_at;
             const dateObj = dateToUse ? new Date(dateToUse) : new Date();
             const dateStr = dateObj.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
             const timeStr = dateObj.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
@@ -204,9 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-size: 0.85rem; color: var(--text-muted);">${product.variant || '-'}</div>
                 </td>
                 <td style="font-weight: 600; color: #10b981;">${formatRupiah(product.price)}</td>
-                <td>
-                    ${actionBtn}
-                </td>
+                <td>${actionBtn}</td>
             `;
             tbodyPesanan.appendChild(tr);
         });
@@ -214,69 +203,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnToggleArchive = document.getElementById('btnToggleArchive');
     if (btnToggleArchive) {
-        btnToggleArchive.onclick = function() {
-            isShowingArchive = !isShowingArchive;
-            renderPesananTable();
-        };
+        btnToggleArchive.onclick = () => { isShowingArchive = !isShowingArchive; renderPesananTable(); };
     }
 
-    window.archiveOrder = function(id) {
-        const product = products.find(p => p.id === id);
-        if (product) {
-            product.isArchived = true;
-            product.archivedAt = new Date().toISOString();
-            saveToStorage();
-            renderPesananTable();
-            alert(`Pesanan ${product.code} dipindahkan ke arsip sampah dan akan dihapus otomatis dalam 30 hari.`);
-        }
+    window.archiveOrder = async function(id) {
+        const { error } = await supabaseClient.from('products').update({ is_archived: true, archived_at: new Date().toISOString() }).eq('id', id);
+        if (error) alert('Gagal mengarsipkan: ' + error.message);
+        else fetchData();
     };
 
-    function cleanupTrash() {
-        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-        const now = new Date().getTime();
-        
-        let originalLength = products.length;
-        products = products.filter(p => {
-            if (p.isArchived && p.archivedAt) {
-                const archiveTime = new Date(p.archivedAt).getTime();
-                if (now - archiveTime > thirtyDaysInMs) {
-                    return false; // Hapus
-                }
-            }
-            return true;
-        });
-
-        if (products.length !== originalLength) {
-            saveToStorage();
-        }
-    }
-    
-    // Run cleanup on load
-    cleanupTrash();
-
-    const searchPesananInput = document.getElementById('searchPesananInput');
-    if(searchPesananInput) {
-        searchPesananInput.addEventListener('input', (e) => {
-            renderPesananTable(e.target.value);
-        });
-    }
-
-    // --- RENDER FAQ TABLE ---
     window.renderFAQTable = function(searchTerm = '') {
         const tbody = document.getElementById('faqTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
-
-        let filteredFaqs = faqs;
-        if (searchTerm) {
-            filteredFaqs = faqs.filter(f => f.q.toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-
+        let filteredFaqs = searchTerm ? faqs.filter(f => f.question.toLowerCase().includes(searchTerm.toLowerCase())) : faqs;
         filteredFaqs.forEach(faq => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="font-weight:600;">${faq.q}</td>
-                <td style="color:var(--text-muted); font-size:0.9rem;">${faq.a}</td>
+                <td style="font-weight:600;">${faq.question}</td>
+                <td style="color:var(--text-muted); font-size:0.9rem;">${faq.answer}</td>
                 <td>
                     <button class="btn-icon" onclick="openFAQModal(${faq.id})" title="Edit"><i class="fas fa-edit"></i></button>
                     <button class="btn-icon delete" onclick="deleteFAQ(${faq.id})" title="Hapus"><i class="fas fa-trash-alt"></i></button>
@@ -286,13 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('searchFAQInput').addEventListener('input', (e) => {
-        renderFAQTable(e.target.value);
-    });
-
-    // FAQ CRUD
-    const faqModal = document.getElementById('faqModal');
-    const faqForm = document.getElementById('faqForm');
+    const searchFAQInput = document.getElementById('searchFAQInput');
+    if(searchFAQInput) searchFAQInput.addEventListener('input', (e) => renderFAQTable(e.target.value));
 
     window.openFAQModal = function(id = null) {
         document.getElementById('faqModal').style.display = 'flex';
@@ -300,303 +240,218 @@ document.addEventListener('DOMContentLoaded', () => {
             const faq = faqs.find(f => f.id === id);
             document.getElementById('faqModalTitle').innerText = "Edit FAQ";
             document.getElementById('editFaqId').value = id;
-            document.getElementById('inputQuestion').value = faq.q;
-            document.getElementById('inputAnswer').value = faq.a;
+            document.getElementById('inputQuestion').value = faq.question;
+            document.getElementById('inputAnswer').value = faq.answer;
         } else {
             document.getElementById('faqModalTitle').innerText = "Tambah FAQ Baru";
-            faqForm.reset();
+            document.getElementById('faqForm').reset();
             document.getElementById('editFaqId').value = '';
         }
     };
 
-    window.deleteFAQ = function(id) {
+    window.deleteFAQ = async function(id) {
         if(confirm('Hapus FAQ ini?')) {
-            faqs = faqs.filter(f => f.id !== id);
-            saveToStorage();
-            renderFAQTable();
+            const { error } = await supabaseClient.from('faqs').delete().eq('id', id);
+            if (error) alert('Gagal hapus FAQ: ' + error.message);
+            else fetchData();
         }
     };
 
     document.getElementById('btnAddFAQ').onclick = () => openFAQModal();
-    document.getElementById('closeFAQModal').onclick = () => faqModal.style.display = 'none';
-    document.getElementById('btnCancelFAQ').onclick = () => faqModal.style.display = 'none';
+    document.getElementById('closeFAQModal').onclick = () => document.getElementById('faqModal').style.display = 'none';
+    document.getElementById('btnCancelFAQ').onclick = () => document.getElementById('faqModal').style.display = 'none';
     
-    document.getElementById('btnSaveFAQ').onclick = function() {
+    document.getElementById('btnSaveFAQ').onclick = async function() {
         const id = document.getElementById('editFaqId').value;
         const q = document.getElementById('inputQuestion').value;
         const a = document.getElementById('inputAnswer').value;
-        
         if (!q || !a) return alert('Lengkapi data FAQ!');
         
+        let result;
         if (id) {
-            faqs = faqs.map(f => f.id === parseInt(id) ? { id: parseInt(id), q, a } : f);
+            result = await supabaseClient.from('faqs').update({ question: q, answer: a }).eq('id', id);
         } else {
-            faqs.push({ id: Date.now(), q, a });
+            result = await supabaseClient.from('faqs').insert([{ question: q, answer: a }]);
         }
         
-        saveToStorage();
-        renderFAQTable();
-        faqModal.style.display = 'none';
+        if (result.error) alert('Gagal simpan FAQ: ' + result.error.message);
+        else { fetchData(); document.getElementById('faqModal').style.display = 'none'; }
     };
 
-    // Include function to global context so inline onclick works
-    window.updateStockQty = function(id, delta) {
+    window.updateStockQty = async function(id, delta) {
         const product = products.find(p => p.id === id);
         if (product) {
-            let newStock = product.stock + delta;
-            product.stock = Math.max(0, newStock);
-            // If stock becomes 0, automatically set isAvailable false and set soldAt
-            if (product.stock === 0) {
-                product.isAvailable = false;
-                if (!product.soldAt) product.soldAt = new Date().toISOString();
+            let newStock = Math.max(0, product.stock + delta);
+            let updateData = { stock: newStock };
+            if (newStock === 0) {
+                updateData.is_available = false;
+                if (!product.sold_at) updateData.sold_at = new Date().toISOString();
             } else {
-                product.isAvailable = true;
-                product.soldAt = null;
-                product.isArchived = false;
-                product.archivedAt = null;
+                updateData.is_available = true;
+                updateData.sold_at = null;
+                updateData.is_archived = false;
+                updateData.archived_at = null;
             }
-            saveToStorage();
+            const { error } = await supabaseClient.from('products').update(updateData).eq('id', id);
+            if (error) console.error(error); else fetchData();
         }
     };
 
-    window.toggleStock = function(id) {
+    window.toggleStock = async function(id) {
         const product = products.find(p => p.id === id);
         if (product) {
-            product.isAvailable = !product.isAvailable;
-            if (!product.isAvailable) {
-                if (!product.soldAt) product.soldAt = new Date().toISOString();
+            let updateData = { is_available: !product.is_available };
+            if (!updateData.is_available) {
+                if (!product.sold_at) updateData.sold_at = new Date().toISOString();
             } else {
-                product.soldAt = null;
-                product.isArchived = false;
-                product.archivedAt = null;
-                if (product.stock <= 0) product.stock = 1;
+                updateData.sold_at = null;
+                updateData.is_archived = false;
+                updateData.archived_at = null;
+                if (product.stock <= 0) updateData.stock = 1;
             }
-            saveToStorage();
+            const { error } = await supabaseClient.from('products').update(updateData).eq('id', id);
+            if (error) console.error(error); else fetchData();
         }
     };
 
-    window.setStockQty = function(id, val) {
+    window.setStockQty = async function(id, val) {
         const product = products.find(p => p.id === id);
         if (product) {
-            let newStock = parseInt(val) || 0;
-            product.stock = Math.max(0, newStock);
-            if (product.stock === 0) {
-                product.isAvailable = false;
-                if (!product.soldAt) product.soldAt = new Date().toISOString();
+            let newStock = Math.max(0, parseInt(val) || 0);
+            let updateData = { stock: newStock };
+            if (newStock === 0) {
+                updateData.is_available = false;
+                if (!product.sold_at) updateData.sold_at = new Date().toISOString();
             } else {
-                product.isAvailable = true;
-                product.soldAt = null;
-                product.isArchived = false;
+                updateData.is_available = true;
+                updateData.sold_at = null;
+                updateData.is_archived = false;
             }
-            saveToStorage();
+            const { error } = await supabaseClient.from('products').update(updateData).eq('id', id);
+            if (error) console.error(error); else fetchData();
         }
     };
 
-    window.deleteProduct = function(id) {
+    window.deleteProduct = async function(id) {
         if(confirm('Apakah Anda yakin ingin menghapus data ikan ini?')) {
-            products = products.filter(p => p.id !== id);
-            saveToStorage();
+            const { error } = await supabaseClient.from('products').delete().eq('id', id);
+            if (error) alert('Gagal hapus: ' + error.message); else fetchData();
         }
     };
 
-    // Global Search
-    searchInput.addEventListener('input', (e) => {
-        renderTable(e.target.value);
-    });
+    if(searchInput) searchInput.addEventListener('input', (e) => renderTable(e.target.value));
 
     // --- 4. Modal Logic (Add/Edit) ---
     const modal = document.getElementById('productModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const btnAddProduct = document.getElementById('btnAddProduct');
-    const closeModal = document.getElementById('closeModal');
-    const btnCancel = document.getElementById('btnCancel');
-    const btnSave = document.getElementById('btnSave');
-
-    // Form inputs
     const fId = document.getElementById('editId');
     const fFile = document.getElementById('inputFile');
     const fImg = document.getElementById('inputGambar');
     const fIsVideo = document.getElementById('inputIsVideo');
     const mediaPreview = document.getElementById('mediaPreview');
-    const fCode = document.getElementById('inputKode');
-    const fCategory = document.getElementById('inputKategori');
-    const fVariant = document.getElementById('inputVarian');
-    const fGender = document.getElementById('inputGender');
-    const fAge = document.getElementById('inputUsia');
-    const fSize = document.getElementById('inputSize');
-    const fStock = document.getElementById('inputStok');
-    const fPrice = document.getElementById('inputHarga');
-    const fShopee = document.getElementById('inputShopee');
-
-    // FileReader Logic for Media
+    
     fFile.addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
-            // Max 2MB to fit in LocalStorage comfortably
-            if(file.size > 2 * 1024 * 1024) {
-                alert('Ukuran file maksimal 2 MB!');
-                this.value = '';
-                return;
-            }
-
+            if(file.size > 2 * 1024 * 1024) { alert('Ukuran file maksimal 2 MB!'); this.value = ''; return; }
             const isVid = file.type.startsWith('video/');
             fIsVideo.value = isVid ? 'true' : 'false';
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 fImg.value = e.target.result; 
                 mediaPreview.style.display = 'block';
-                if(isVid) {
-                    mediaPreview.innerHTML = `<video src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;" autoplay loop muted></video>`;
-                } else {
-                    mediaPreview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-                }
+                mediaPreview.innerHTML = isVid ? `<video src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;" autoplay loop muted></video>` : `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
             }
             reader.readAsDataURL(file);
         }
     });
 
-    function openModalForAdd() {
-        modalTitle.innerText = "Tambah Data Ikan";
-        fId.value = ''; 
-        document.getElementById('productForm').reset();
-        mediaPreview.style.display = 'none';
-        fImg.value = ''; // Force empty initially
-        modal.style.display = 'flex';
-    }
-
     window.openEditModal = function(id) {
         const product = products.find(p => p.id === id);
         if(!product) return;
-
-        modalTitle.innerText = "Edit Data Ikan";
+        document.getElementById('modalTitle').innerText = "Edit Data Ikan";
         document.getElementById('productForm').reset();
-
         fId.value = product.id;
         fImg.value = product.img;
-        fIsVideo.value = product.isVideo ? 'true' : 'false';
-
-        // Render preview if exists
+        fIsVideo.value = product.is_video ? 'true' : 'false';
         if(product.img) {
             mediaPreview.style.display = 'block';
-            if(product.isVideo) {
-                mediaPreview.innerHTML = `<video src="${product.img}" style="width:100%; height:100%; object-fit:cover;" autoplay loop muted></video>`;
-            } else {
-                mediaPreview.innerHTML = `<img src="${product.img}" style="width:100%; height:100%; object-fit:cover;">`;
-            }
-        } else {
-            mediaPreview.style.display = 'none';
-        }
-
-        fCode.value = product.code;
-        fCategory.value = product.category;
-        fVariant.value = product.variant || '';
-        fGender.value = product.gender;
-        fAge.value = product.age;
-        fSize.value = product.size;
-        fStock.value = product.stock !== undefined ? product.stock : 1;
-        fPrice.value = product.price;
-        fShopee.value = product.shopee;
-
+            mediaPreview.innerHTML = product.is_video ? `<video src="${product.img}" style="width:100%; height:100%; object-fit:cover;" autoplay loop muted></video>` : `<img src="${product.img}" style="width:100%; height:100%; object-fit:cover;">`;
+        } else mediaPreview.style.display = 'none';
+        
+        document.getElementById('inputKode').value = product.code;
+        document.getElementById('inputKategori').value = product.category;
+        document.getElementById('inputVarian').value = product.variant || '';
+        document.getElementById('inputGender').value = product.gender;
+        document.getElementById('inputUsia').value = product.age;
+        document.getElementById('inputSize').value = product.size;
+        document.getElementById('inputStok').value = product.stock;
+        document.getElementById('inputHarga').value = product.price;
+        document.getElementById('inputShopee').value = product.shopee;
         modal.style.display = 'flex';
     };
 
-    function closeFormModal() {
-        modal.style.display = 'none';
-    }
+    document.getElementById('btnAddProduct').onclick = () => {
+        document.getElementById('modalTitle').innerText = "Tambah Data Ikan";
+        fId.value = ''; document.getElementById('productForm').reset();
+        mediaPreview.style.display = 'none'; fImg.value = '';
+        modal.style.display = 'flex';
+    };
 
-    btnAddProduct.addEventListener('click', openModalForAdd);
-    closeModal.addEventListener('click', closeFormModal);
-    btnCancel.addEventListener('click', closeFormModal);
+    const closeFormModal = () => modal.style.display = 'none';
+    document.getElementById('closeModal').onclick = closeFormModal;
+    document.getElementById('btnCancel').onclick = closeFormModal;
 
-    btnSave.addEventListener('click', () => {
-        // Basic validation
-        if(!fImg.value || !fCode.value || !fCategory.value || !fGender.value || !fAge.value || !fSize.value || !fPrice.value || !fShopee.value) {
-            alert('Harap isi semua field yang wajib!');
-            return;
-        }
+    document.getElementById('btnSave').onclick = async () => {
+        const fields = ['inputKode', 'inputKategori', 'inputGender', 'inputUsia', 'inputSize', 'inputHarga', 'inputShopee'];
+        if(!fImg.value || fields.some(f => !document.getElementById(f).value)) return alert('Harap isi semua field yang wajib!');
 
         const id = fId.value;
-        const newProduct = {
-            id: id ? parseInt(id) : Date.now(), 
+        const pData = {
             img: fImg.value,
-            isVideo: fIsVideo.value === 'true',
-            code: fCode.value,
-            category: fCategory.value,
-            variant: fVariant.value,
-            gender: fGender.value,
-            age: fAge.value,
-            size: fSize.value,
-            stock: parseInt(fStock.value) || 0,
-            price: parseInt(fPrice.value),
-            shopee: fShopee.value,
-            isAvailable: true // Default true
+            is_video: fIsVideo.value === 'true',
+            code: document.getElementById('inputKode').value,
+            category: document.getElementById('inputKategori').value,
+            variant: document.getElementById('inputVarian').value,
+            gender: document.getElementById('inputGender').value,
+            age: document.getElementById('inputUsia').value,
+            size: document.getElementById('inputSize').value,
+            stock: parseInt(document.getElementById('inputStok').value) || 0,
+            price: parseInt(document.getElementById('inputHarga').value),
+            shopee: document.getElementById('inputShopee').value,
+            is_available: parseInt(document.getElementById('inputStok').value) > 0
         };
 
-        if (newProduct.stock <= 0) newProduct.isAvailable = false;
+        let res;
+        if (id) res = await supabaseClient.from('products').update(pData).eq('id', id);
+        else res = await supabaseClient.from('products').insert([pData]);
 
-        if (id) {
-            // Update retain old toggle state unless overridden by stock=0
-            if (newProduct.stock > 0) {
-                newProduct.isAvailable = products.find(p => p.id === parseInt(id)).isAvailable;
-            }
-            products = products.map(p => p.id === parseInt(id) ? newProduct : p);
-        } else {
-            // Create
-            products.unshift(newProduct);
-        }
+        if (res.error) alert('Gagal simpan: ' + res.error.message);
+        else { fetchData(); closeFormModal(); }
+    };
 
-        saveToStorage();
-        closeFormModal();
-    });
-
-    // --- 5. Dashboard Routing (SPA) ---
     window.switchTab = function(tabName) {
-        // Hide all views
         document.querySelectorAll('.tab-view').forEach(el => el.style.display = 'none');
-        // Remove active class from all links
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
-
-        // Show targets
         document.getElementById('view' + tabName).style.display = 'block';
         document.getElementById('nav' + tabName).classList.add('active');
-
-        // Execute tab-specific logic
-        if (tabName === 'Statistik') {
-            updateStatistics();
-        } else if (tabName === 'Pesanan') {
-            renderPesananTable();
-        } else if (tabName === 'FAQ') {
-            renderFAQTable();
-        }
+        if (tabName === 'Statistik') updateStatistics();
+        else if (tabName === 'Pesanan') renderPesananTable();
+        else if (tabName === 'FAQ') renderFAQTable();
     };
 
     function updateStatistics() {
-        let countTersedia = 0;
-        let countTerjual = 0;
-        let totalHarga = 0;
-        let pendapatanKotor = 0;
-
+        let countTersedia = 0, countTerjual = 0, totalHarga = 0, pendapatanKotor = 0;
         products.forEach(p => {
-            const isSoldOut = (!p.isAvailable || p.stock <= 0);
-            if(isSoldOut) {
-                countTerjual++;
-                pendapatanKotor += p.price;
-            } else {
-                countTersedia++;
-            }
+            if(!p.is_available || p.stock <= 0) { countTerjual++; pendapatanKotor += p.price; }
+            else countTersedia++;
             totalHarga += p.price;
         });
-
         const avgHarga = products.length > 0 ? (totalHarga / products.length) : 0;
-
         document.getElementById('statTersedia').innerText = countTersedia;
         document.getElementById('statTerjual').innerText = countTerjual;
         document.getElementById('statHarga').innerText = formatRupiah(avgHarga);
         document.getElementById('statPendapatan').innerText = formatRupiah(pendapatanKotor);
     }
 
-    // Initial Render
-    renderTable();
-
+    fetchData();
 });
