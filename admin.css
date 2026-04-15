@@ -25,6 +25,11 @@
 body {
     background-color: var(--bg-light);
     color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+body:not(.logged-in) {
+    overflow: hidden;
 }
 
 /* --- Login Screen --- */
@@ -104,7 +109,6 @@ body {
 .dashboard-container {
     display: none; /* hidden until login */
     min-height: 100vh;
-    display: flex;
 }
 
 /* Dropdown specific for dash container script logic */
