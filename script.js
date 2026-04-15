@@ -9,15 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Unified Database Layer (Supabase)
     async function fetchProducts() {
         try {
-            const { data, error } = await supabase
+            console.log('Fetching products from Supabase...');
+            const { data, error } = await supabaseClient
                 .from('products')
                 .select('*')
                 .order('created_at', { ascending: false });
             
             if (error) throw error;
+            console.log('Successfully fetched:', data.length, 'products');
             return data || [];
         } catch (err) {
             console.error('Error fetching products:', err);
+            // Tampilkan pesan error di UI jika gagal
+            if(productGrid) productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Gagal mengambil data dari database. Pastikan koneksi dan RLS Supabase sudah benar.</p>`;
             return [];
         }
     }
@@ -32,23 +36,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Render Engine
     function renderProducts(searchTerm = '') {
+        if (!productGrid) return;
+
         // Filter By Category
-        let filtered = products.filter(p => currentCategoryFilter === 'all' || p.category.toLowerCase() === currentCategoryFilter.toLowerCase());
+        let filtered = products.filter(p => {
+            if (!p.category) return false;
+            return currentCategoryFilter === 'all' || p.category.toLowerCase() === currentCategoryFilter.toLowerCase();
+        });
 
         // Filter By Search Term
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             filtered = filtered.filter(p =>
-                p.code.toLowerCase().includes(term) ||
-                p.category.toLowerCase().includes(term) ||
+                (p.code && p.code.toLowerCase().includes(term)) ||
+                (p.category && p.category.toLowerCase().includes(term)) ||
                 (p.variant && p.variant.toLowerCase().includes(term))
             );
         }
 
         // Sort: Tersedia (Ready) at the top, Terjual (Sold Out) at the bottom
         filtered.sort((a, b) => {
-            let aSold = (!a.isAvailable || a.stock <= 0) ? 1 : 0;
-            let bSold = (!b.isAvailable || b.stock <= 0) ? 1 : 0;
+            let aSold = (!a.is_available || a.stock <= 0) ? 1 : 0;
+            let bSold = (!b.is_available || b.stock <= 0) ? 1 : 0;
             return aSold - bSold;
         });
 
@@ -60,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         filtered.forEach(product => {
-            const isSoldOut = (!product.isAvailable || product.stock <= 0);
+            const isSoldOut = (!product.is_available || product.stock <= 0);
             const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
             const ribbon = isSoldOut ? '<div class="sold-ribbon">SOLD OUT</div>' : '';
             const btnText = isSoldOut ? 'Habis Terjual' : 'Beli di Sini <i class="fas fa-external-link-alt"></i>';
@@ -74,7 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="${cardClass}" data-category="${product.category.toLowerCase()}">
                     ${ribbon}
                     <div class="product-img-container">
-                        <img src="${product.img}" alt="${product.code}">
+                        ${product.is_video 
+                            ? `<video src="${product.img}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>` 
+                            : `<img src="${product.img}" alt="${product.code}">`
+                        }
                     </div>
                     <div class="product-info">
                         <span class="product-code">${titleDisplay} - ${product.code}</span>
@@ -126,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryDropdown.style.display = categoryDropdown.style.display === 'block' ? 'none' : 'block';
     });
     window.addEventListener('click', () => {
-        categoryDropdown.style.display = 'none';
+        if(categoryDropdown) categoryDropdown.style.display = 'none';
     });
 
     categoryOptions.forEach(option => {
@@ -139,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetBtn) {
                 targetBtn.click();
             } else {
-                // Failsafe
                 currentCategoryFilter = filter;
                 renderProducts(searchInput.value);
             }
@@ -147,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Real-time update fallback (refetch when window focused)
+    // Sinkronisasi otomatis saat halaman difokuskan kembali
     window.addEventListener('focus', async () => {
         products = await fetchProducts();
         renderProducts(searchInput.value);
@@ -159,9 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
+                target.scrollIntoView({ behavior: 'smooth' });
             }
         });
     });
