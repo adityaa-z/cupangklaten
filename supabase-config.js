@@ -1,9 +1,17 @@
-// Supabase & Admin Configuration
-const CONFIG = {
-    SUPABASE_URL: "https://mtbnbjimpsnozckxmqok.supabase.co",
-    SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Ym5iamltcHNub3pja3htcW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTY4NzUsImV4cCI6MjA5MTgzMjg3NX0.AUzIdzECbP_kz-ZtMVU4_2YD2Fh1vIIVFetI-9evCR8",
-    ADMIN_USERNAME: "admin",
-    ADMIN_PASSWORD: "admin"
-};
+// Load credentials from .env file
+const env = {};
+const xhr = new XMLHttpRequest();
+xhr.open('GET', '.env', false);
+xhr.send();
+if (xhr.status === 200) {
+    xhr.responseText.split('\n').forEach(line => {
+        const idx = line.indexOf('=');
+        if (idx > 0) {
+            const key = line.substring(0, idx).trim();
+            const val = line.substring(idx + 1).trim();
+            if (key) env[key] = val;
+        }
+    });
+}
 
-const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+const supabaseClient = supabase.createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
