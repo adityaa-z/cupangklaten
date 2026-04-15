@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZALVEO HQ Admin Panel - Cupang Klaten</title>
+    <link rel="stylesheet" href="admin.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <img src="assets/logo.png" alt="CupangKlaten HQ"
+                style="height: 50px; margin-bottom: 1.5rem; display: block; margin-left: auto; margin-right: auto; border-radius: 8px;">
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Secure Access Only</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username admin" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login ke Dashboard</button>
+                <div id="loginError" style="color: var(--danger); margin-top: 1rem; font-size: 0.9rem; display: none;">
+                    Username atau password salah! (Hint: admin/admin)</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header" style="justify-content: center; padding: 2rem 1.5rem;">
+                <img src="assets/logo.png" alt="CupangKlaten" style="height: 35px; border-radius: 6px;">
+            </div>
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active" id="navProduk" onclick="switchTab('Produk')"><i
+                        class="fas fa-box"></i> Manajemen Produk</a>
+                <a href="#" class="nav-item" id="navPesanan" onclick="switchTab('Pesanan')"><i
+                        class="fas fa-shopping-cart"></i> Data Pesanan</a>
+                <a href="#" class="nav-item" id="navFAQ" onclick="switchTab('FAQ')"><i
+                        class="fas fa-question-circle"></i> Manajemen FAQ</a>
+                <a href="#" class="nav-item" id="navStatistik" onclick="switchTab('Statistik')"><i
+                        class="fas fa-chart-line"></i> Statistik Web</a>
+                <a href="#" class="nav-item" id="navPengaturan" onclick="switchTab('Pengaturan')"><i
+                        class="fas fa-cog"></i> Pengaturan Web</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h2>CupangKlaten Dashboard</h2>
+                <div class="user-profile">
+                    <span>Admin CupangKlaten</span>
+                    <button class="btn btn-outline" id="logoutBtn"
+                        style="padding: 0.5rem 1rem; border-color: #ef4444; color: #ef4444;">Logout</button>
+                </div>
+            </header>
+
+            <!-- 1. VIEW MANAJEMEN PRODUK -->
+            <div id="viewProduk" class="tab-view" style="display: block;">
+                <div class="dashboard-controls">
+                    <button class="btn btn-primary" id="btnAddProduct"><i class="fas fa-plus"></i> Tambah Ikan
+                        Baru</button>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Cari kode ikan...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Kode & Jenis</th>
+                                <th>Spesifikasi</th>
+                                <th>Harga</th>
+                                <th>Status Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. VIEW DATA PESANAN -->
+            <div id="viewPesanan" class="tab-view" style="display: none;">
+                <div class="dashboard-controls" style="margin-top: 1rem; justify-content: space-between;">
+                    <h3 id="pesananTitle" style="color: var(--text-dark); margin: 0;"><i class="fas fa-clipboard-list" style="color: var(--primary-cyan); margin-right: 0.5rem;"></i> Antrean Kemas & Kirim</h3>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <button id="btnToggleArchive" class="btn btn-outline" style="padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-rocket"></i> <span id="toggleText">Lihat Sudah Kirim</span>
+                        </button>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchPesananInput" placeholder="Cari pesanan...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Kode Ikan</th>
+                                <th>Jenis & Varian</th>
+                                <th>Harga Jual</th>
+                                <th>Aksi Operasional</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablePesananBody">
+                            <!-- Data injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. VIEW MANAJEMEN FAQ -->
+            <div id="viewFAQ" class="tab-view" style="display: none;">
+                <div class="dashboard-controls">
+                    <button class="btn btn-primary" id="btnAddFAQ"><i class="fas fa-plus"></i> Tambah FAQ Baru</button>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchFAQInput" placeholder="Cari pertanyaan...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th width="30%">Pertanyaan</th>
+                                <th>Jawaban</th>
+                                <th width="120">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faqTableBody">
+                            <!-- Data injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. VIEW STATISTIK WEB -->
+            <div id="viewStatistik" class="tab-view" style="display: none;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 1rem; margin-bottom: 2rem;">
+                    <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-cyan); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Katalog Tersedia</p>
+                        <h3 id="statTersedia" style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-top: 0.5rem;">0</h3>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--secondary-coral); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Ikan Terjual</p>
+                        <h3 id="statTerjual" style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-top: 0.5rem;">0</h3>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #10b981; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Harga Rata-Rata Ikan</p>
+                        <h3 id="statHarga" style="font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-top: 1rem;">Rp 0</h3>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Pendapatan Kotor</p>
+                        <h3 id="statPendapatan" style="font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-top: 1rem;">Rp 0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. VIEW PENGATURAN WEB -->
+            <div id="viewPengaturan" class="tab-view" style="display: none;">
+                <div
+                    style="background: var(--bg-light); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 1rem;">
+                    <h3
+                        style="margin-bottom: 2rem; color: var(--text-dark); border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                        Pengaturan Sistem Web</h3>
+
+                    <div class="form-group" style="max-width: 500px;">
+                        <label>Nomor WhatsApp Admin (Konfirmasi Pembeli)</label>
+                        <input type="text" id="settingWA" value="6285700846152"
+                            style="padding: 0.8rem; width: 100%; border: 1px solid var(--border-color); border-radius: 6px;">
+                        <small style="color: var(--secondary-coral); display: block; margin-top: 0.5rem;"><i
+                                class="fas fa-info-circle"></i> Gunakan format 62 (contoh: 6285123...). Perubahan ini
+                            sementara tidak disimpan permanen karena index.html berbasis file statis.</small>
+                    </div>
+
+                    <div class="form-group" style="max-width: 500px; margin-top: 1.5rem;">
+                        <label>Ubah Kata Sandi ZALVEO Admin Baru</label>
+                        <input type="password" id="settingPass" placeholder="Masukkan password admin yang baru..."
+                            style="padding: 0.8rem; width: 100%; border: 1px solid var(--border-color); border-radius: 6px;">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="alert('Demo: Pengaturan berhasil disimulasikan!')"
+                        style="margin-top: 1.5rem;"><i class="fas fa-save"></i> Simpan Pengaturan</button>
+                    <button class="btn btn-outline"
+                        onclick="if(confirm('Awas! Web akan di-reset murni ke awal. Yakin?')){localStorage.clear(); location.reload();}"
+                        style="margin-top: 1.5rem; margin-left: 1rem; border-color: #ef4444; color: #ef4444;"><i
+                            class="fas fa-trash"></i> Reset Database Web Keras</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Form (Add/Edit) -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Tambah Data Ikan</h3>
+                <button class="btn-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="editId">
+
+                    <div class="form-group">
+                        <label>Upload Media (Foto / Video MP4) <span style="font-weight:normal; color:#e53e3e;">*Maks.
+                                2MB</span></label>
+                        <input type="file" id="inputFile" accept="image/*, video/mp4, video/webm">
+                        <small style="color:var(--text-muted); display:block; margin-top:0.3rem;">Biarkan kosong jika
+                            tidak ingin mengubah foto/video yang sudah ada.</small>
+                        <input type="hidden" id="inputGambar" required>
+                        <input type="hidden" id="inputIsVideo">
+                        <div id="mediaPreview"
+                            style="margin-top: 10px; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Kode Ikan</label>
+                            <input type="text" id="inputKode" placeholder="Contoh: PK-001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori / Jenis</label>
+                            <select id="inputKategori" required>
+                                <option value="">Pilih Kategori...</option>
+                                <option value="Plakat">Plakat</option>
+                                <option value="Halfmoon">Halfmoon</option>
+                                <option value="HMPK">HMPK</option>
+                                <option value="Crowntail">Crowntail (Serit)</option>
+                                <option value="Giant">Giant</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Varian (Opsional - Cth: Multicolor/Blue Rim)</label>
+                        <input type="text" id="inputVarian" placeholder="Contoh: Multicolor">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Jenis Kelamin</label>
+                            <select id="inputGender" required>
+                                <option value="Jantan">Jantan</option>
+                                <option value="Betina">Betina</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Usia (Bulan)</label>
+                            <input type="number" step="0.5" id="inputUsia" placeholder="Contoh: 4.5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Size</label>
+                            <select id="inputSize" required>
+                                <option value="S">S</option>
+                                <option value="S+">S+</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stok (Jumlah Ikan)</label>
+                            <input type="number" id="inputStok" min="0" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Harga (Rp)</label>
+                            <input type="number" id="inputHarga" placeholder="Contoh: 150000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Link Checkout Shopee</label>
+                            <input type="url" id="inputShopee" placeholder="https://shopee.co.id/..." required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="btnCancel">Batal</button>
+                <button class="btn btn-primary" style="width: auto;" id="btnSave">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal FAQ (Add/Edit) -->
+    <div class="modal-overlay" id="faqModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="faqModalTitle">Tambah FAQ</h3>
+                <button class="btn-close" id="closeFAQModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="faqForm">
+                    <input type="hidden" id="editFaqId">
+                    <div class="form-group">
+                        <label>Pertanyaan</label>
+                        <input type="text" id="inputQuestion" placeholder="Masukkan pertanyaan..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jawaban</label>
+                        <textarea id="inputAnswer" rows="4" placeholder="Masukkan jawaban..." required style="width:100%; padding:0.8rem; border:1px solid var(--border-color); border-radius:6px; font-family:inherit;"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="btnCancelFAQ">Batal</button>
+                <button class="btn btn-primary" style="width: auto;" id="btnSaveFAQ">Simpan FAQ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
