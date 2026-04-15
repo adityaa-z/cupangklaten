@@ -63,7 +63,7 @@
                 const faqContainer = document.getElementById('faqContainer');
                 
                 try {
-                    const { data: faqs, error } = await supabase
+                    const { data: faqs, error } = await supabaseClient
                         .from('faqs')
                         .select('*')
                         .order('created_at', { ascending: true });
