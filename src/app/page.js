@@ -14,6 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchFeatured() {
+      if (!supabase) return;
       try {
         const { data, error } = await supabase
           .from('products')

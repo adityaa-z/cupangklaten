@@ -42,6 +42,7 @@ export default function AdminPage() {
     }, []);
 
     const fetchData = async () => {
+        if (!supabase) return;
         setLoading(true);
         const { data: pData } = await supabase.from('products').select('*').order('created_at', { ascending: false });
         const { data: fData } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });

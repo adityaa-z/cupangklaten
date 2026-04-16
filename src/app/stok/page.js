@@ -18,6 +18,7 @@ const StokContent = () => {
 
     useEffect(() => {
         async function fetchAllProducts() {
+            if (!supabase) return;
             try {
                 const { data, error } = await supabase
                     .from('products')
