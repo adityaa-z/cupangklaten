@@ -83,6 +83,17 @@ export default function AdminPage() {
         fetchData();
     };
 
+    const updateStock = async (product, delta) => {
+        const newStock = Math.max(0, product.stock + delta);
+        const update = { 
+            stock: newStock,
+            is_available: newStock > 0,
+            sold_at: newStock === 0 ? (product.sold_at || new Date().toISOString()) : null
+        };
+        await supabase.from('products').update(update).eq('id', product.id);
+        fetchData();
+    };
+
     const saveProduct = async (e) => {
         e.preventDefault();
         if (editingItem) {
@@ -175,9 +186,26 @@ export default function AdminPage() {
                                                 <td>{p.category}</td>
                                                 <td>Rp {p.price.toLocaleString()}</td>
                                                 <td>
-                                                    <span className={`status-badge ${p.is_available && p.stock > 0 ? 'status-tersedia' : 'status-terjual'}`}>
-                                                        {p.is_available && p.stock > 0 ? 'Ready' : 'Sold'}
-                                                    </span>
+                                                    <div className="status-control" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                                            <label className="switch">
+                                                                <input 
+                                                                    type="checkbox" 
+                                                                    checked={p.is_available && p.stock > 0} 
+                                                                    onChange={() => toggleStock(p)} 
+                                                                />
+                                                                <span className="slider"></span>
+                                                            </label>
+                                                            <span className={`status-badge ${p.is_available && p.stock > 0 ? 'status-tersedia' : 'status-terjual'}`}>
+                                                                {p.is_available && p.stock > 0 ? 'Ready' : 'Sold'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="qty-control">
+                                                            <button className="qty-btn" onClick={() => updateStock(p, -1)}>-</button>
+                                                            <input type="number" className="qty-input" value={p.stock} readOnly />
+                                                            <button className="qty-btn" onClick={() => updateStock(p, 1)}>+</button>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="action-btns">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData(p); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
