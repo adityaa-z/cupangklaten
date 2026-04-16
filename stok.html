@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Produk - Cupang Klaten</title>
+    <meta name="description"
+        content="Cek stok ikan cupang ready di Cupang Klaten. Koleksi HMPK, Giant, Plakat, dan Crowntail berkualitas tinggi.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo.png" alt="cupangklaten.id">
+                <span class="logo-text">CUPANGKLATEN.ID</span>
+            </a>
+
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="productSearch" placeholder="Cari jenis ikan...">
+            </div>
+
+            <div class="nav-links" style="display: flex; gap: 2rem; align-items: center;">
+                <a href="index.html" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">Home</a>
+                <div class="dropdown" style="position: relative; cursor: pointer;">
+                    <span id="categoryBtn">Kategori <i class="fas fa-chevron-down"></i></span>
+                    <div class="dropdown-content" id="categoryDropdown">
+                        <a href="#" class="filter-option" data-category="all">Semua</a>
+                        <a href="#" class="filter-option" data-category="plakat">Plakat</a>
+                        <a href="#" class="filter-option" data-category="halfmoon">Halfmoon</a>
+                        <a href="#" class="filter-option" data-category="hmpk">HMPK</a>
+                        <a href="#" class="filter-option" data-category="crowntail">Crowntail (Serit)</a>
+                        <a href="#" class="filter-option" data-category="giant">Giant</a>
+                        <a href="#" class="filter-option" data-category="kebutuhan ikan">Kebutuhan Ikan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <div style="background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%); padding: 3rem 2rem; text-align: center;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Stok Ikan <span style="background: linear-gradient(to right, var(--primary-dark), var(--primary-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Ready</span></h1>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Pilih ikan favoritmu dari berbagai kategori dan amankan sebelum terjual!</p>
+    </div>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products" style="margin-top: 2rem;">
+        <div class="section-header">
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;" id="currentCategoryLabel">Semua Koleksi</h2>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <button class="filter-btn" data-filter="plakat">Plakat</button>
+                <button class="filter-btn" data-filter="halfmoon">Halfmoon</button>
+                <button class="filter-btn" data-filter="hmpk">HMPK</button>
+                <button class="filter-btn" data-filter="crowntail">Crowntail (Serit)</button>
+                <button class="filter-btn" data-filter="giant">Giant</button>
+                <button class="filter-btn" data-filter="kebutuhan ikan">Kebutuhan Ikan</button>
+            </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <!-- Data populated via script.js -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <img src="assets/logo.png" alt="cupangklaten.id"
+                        style="filter: grayscale(100%) brightness(200%); height: 40px;">
+                    <span class="logo-text"
+                        style="filter: grayscale(100%) brightness(200%);color: #94a3b8; margin-top: 1rem;">CUPANGKLATEN.ID</span>
+                </a>
+                <p style="color: #94a3b8; margin-top: 1rem;">Dedikasi kami adalah menghadirkan keindahan ikan cupang
+                    Klaten ke seluruh penjuru Asia dengan kualitas premium.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Bantuan</h4>
+                <ul>
+                    <li><a href="https://wa.me/6285700846152" target="_blank">Konfirmasi Pembayaran</a></li>
+                    <li><a href="cara-order.html">Cara Order</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Kontak</h4>
+                <a href="https://maps.app.goo.gl/L3un2gn9ieBxzgJf7" target="_blank"
+                    style="color: #94a3b8; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s;"
+                    onmouseover="this.style.color='var(--secondary-coral)'" onmouseout="this.style.color='#94a3b8'">
+                    <i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; width: 15px; text-align: center;"></i>
+                    Klaten, Jawa Tengah, Indonesia
+                </a>
+                <a href="https://wa.me/6285700846152" target="_blank"
+                    style="color: #94a3b8; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s;"
+                    onmouseover="this.style.color='var(--secondary-coral)'" onmouseout="this.style.color='#94a3b8'">
+                    <i class="fab fa-whatsapp" style="margin-right: 0.5rem; width: 15px; text-align: center;"></i>
+                    +62 857-0084-6152
+                </a>
+                <a href="https://www.instagram.com/cupangklaten.id" target="_blank"
+                    style="color: #94a3b8; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.3s;"
+                    onmouseover="this.style.color='var(--secondary-coral)'" onmouseout="this.style.color='#94a3b8'">
+                    <i class="fab fa-instagram" style="margin-right: 0.5rem; width: 15px; text-align: center;"></i>
+                    @cupangklaten.id
+                </a>
+                <a href="https://www.tiktok.com/@cupangklaten.id" target="_blank"
+                    style="color: #94a3b8; font-size: 0.9rem; text-decoration: none; display: block; transition: color 0.3s;"
+                    onmouseover="this.style.color='var(--secondary-coral)'" onmouseout="this.style.color='#94a3b8'">
+                    <i class="fab fa-tiktok" style="margin-right: 0.5rem; width: 15px; text-align: center;"></i>
+                    @cupangklaten.id
+                </a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2024 CupangKlaten.id - All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <a href="https://wa.me/6285700846152" class="fab-whatsapp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

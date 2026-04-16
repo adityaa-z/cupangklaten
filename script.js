@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderProducts(searchTerm = '') {
         if (!productGrid) return;
 
+        const viewMode = productGrid.getAttribute('data-view'); // 'featured' or null
+        const categoryLabel = document.getElementById('currentCategoryLabel');
+
         // Filter By Category
         let filtered = products.filter(p => {
             if (!p.category) return false;
@@ -54,12 +57,47 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // Sort: Tersedia (Ready) at the top, Terjual (Sold Out) at the bottom
-        filtered.sort((a, b) => {
-            let aSold = (!a.is_available || a.stock <= 0) ? 1 : 0;
-            let bSold = (!b.is_available || b.stock <= 0) ? 1 : 0;
-            return aSold - bSold;
-        });
+        // --- View logic ---
+        if (viewMode === 'featured') {
+            // "Terpopuler" logic:
+            // 1. Only show available (stock > 0)
+            const readyProducts = products.filter(p => p.is_available && p.stock > 0);
+            const categories = ['Plakat', 'Halfmoon', 'HMPK', 'Crowntail', 'Giant'];
+            let featuredItems = [];
+            
+            // 2. Multi-category requirement: try to get 1 from each category first
+            categories.forEach(cat => {
+                const itemFromCat = readyProducts.find(p => 
+                    p.category.toLowerCase() === cat.toLowerCase()
+                );
+                if (itemFromCat) featuredItems.push(itemFromCat);
+            });
+
+            // 3. Fill up to 6 items from other ready products
+            const remainingCount = 6 - featuredItems.length;
+            if (remainingCount > 0) {
+                const fillers = readyProducts.filter(p => 
+                    !featuredItems.find(fi => fi.id === p.id)
+                ).slice(0, remainingCount);
+                featuredItems = [...featuredItems, ...fillers];
+            }
+
+            // 4. Final safety slice to 6
+            filtered = featuredItems.slice(0, 6);
+        } else {
+            // Standard Stock Page logic:
+            // Sort: Tersedia (Ready) at the top, Terjual (Sold Out) at the bottom
+            filtered.sort((a, b) => {
+                let aSold = (!a.is_available || a.stock <= 0) ? 1 : 0;
+                let bSold = (!b.is_available || b.stock <= 0) ? 1 : 0;
+                return aSold - bSold;
+            });
+
+            // Update Label if on stock page
+            if (categoryLabel) {
+                categoryLabel.innerText = currentCategoryFilter === 'all' ? 'Semua Koleksi' : `Koleksi ${currentCategoryFilter.charAt(0).toUpperCase() + currentCategoryFilter.slice(1)}`;
+            }
+        }
 
         productGrid.innerHTML = '';
 
@@ -79,6 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const variantDisplay = product.variant ? ` - ${product.variant}` : '';
             const titleDisplay = `${product.category}${variantDisplay}`;
 
+            // Check if it's a non-living product (like equipment) by looking for '-' in age
+            const isNonLiving = product.age === '-';
+            const metaHTML = isNonLiving ? '' : `
+                <div class="product-meta">
+                    <span><i class="fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}"></i> ${product.gender}</span>
+                    <span class="separator">|</span>
+                    <span>Usia: ${product.age} Bulan</span>
+                    <span class="separator">|</span>
+                    <span>Size: ${product.size}</span>
+                </div>
+            `;
+
             const cardHTML = `
                 <div class="${cardClass}" data-category="${product.category.toLowerCase()}">
                     ${ribbon}
@@ -90,13 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="product-info">
                         <span class="product-code">${titleDisplay} - ${product.code}</span>
-                        <div class="product-meta">
-                            <span><i class="fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}"></i> ${product.gender}</span>
-                            <span class="separator">|</span>
-                            <span>Usia: ${product.age} Bulan</span>
-                            <span class="separator">|</span>
-                            <span>Size: ${product.size}</span>
-                        </div>
+                        ${metaHTML}
                         <div class="product-price">${formatRupiah(product.price)}</div>
                         <a href="${btnLink}" ${targetAttr} class="buy-btn">
                             ${btnText}
@@ -118,9 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
 
     // Search bar listener
-    searchInput.addEventListener('input', (e) => {
-        renderProducts(e.target.value);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderProducts(e.target.value);
+        });
+    }
 
     // Handle Tabs
     filterBtns.forEach(btn => {
@@ -128,15 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentCategoryFilter = btn.getAttribute('data-filter');
-            renderProducts(searchInput.value);
+            renderProducts(searchInput ? searchInput.value : '');
         });
     });
 
     // Dropdown Toggles and clicks
-    categoryBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        categoryDropdown.style.display = categoryDropdown.style.display === 'block' ? 'none' : 'block';
-    });
+    if (categoryBtn && categoryDropdown) {
+        categoryBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            categoryDropdown.style.display = categoryDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+    
     window.addEventListener('click', () => {
         if(categoryDropdown) categoryDropdown.style.display = 'none';
     });
@@ -161,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sinkronisasi otomatis saat halaman difokuskan kembali
     window.addEventListener('focus', async () => {
         products = await fetchProducts();
-        renderProducts(searchInput.value);
+        renderProducts(searchInput ? searchInput.value : '');
     });
 
     // Smooth Scroll

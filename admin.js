@@ -111,9 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </td>
                 <td>
                     <div style="font-size:0.85rem;">
+                        ${product.age === '-' ? '<span style="color:var(--text-muted);">Non-Living / Equipment</span>' : `
                         <i class="fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}"></i> ${product.gender} | 
                         Usia: ${product.age} Bln | 
                         Size: ${product.size}
+                        `}
                     </div>
                 </td>
                 <td style="font-weight:700; color:var(--text-dark);">${formatRupiah(product.price)}</td>
