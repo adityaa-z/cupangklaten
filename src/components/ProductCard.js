@@ -8,7 +8,6 @@ const ProductCard = ({ product }) => {
     
     const variantDisplay = product.variant ? ` - ${product.variant}` : '';
     const titleDisplay = `${product.category}${variantDisplay}`;
-    const isNonLiving = product.age === '-';
 
     const formatRupiah = (number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
@@ -26,7 +25,7 @@ const ProductCard = ({ product }) => {
             </div>
             <div className="product-info">
                 <span className="product-code">{titleDisplay} - {product.code}</span>
-                {!isNonLiving && (
+                {(product.age && product.age !== '-' && product.age.toLowerCase() !== 'tidak ada') && (
                     <div className="product-meta">
                         <span><i className={`fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}`}></i> {product.gender}</span>
                         <span className="separator">|</span>

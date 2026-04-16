@@ -216,13 +216,54 @@ export default function AdminPage() {
                         <div className="modal-body">
                             <form onSubmit={saveProduct}>
                                 <div className="form-group">
-                                    <label>URL Gambar/Video</label>
-                                    <input type="text" value={formData.img} onChange={e => setFormData({...formData, img: e.target.result || e.target.value})} placeholder="https://..." />
+                                    <label>Upload Media (Gambar/Video)</label>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*,video/*" 
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                if (file.size > 2 * 1024 * 1024) {
+                                                    alert('Ukuran file maksimal 2 MB!');
+                                                    return;
+                                                }
+                                                const isVid = file.type.startsWith('video/');
+                                                const reader = new FileReader();
+                                                reader.onload = (event) => {
+                                                    setFormData({ ...formData, img: event.target.result, is_video: isVid });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }} 
+                                    />
+                                    <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
+                                        Maksimal 2 MB. File akan dikonversi ke Base64.
+                                    </small>
+                                </div>
+
+                                {formData.img && (
+                                    <div style={{ width: '100%', height: '200px', background: '#f0f0f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {formData.is_video ? (
+                                            <video src={formData.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <img src={formData.img} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="form-group">
+                                    <label>Atau Gunakan URL Media (Opsional)</label>
+                                    <input 
+                                        type="text" 
+                                        value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''} 
+                                        onChange={e => setFormData({...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null})} 
+                                        placeholder="https://..." 
+                                    />
                                 </div>
                                 <div className="form-row">
                                     <div className="form-group">
-                                        <label>Kode</label>
-                                        <input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} required />
+                                        <label>Kode Ikan</label>
+                                        <input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} placeholder="Contoh: PK-001" required />
                                     </div>
                                     <div className="form-group">
                                         <label>Kategori</label>
@@ -233,24 +274,63 @@ export default function AdminPage() {
                                             <option value="HMPK">HMPK</option>
                                             <option value="Crowntail">Crowntail</option>
                                             <option value="Giant">Giant</option>
+                                            <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Varian (Warna/Jenis)</label>
+                                        <input type="text" value={formData.variant} onChange={e => setFormData({...formData, variant: e.target.value})} placeholder="Contoh: Nemo, Galaxy" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Gender</label>
+                                        <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} required>
+                                            <option value="Jantan">Jantan</option>
+                                            <option value="Betina">Betina</option>
+                                            <option value="-">- (Unisex/Peralatan)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Usia</label>
+                                        <select value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} required>
+                                            <option value="">Pilih...</option>
+                                            {[...Array(12)].map((_, i) => (
+                                                <option key={i+1} value={(i+1).toString()}>{i+1} Bulan</option>
+                                            ))}
+                                            <option value="Tidak Ada">Tidak Ada (Non-Living)</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Size</label>
+                                        <select value={formData.size} onChange={e => setFormData({...formData, size: e.target.value})} required>
+                                            <option value="S">S</option>
+                                            <option value="S+">S+</option>
+                                            <option value="M">M</option>
+                                            <option value="M+">M+</option>
+                                            <option value="L">L</option>
+                                            <option value="XL">XL</option>
+                                            <option value="-">- (Universal)</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div className="form-row">
                                     <div className="form-group">
                                         <label>Harga (Rp)</label>
-                                        <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseInt(e.target.value)})} required />
+                                        <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} required />
                                     </div>
                                     <div className="form-group">
                                         <label>Stok</label>
-                                        <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: parseInt(e.target.value)})} required />
+                                        <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})} required />
                                     </div>
                                 </div>
                                 <div className="form-group">
                                     <label>Link Shopee</label>
-                                    <input type="url" value={formData.shopee} onChange={e => setFormData({...formData, shopee: e.target.value})} required />
+                                    <input type="url" value={formData.shopee} onChange={e => setFormData({...formData, shopee: e.target.value})} placeholder="https://shopee.co.id/..." required />
                                 </div>
-                                <button type="submit" className="btn btn-primary">Simpan</button>
+                                <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
                             </form>
                         </div>
                     </div>
