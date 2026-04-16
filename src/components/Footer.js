@@ -26,7 +26,7 @@ const Footer = () => {
                 </div>
                 <div className="footer-links">
                     <h4>Kontak</h4>
-                    <a href="https://maps.app.goo.gl/L3un2gn9ieBxzgJf7" target="_blank" rel="noopener noreferrer"
+                    <a href="https://maps.app.goo.gl/mkFP6BYoa9MmM4UM8" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fas fa-map-marker-alt" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
                         Klaten, Jawa Tengah, Indonesia
