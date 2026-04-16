@@ -4,10 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import './admin.css';
 
+export const dynamic = 'force-dynamic';
+
 const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
 export default function AdminPage() {
+    const [isMounted, setIsMounted] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('Produk');
     const [products, setProducts] = useState([]);
@@ -32,6 +35,7 @@ export default function AdminPage() {
     });
 
     useEffect(() => {
+        setIsMounted(true);
         const loggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         setIsLoggedIn(loggedIn);
         if (loggedIn) fetchData();
@@ -88,6 +92,8 @@ export default function AdminPage() {
         setIsModalOpen(false);
         fetchData();
     };
+
+    if (!isMounted) return <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)' }}></div>;
 
     if (!isLoggedIn) {
         return (
