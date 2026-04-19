@@ -16,6 +16,7 @@ export default function AdminPage() {
     // Auth State
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loginError, setLoginError] = useState(false);
 
     // Modal State
@@ -202,11 +203,33 @@ export default function AdminPage() {
                             <label>Username</label>
                             <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
                         </div>
-                        <div className="form-group">
+                        <div className="form-group" style={{ position: 'relative' }}>
                             <label>Password</label>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                value={password} 
+                                onChange={e => setPassword(e.target.value)} 
+                                required 
+                            />
+                            <button 
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{ 
+                                    position: 'absolute', 
+                                    right: '10px', 
+                                    top: '35px', 
+                                    background: 'none', 
+                                    border: 'none', 
+                                    color: 'var(--text-muted)', 
+                                    cursor: 'pointer' 
+                                }}
+                            >
+                                <i className={`fas fa-eye${showPassword ? '-slash' : ''}`}></i>
+                            </button>
                         </div>
-                        <button type="submit" className="btn btn-primary">Login</button>
+                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                            {loading ? 'Logging in...' : 'Login'}
+                        </button>
                         {loginError && <p style={{ color: 'red', marginTop: '1rem' }}>Username atau password salah!</p>}
                     </form>
                 </div>

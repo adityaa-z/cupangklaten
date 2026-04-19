@@ -26,7 +26,19 @@ export async function POST(request) {
     if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...inputData } = body;
+
+    // Filter hanya kolom yang diizinkan (Whitelist)
+    const allowedFields = [
+        'code', 'category', 'variant', 'gender', 'age', 'size', 
+        'stock', 'price', 'shopee', 'img', 'is_video', 
+        'is_available', 'is_pinned', 'is_archived', 'archived_at', 'sold_at'
+    ];
+
+    const data = {};
+    allowedFields.forEach(field => {
+        if (inputData[field] !== undefined) data[field] = inputData[field];
+    });
 
     let result;
     if (id) {

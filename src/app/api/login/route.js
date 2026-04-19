@@ -22,6 +22,9 @@ export async function POST(request) {
         return response;
     }
 
+    // Penunda (Delay) untuk mencegah Brute Force jika gagal
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     return NextResponse.json(
         { success: false, message: 'Invalid credentials' },
         { status: 401 }

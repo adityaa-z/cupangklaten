@@ -27,11 +27,14 @@ export async function POST(request) {
     const body = await request.json();
     const { id, question, answer } = body;
 
+    // Filter input (Whitelist)
+    const data = { question, answer };
+
     let result;
     if (id) {
-        result = await supabase.from('faqs').update({ question, answer }).eq('id', id);
+        result = await supabase.from('faqs').update(data).eq('id', id);
     } else {
-        result = await supabase.from('faqs').insert([{ question, answer }]);
+        result = await supabase.from('faqs').insert([data]);
     }
 
     if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
