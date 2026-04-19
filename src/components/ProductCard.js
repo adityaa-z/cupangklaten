@@ -6,8 +6,14 @@ const ProductCard = ({ product }) => {
     const btnText = isSoldOut ? 'Habis Terjual' : 'Beli di Sini';
     const btnLink = isSoldOut ? '#' : product.shopee;
     
+    const isKebutuhanIkan = product.category?.toLowerCase() === 'kebutuhan ikan';
+    const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
+    const isFishBreed = fishBreeds.includes(product.category?.toLowerCase());
+    
     const variantDisplay = product.variant ? ` - ${product.variant}` : '';
-    const titleDisplay = `${product.category}${variantDisplay}`;
+    const titleDisplay = (isKebutuhanIkan || isFishBreed)
+        ? (product.variant || 'Koleksi Terbaik') 
+        : `${product.category}${variantDisplay}`;
 
     const formatRupiah = (number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
@@ -28,10 +34,16 @@ const ProductCard = ({ product }) => {
                 {(product.age && product.age !== '-' && product.age.toLowerCase() !== 'tidak ada') && (
                     <div className="product-meta">
                         <span><i className={`fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}`}></i> {product.gender}</span>
+                        {isFishBreed && (
+                            <>
+                                <span className="separator">|</span>
+                                <span>{product.category}</span>
+                            </>
+                        )}
                         <span className="separator">|</span>
-                        <span>Usia: {product.age} Bulan</span>
+                        <span>{product.age} Bln</span>
                         <span className="separator">|</span>
-                        <span>Size: {product.size}</span>
+                        <span>Size {product.size}</span>
                     </div>
                 )}
                 <div className="product-price">{formatRupiah(product.price)}</div>
