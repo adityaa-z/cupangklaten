@@ -42,7 +42,7 @@ export default function AdminPage() {
     const checkSession = async () => {
         setAuthLoading(true);
         try {
-            const res = await fetch('/api/auth/check');
+            const res = await fetch('/api/auth/check/');
             const data = await res.json();
             if (data.isLoggedIn) {
                 setIsLoggedIn(true);
@@ -59,8 +59,8 @@ export default function AdminPage() {
         setLoading(true);
         try {
             const [pRes, fRes] = await Promise.all([
-                fetch('/api/admin/products'),
-                fetch('/api/admin/faq')
+                fetch('/api/admin/products/'),
+                fetch('/api/admin/faq/')
             ]);
 
             if (pRes.ok) setProducts(await pRes.json());
@@ -75,7 +75,7 @@ export default function AdminPage() {
         e.preventDefault();
         setLoginError(false);
         try {
-            const res = await fetch('/api/login', {
+            const res = await fetch('/api/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -93,20 +93,20 @@ export default function AdminPage() {
     };
 
     const handleLogout = async () => {
-        await fetch('/api/logout', { method: 'POST' });
+        await fetch('/api/logout/', { method: 'POST' });
         setIsLoggedIn(false);
     };
 
     // Product Functions
     const deleteProduct = async (id) => {
         if (!confirm('Hapus produk ini?')) return;
-        const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/admin/products/?id=${id}`, { method: 'DELETE' });
         if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
     const togglePin = async (product) => {
-        const res = await fetch('/api/admin/products', {
+        const res = await fetch('/api/admin/products/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: product.id, is_pinned: !product.is_pinned })
@@ -122,7 +122,7 @@ export default function AdminPage() {
             sold_at: !product.is_available ? new Date().toISOString() : null,
             is_pinned: false // Unpin if sold out
         };
-        const res = await fetch('/api/admin/products', {
+        const res = await fetch('/api/admin/products/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(update)
@@ -139,7 +139,7 @@ export default function AdminPage() {
             is_available: newStock > 0,
             sold_at: newStock === 0 ? (product.sold_at || new Date().toISOString()) : null
         };
-        const res = await fetch('/api/admin/products', {
+        const res = await fetch('/api/admin/products/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(update)
@@ -173,7 +173,7 @@ export default function AdminPage() {
             const formDataUpload = new FormData();
             formDataUpload.append('file', file);
 
-            const res = await fetch('/api/admin/upload', {
+            const res = await fetch('/api/admin/upload/', {
                 method: 'POST',
                 body: formDataUpload
             });
@@ -202,7 +202,7 @@ export default function AdminPage() {
         let res;
         if (modalType === 'product') {
             const dataToSave = editingItem ? { ...formData, id: editingItem.id } : { ...formData, is_available: formData.stock > 0 };
-            res = await fetch('/api/admin/products', {
+            res = await fetch('/api/admin/products/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataToSave)
@@ -211,7 +211,7 @@ export default function AdminPage() {
             const faqData = editingItem 
                 ? { id: editingItem.id, question: formData.question, answer: formData.answer }
                 : { question: formData.question, answer: formData.answer };
-            res = await fetch('/api/admin/faq', {
+            res = await fetch('/api/admin/faq/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(faqData)
@@ -236,7 +236,7 @@ export default function AdminPage() {
 
     const deleteFaq = async (id) => {
         if (!confirm('Hapus FAQ ini?')) return;
-        const res = await fetch(`/api/admin/faq?id=${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/admin/faq/?id=${id}`, { method: 'DELETE' });
         if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
