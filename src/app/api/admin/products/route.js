@@ -3,9 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
+// Gunakan Service Role Key (kunci sakti) — hanya bisa diakses di server
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 function isAuthenticated(request) {
