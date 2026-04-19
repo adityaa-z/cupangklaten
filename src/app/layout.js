@@ -11,6 +11,9 @@ export const metadata = {
   title: "Cupang Klaten | Jual Ikan Cupang Klaten Berkualitas & Bergaransi",
   description: "Pusat Ikan Cupang Klaten terbaik. Jual Cupang HMPK, Giant, Plakat, dan Crowntail dengan genetik stabil dan warna tajam. Kirim ke seluruh Indonesia dengan garansi ikan hidup.",
   keywords: "cupang klaten, jual cupang klaten, ikan cupang klaten, cupang hmpk klaten, giant betta klaten, cupang hias klaten, cupang kontes klaten",
+  verification: {
+    google: "Cm3Ij7HVbOgV1-1DpBXwz4qqYm9Yjgftqt8HN5m0qsM",
+  },
   openGraph: {
     title: "Cupang Klaten | Koleksi Ikan Cupang Terbaik",
     description: "Jual Ikan Cupang Klaten berkualitas. Koleksi Cupang HMPK, Giant, Plakat, dan Crowntail terbaik dari Klaten.",
