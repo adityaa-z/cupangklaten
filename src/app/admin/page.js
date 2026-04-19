@@ -25,6 +25,7 @@ export default function AdminPage() {
     const [modalType, setModalType] = useState('product'); // 'product' or 'faq'
     const [editingItem, setEditingItem] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+    const [uploadingField, setUploadingField] = useState(null);
 
     // Form States (Product)
     const [formData, setFormData] = useState({
@@ -155,6 +156,45 @@ export default function AdminPage() {
         });
         if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
+    };
+
+    const handleFileUpload = async (e, field, isPrimary) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file maksimal 2 MB!');
+            e.target.value = '';
+            return;
+        }
+
+        setUploadingField(field);
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('file', file);
+
+            const res = await fetch('/api/admin/upload', {
+                method: 'POST',
+                body: formDataUpload
+            });
+
+            if (!res.ok) throw new Error('Gagal upload ke storage');
+
+            const { url } = await res.json();
+            const isVid = isPrimary && file.type.startsWith('video/');
+            
+            setFormData(prev => ({ 
+                ...prev, 
+                [field]: url, 
+                is_video: isPrimary ? isVid : prev.is_video 
+            }));
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Gagal mengupload gambar. Pastikan Bucket "produk" sudah ada di Supabase dan diatur ke Public.');
+        } finally {
+            setUploadingField(null);
+            e.target.value = ''; // Reset input
+        }
     };
 
     const saveProduct = async (e) => {
@@ -479,7 +519,9 @@ export default function AdminPage() {
                                                 
                                                 {/* Preview Box */}
                                                 <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '8px', overflow: 'hidden', margin: '0.5rem 0', border: '2px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                                    {formData[slot.field] ? (
+                                                    {uploadingField === slot.field ? (
+                                                        <div className="spinner"></div>
+                                                    ) : formData[slot.field] ? (
                                                         <>
                                                             {(slot.isPrimary && formData.is_video) ? (
                                                                 <video src={formData[slot.field]} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -489,7 +531,7 @@ export default function AdminPage() {
                                                             <button 
                                                                 type="button" 
                                                                 onClick={() => setFormData({ ...formData, [slot.field]: '', is_video: slot.isPrimary ? false : formData.is_video })}
-                                                                style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}
+                                                                style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', zIndex: 10 }}
                                                             >
                                                                 <i className="fas fa-times"></i>
                                                             </button>
@@ -504,23 +546,9 @@ export default function AdminPage() {
 
                                                 <input
                                                     type="file"
+                                                    disabled={uploadingField !== null}
                                                     accept={slot.isPrimary ? "image/*,video/*" : "image/*"}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files[0];
-                                                        if (file) {
-                                                            if (file.size > 2 * 1024 * 1024) {
-                                                                alert('Ukuran file maksimal 2 MB!');
-                                                                e.target.value = '';
-                                                                return;
-                                                            }
-                                                            const isVid = slot.isPrimary && file.type.startsWith('video/');
-                                                            const reader = new FileReader();
-                                                            reader.onload = (event) => {
-                                                                setFormData({ ...formData, [slot.field]: event.target.result, is_video: isVid });
-                                                            };
-                                                            reader.readAsDataURL(file);
-                                                        }
-                                                    }}
+                                                    onChange={(e) => handleFileUpload(e, slot.field, slot.isPrimary)}
                                                     style={{ fontSize: '0.7rem', width: '100%' }}
                                                 />
                                             </div>
