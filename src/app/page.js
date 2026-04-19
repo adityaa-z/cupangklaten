@@ -32,13 +32,13 @@ export default function Home() {
         let selected = [];
         
         // 1. First, take all pinned products (limit to 6)
-        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 6);
+        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 10);
         selected = [...pinned];
 
         // 2. If less than 6, try to fill with 1 from each category that isn't already selected
-        if (selected.length < 6) {
+        if (selected.length < 10) {
             categories.forEach(cat => {
-                if (selected.length >= 6) return;
+                if (selected.length >= 10) return;
                 const item = readyProducts.find(p => 
                     p.category.toLowerCase() === cat.toLowerCase() && 
                     !selected.find(s => s.id === p.id)
@@ -48,14 +48,14 @@ export default function Home() {
         }
 
         // 3. If still less than 6, fill with newest available
-        if (selected.length < 6) {
+        if (selected.length < 10) {
             const remaining = readyProducts
                 .filter(p => !selected.find(s => s.id === p.id))
-                .slice(0, 6 - selected.length);
+                .slice(0, 10 - selected.length);
             selected = [...selected, ...remaining];
         }
 
-        setFeaturedProducts(selected.slice(0, 6));
+        setFeaturedProducts(selected.slice(0, 10));
       } catch (err) {
         console.error('Error fetching featured products:', err);
       } finally {
@@ -98,7 +98,8 @@ export default function Home() {
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
             Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaik</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan unggulan dari cupangklaten.id</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Produk Unggulan dari cupangklaten.id</p>
+          <div style={{ padding: '2px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.6rem', color: '#94a3b8', marginTop: '5px' }}>v.1.0.6-fresh</div>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
