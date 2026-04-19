@@ -7,15 +7,16 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_KEY
 );
 
-function isAuthenticated() {
-    const cookieStore = cookies();
+// Helper function to check session
+async function isAuthenticated() {
+    const cookieStore = await cookies();
     const session = cookieStore.get('admin_session');
     return session && session.value === 'true';
 }
 
 export async function GET() {
     try {
-        if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_KEY) {
             console.error('Supabase env variables are missing!');
@@ -37,7 +38,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
     const { id, question, answer } = body;
@@ -57,7 +58,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-    if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
