@@ -14,11 +14,26 @@ function isAuthenticated() {
 }
 
 export async function GET() {
-    if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    
-    const { data, error } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(data);
+    try {
+        if (!isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_KEY) {
+            console.error('Supabase env variables are missing!');
+            return NextResponse.json({ error: 'System configuration error' }, { status: 500 });
+        }
+
+        const { data, error } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
+        
+        if (error) {
+            console.error('Supabase fetching error:', error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        
+        return NextResponse.json(data || []);
+    } catch (err) {
+        console.error('API FAQ GET Crash:', err);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
 }
 
 export async function POST(request) {
