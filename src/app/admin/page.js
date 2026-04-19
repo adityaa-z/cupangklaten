@@ -77,7 +77,7 @@ export default function AdminPage() {
     const toggleStock = async (product) => {
         const update = { 
             is_available: !product.is_available,
-            sold_at: !product.is_available ? null : new Date().toISOString()
+            sold_at: !product.is_available ? new Date().toISOString() : null
         };
         await supabase.from('products').update(update).eq('id', product.id);
         fetchData();
@@ -94,14 +94,34 @@ export default function AdminPage() {
         fetchData();
     };
 
+    const archiveOrder = async (id) => {
+        await supabase.from('products').update({ is_archived: true, archived_at: new Date().toISOString() }).eq('id', id);
+        fetchData();
+    };
+
     const saveProduct = async (e) => {
         e.preventDefault();
-        if (editingItem) {
-            await supabase.from('products').update(formData).eq('id', editingItem.id);
-        } else {
-            await supabase.from('products').insert([{ ...formData, is_available: formData.stock > 0 }]);
+        if (modalType === 'product') {
+            if (editingItem) {
+                await supabase.from('products').update(formData).eq('id', editingItem.id);
+            } else {
+                await supabase.from('products').insert([{ ...formData, is_available: formData.stock > 0 }]);
+            }
+        } else if (modalType === 'faq') {
+            const faqData = { question: formData.question, answer: formData.answer };
+            if (editingItem) {
+                await supabase.from('faqs').update(faqData).eq('id', editingItem.id);
+            } else {
+                await supabase.from('faqs').insert([faqData]);
+            }
         }
         setIsModalOpen(false);
+        fetchData();
+    };
+
+    const deleteFaq = async (id) => {
+        if (!confirm('Hapus FAQ ini?')) return;
+        await supabase.from('faqs').delete().eq('id', id);
         fetchData();
     };
 
@@ -180,7 +200,11 @@ export default function AdminPage() {
                                         {products.map(p => (
                                             <tr key={p.id}>
                                                 <td className="td-img">
-                                                    {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
+                                                    {p.is_video ? (
+                                                        <video src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} muted />
+                                                    ) : (
+                                                        <img src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} alt="" />
+                                                    )}
                                                 </td>
                                                 <td>{p.code}</td>
                                                 <td>{p.category}</td>
@@ -219,15 +243,95 @@ export default function AdminPage() {
                         </div>
                     )}
 
+                    {activeTab === 'Pesanan' && (
+                        <div className="tab-view">
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Media</th>
+                                            <th>Info Pesanan</th>
+                                            <th>Detail Ikan</th>
+                                            <th>Harga</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).map(p => (
+                                            <tr key={p.id}>
+                                                <td className="td-img">
+                                                    {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
+                                                </td>
+                                                <td>
+                                                    <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{p.code}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#718096' }}>
+                                                        <i className="fas fa-clock"></i> Checkout: {p.sold_at ? new Date(p.sold_at).toLocaleDateString('id-ID') : '-'}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ fontWeight: '600' }}>{p.category}</div>
+                                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{p.variant || '-'}</div>
+                                                </td>
+                                                <td style={{ fontWeight: '600', color: '#10b981' }}>Rp {p.price.toLocaleString()}</td>
+                                                <td>
+                                                    <button className="btn btn-primary" onClick={() => archiveOrder(p.id)} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: '#6366f1' }}>
+                                                        Selesai Pengiriman
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'FAQ' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls">
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setModalType('faq'); setFormData({ question: '', answer: '' }); setIsModalOpen(true); }}>
+                                    <i className="fas fa-plus"></i> Tambah FAQ
+                                </button>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Pertanyaan</th>
+                                            <th>Jawaban</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {faqs.map(f => (
+                                            <tr key={f.id}>
+                                                <td style={{ fontWeight: '600' }}>{f.question}</td>
+                                                <td style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{f.answer}</td>
+                                                <td className="action-btns">
+                                                    <button className="btn-icon" onClick={() => { setEditingItem(f); setFormData(f); setModalType('faq'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
+                                                    <button className="btn-icon delete" onClick={() => deleteFaq(f.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === 'Statistik' && (
                         <div className="tab-view" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-                            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid cyan' }}>
-                                <small>Tersedia</small>
-                                <h3>{products.filter(p => p.is_available && p.stock > 0).length}</h3>
+                            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #00bcd4', boxShadow: 'var(--shadow-sm)' }}>
+                                <small style={{ color: 'var(--text-muted)', fontWeight: '600' }}>READY STOK</small>
+                                <h3 style={{ fontSize: '1.8rem', marginTop: '0.5rem' }}>{products.filter(p => p.is_available && p.stock > 0).length}</h3>
                             </div>
-                            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid coral' }}>
-                                <small>Terjual</small>
-                                <h3>{products.filter(p => !p.is_available || p.stock <= 0).length}</h3>
+                            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #ff7043', boxShadow: 'var(--shadow-sm)' }}>
+                                <small style={{ color: 'var(--text-muted)', fontWeight: '600' }}>TOTAL TERJUAL</small>
+                                <h3 style={{ fontSize: '1.8rem', marginTop: '0.5rem' }}>{products.filter(p => !p.is_available || p.stock <= 0).length}</h3>
+                            </div>
+                            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #6366f1', boxShadow: 'var(--shadow-sm)' }}>
+                                <small style={{ color: 'var(--text-muted)', fontWeight: '600' }}>DIPROSES</small>
+                                <h3 style={{ fontSize: '1.8rem', marginTop: '0.5rem' }}>{products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).length}</h3>
                             </div>
                         </div>
                     )}
@@ -242,124 +346,143 @@ export default function AdminPage() {
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            <form onSubmit={saveProduct}>
-                                <div className="form-group">
-                                    <label>Upload Media (Gambar/Video)</label>
-                                    <input 
-                                        type="file" 
-                                        accept="image/*,video/*" 
-                                        onChange={(e) => {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                if (file.size > 2 * 1024 * 1024) {
-                                                    alert('Ukuran file maksimal 2 MB!');
-                                                    return;
+                            {modalType === 'product' ? (
+                                <form onSubmit={saveProduct}>
+                                    <div className="form-group">
+                                        <label>Upload Media (Gambar/Video)</label>
+                                        <input 
+                                            type="file" 
+                                            accept="image/*,video/*" 
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    if (file.size > 2 * 1024 * 1024) {
+                                                        alert('Ukuran file maksimal 2 MB!');
+                                                        return;
+                                                    }
+                                                    const isVid = file.type.startsWith('video/');
+                                                    const reader = new FileReader();
+                                                    reader.onload = (event) => {
+                                                        setFormData({ ...formData, img: event.target.result, is_video: isVid });
+                                                    };
+                                                    reader.readAsDataURL(file);
                                                 }
-                                                const isVid = file.type.startsWith('video/');
-                                                const reader = new FileReader();
-                                                reader.onload = (event) => {
-                                                    setFormData({ ...formData, img: event.target.result, is_video: isVid });
-                                                };
-                                                reader.readAsDataURL(file);
-                                            }
-                                        }} 
-                                    />
-                                    <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
-                                        Maksimal 2 MB. File akan dikonversi ke Base64.
-                                    </small>
-                                </div>
+                                            }} 
+                                        />
+                                        <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
+                                            Maksimal 2 MB. File akan dikonversi ke Base64.
+                                        </small>
+                                    </div>
 
-                                {formData.img && (
-                                    <div style={{ width: '100%', height: '200px', background: '#f0f0f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {formData.is_video ? (
-                                            <video src={formData.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <img src={formData.img} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        )}
-                                    </div>
-                                )}
+                                    {formData.img && (
+                                        <div style={{ width: '100%', height: '200px', background: '#f0f0f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {formData.is_video ? (
+                                                <video src={formData.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <img src={formData.img} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            )}
+                                        </div>
+                                    )}
 
-                                <div className="form-group">
-                                    <label>Atau Gunakan URL Media (Opsional)</label>
-                                    <input 
-                                        type="text" 
-                                        value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''} 
-                                        onChange={e => setFormData({...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null})} 
-                                        placeholder="https://..." 
-                                    />
-                                </div>
-                                <div className="form-row">
                                     <div className="form-group">
-                                        <label>Kode Ikan</label>
-                                        <input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} placeholder="Contoh: PK-001" required />
+                                        <label>Atau Gunakan URL Media (Opsional)</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''} 
+                                            onChange={e => setFormData({...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null})} 
+                                            placeholder="https://..." 
+                                        />
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Kode Ikan</label>
+                                            <input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} placeholder="Contoh: PK-001" required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Kategori</label>
+                                            <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required>
+                                                <option value="">Pilih...</option>
+                                                <option value="Plakat">Plakat</option>
+                                                <option value="Halfmoon">Halfmoon</option>
+                                                <option value="HMPK">HMPK</option>
+                                                <option value="Crowntail">Crowntail</option>
+                                                <option value="Giant">Giant</option>
+                                                <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Varian (Warna/Jenis)</label>
+                                            <input type="text" value={formData.variant} onChange={e => setFormData({...formData, variant: e.target.value})} placeholder="Contoh: Nemo, Galaxy" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Gender</label>
+                                            <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} required>
+                                                <option value="Jantan">Jantan</option>
+                                                <option value="Betina">Betina</option>
+                                                <option value="-">- (Unisex/Peralatan)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Usia</label>
+                                            <select value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} required>
+                                                <option value="">Pilih...</option>
+                                                {[...Array(12)].map((_, i) => (
+                                                    <option key={i+1} value={(i+1).toString()}>{i+1} Bulan</option>
+                                                ))}
+                                                <option value="Tidak Ada">Tidak Ada (Non-Living)</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Size</label>
+                                            <select value={formData.size} onChange={e => setFormData({...formData, size: e.target.value})} required>
+                                                <option value="S">S</option>
+                                                <option value="S+">S+</option>
+                                                <option value="M">M</option>
+                                                <option value="M+">M+</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="-">- (Universal)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Harga (Rp)</label>
+                                            <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Stok</label>
+                                            <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})} required />
+                                        </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Kategori</label>
-                                        <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required>
-                                            <option value="">Pilih...</option>
-                                            <option value="Plakat">Plakat</option>
-                                            <option value="Halfmoon">Halfmoon</option>
-                                            <option value="HMPK">HMPK</option>
-                                            <option value="Crowntail">Crowntail</option>
-                                            <option value="Giant">Giant</option>
-                                            <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
-                                        </select>
+                                        <label>Link Shopee</label>
+                                        <input type="url" value={formData.shopee} onChange={e => setFormData({...formData, shopee: e.target.value})} placeholder="https://shopee.co.id/..." required />
                                     </div>
-                                </div>
-                                <div className="form-row">
+                                    <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
+                                </form>
+                            ) : (
+                                <form onSubmit={saveProduct}>
                                     <div className="form-group">
-                                        <label>Varian (Warna/Jenis)</label>
-                                        <input type="text" value={formData.variant} onChange={e => setFormData({...formData, variant: e.target.value})} placeholder="Contoh: Nemo, Galaxy" />
+                                        <label>Pertanyaan</label>
+                                        <input type="text" value={formData.question} onChange={e => setFormData({ ...formData, question: e.target.value })} required />
                                     </div>
                                     <div className="form-group">
-                                        <label>Gender</label>
-                                        <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} required>
-                                            <option value="Jantan">Jantan</option>
-                                            <option value="Betina">Betina</option>
-                                            <option value="-">- (Unisex/Peralatan)</option>
-                                        </select>
+                                        <label>Jawaban</label>
+                                        <textarea 
+                                            value={formData.answer} 
+                                            onChange={e => setFormData({ ...formData, answer: e.target.value })} 
+                                            required 
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '100px' }}
+                                        ></textarea>
                                     </div>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Usia</label>
-                                        <select value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} required>
-                                            <option value="">Pilih...</option>
-                                            {[...Array(12)].map((_, i) => (
-                                                <option key={i+1} value={(i+1).toString()}>{i+1} Bulan</option>
-                                            ))}
-                                            <option value="Tidak Ada">Tidak Ada (Non-Living)</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Size</label>
-                                        <select value={formData.size} onChange={e => setFormData({...formData, size: e.target.value})} required>
-                                            <option value="S">S</option>
-                                            <option value="S+">S+</option>
-                                            <option value="M">M</option>
-                                            <option value="M+">M+</option>
-                                            <option value="L">L</option>
-                                            <option value="XL">XL</option>
-                                            <option value="-">- (Universal)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Harga (Rp)</label>
-                                        <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Stok</label>
-                                        <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})} required />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <label>Link Shopee</label>
-                                    <input type="url" value={formData.shopee} onChange={e => setFormData({...formData, shopee: e.target.value})} placeholder="https://shopee.co.id/..." required />
-                                </div>
-                                <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
-                            </form>
+                                    <button type="submit" className="btn btn-primary">Simpan FAQ</button>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>
