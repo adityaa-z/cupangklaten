@@ -508,10 +508,10 @@ footer {
 
 @media (max-width: 768px) {
     .nav-links {
-        gap: 0.8rem !important;
+        gap: 1.5rem !important;
     }
     .nav-btn {
-        padding: 0.5rem 0.8rem !important;
+        padding: 0.6rem 1.2rem !important;
         font-size: 0.85rem;
     }
     .search-bar {
@@ -537,6 +537,13 @@ footer {
     }
     .logo {
         gap: 0.5rem;
+    }
+    .nav-links {
+        gap: 1rem !important;
+    }
+    .nav-btn {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.8rem;
     }
     .hero {
         padding: 2.5rem 1rem;

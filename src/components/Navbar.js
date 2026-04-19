@@ -28,7 +28,7 @@ const Navbar = () => {
 
                 <div className="nav-links">
                     <div className="dropdown" style={{ position: 'relative', cursor: 'pointer' }}>
-                        <span id="categoryBtn" onClick={toggleDropdown}>
+                        <span id="categoryBtn" onClick={toggleDropdown} style={{ padding: '0.5rem 0.2rem', display: 'inline-block' }}>
                             Kategori <i className={`fas fa-chevron-${dropdownOpen ? 'up' : 'down'}`}></i>
                         </span>
                         <div className="dropdown-content" id="categoryDropdown" style={{ display: dropdownOpen ? 'block' : 'none' }}>
