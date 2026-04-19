@@ -89,7 +89,8 @@ export default function RootLayout({ children }) {
                 "closes": "23:59"
               },
               "sameAs": [
-                "https://shopee.co.id/cupangklaten" // Ganti dengan link sosmed asli
+                "https://www.instagram.com/cupangklaten.id",
+                "https://www.tiktok.com/@cupangklaten.id"
               ]
             })
           }}
