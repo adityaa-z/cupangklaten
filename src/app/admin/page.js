@@ -24,6 +24,7 @@ export default function AdminPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState('product'); // 'product' or 'faq'
     const [editingItem, setEditingItem] = useState(null);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     // Form States (Product)
     const [formData, setFormData] = useState({
@@ -182,6 +183,12 @@ export default function AdminPage() {
         if (res && res.ok) {
             setIsModalOpen(false);
             fetchData();
+            setToast({ 
+                show: true, 
+                message: modalType === 'product' ? 'Produk berhasil disimpan!' : 'FAQ berhasil disimpan!', 
+                type: 'success' 
+            });
+            setTimeout(() => setToast({ ...toast, show: false }), 3000);
         } else {
             alert('Gagal menyimpan data!');
         }
@@ -459,58 +466,74 @@ export default function AdminPage() {
                         <div className="modal-body">
                             {modalType === 'product' ? (
                                 <form onSubmit={saveProduct}>
-                                    <div className="form-group">
-                                        <label>Upload Media (Gambar/Video)</label>
-                                        <input
-                                            type="file"
-                                            accept="image/*,video/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files[0];
-                                                if (file) {
-                                                    if (file.size > 2 * 1024 * 1024) {
-                                                        alert('Ukuran file maksimal 2 MB!');
-                                                        return;
-                                                    }
-                                                    const isVid = file.type.startsWith('video/');
-                                                    const reader = new FileReader();
-                                                    reader.onload = (event) => {
-                                                        setFormData({ ...formData, img: event.target.result, is_video: isVid });
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            }}
-                                        />
-                                        <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
-                                            Maksimal 2 MB. File akan dikonversi ke Base64.
-                                        </small>
+                                    {/* Media Pickers Grid */}
+                                    <div className="media-grid-admin" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                                        {[
+                                            { label: 'Media Utama (Gambar/Video)', field: 'img', isPrimary: true },
+                                            { label: 'Gambar 2', field: 'img2' },
+                                            { label: 'Gambar 3', field: 'img3' },
+                                            { label: 'Gambar 4', field: 'img4' }
+                                        ].map((slot, index) => (
+                                            <div key={slot.field} className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                                <label style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', fontWeight: '700' }}>{slot.label}</label>
+                                                
+                                                {/* Preview Box */}
+                                                <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '8px', overflow: 'hidden', margin: '0.5rem 0', border: '2px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                                    {formData[slot.field] ? (
+                                                        <>
+                                                            {(slot.isPrimary && formData.is_video) ? (
+                                                                <video src={formData[slot.field]} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            ) : (
+                                                                <img src={formData[slot.field]} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            )}
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setFormData({ ...formData, [slot.field]: '', is_video: slot.isPrimary ? false : formData.is_video })}
+                                                                style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}
+                                                            >
+                                                                <i className="fas fa-times"></i>
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                                                            <i className="fas fa-cloud-upload-alt" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}></i>
+                                                            <div style={{ fontSize: '0.7rem' }}>Klik Upload</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <input
+                                                    type="file"
+                                                    accept={slot.isPrimary ? "image/*,video/*" : "image/*"}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files[0];
+                                                        if (file) {
+                                                            if (file.size > 2 * 1024 * 1024) {
+                                                                alert('Ukuran file maksimal 2 MB!');
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
+                                                            const isVid = slot.isPrimary && file.type.startsWith('video/');
+                                                            const reader = new FileReader();
+                                                            reader.onload = (event) => {
+                                                                setFormData({ ...formData, [slot.field]: event.target.result, is_video: isVid });
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                    style={{ fontSize: '0.7rem', width: '100%' }}
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
 
-                                    {formData.img && (
-                                        <div style={{ width: '100%', height: '200px', background: '#f0f0f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            {formData.is_video ? (
-                                                <video src={formData.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            ) : (
-                                                <img src={formData.img} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            )}
-                                        </div>
-                                    )}
-
-                                    <div className="form-group">
-                                        <label>Atau Gunakan URL Media (Opsional)</label>
-                                        <input
-                                            type="text"
-                                            value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''}
-                                            onChange={e => setFormData({ ...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null })}
-                                            placeholder="URL Media Utama..."
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>Gambar Tambahan (Opsional - Max 3 Gambar Lain)</label>
-                                        <div className="form-row">
-                                            <input type="text" value={formData.img2 && !formData.img2.startsWith('data:') ? formData.img2 : ''} onChange={e => setFormData({ ...formData, img2: e.target.value })} placeholder="URL Gambar 2..." />
-                                            <input type="text" value={formData.img3 && !formData.img3.startsWith('data:') ? formData.img3 : ''} onChange={e => setFormData({ ...formData, img3: e.target.value })} placeholder="URL Gambar 3..." />
-                                            <input type="text" value={formData.img4 && !formData.img4.startsWith('data:') ? formData.img4 : ''} onChange={e => setFormData({ ...formData, img4: e.target.value })} placeholder="URL Gambar 4..." />
+                                    <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                                        <label>Atau Input Manual Semua URL (Jika dibutuhkan)</label>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+                                            <input type="text" value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''} onChange={e => setFormData({ ...formData, img: e.target.value })} placeholder="URL Media 1..." style={{ fontSize: '0.8rem' }} />
+                                            <input type="text" value={formData.img2 && !formData.img2.startsWith('data:') ? formData.img2 : ''} onChange={e => setFormData({ ...formData, img2: e.target.value })} placeholder="URL Media 2..." style={{ fontSize: '0.8rem' }} />
+                                            <input type="text" value={formData.img3 && !formData.img3.startsWith('data:') ? formData.img3 : ''} onChange={e => setFormData({ ...formData, img3: e.target.value })} placeholder="URL Media 3..." style={{ fontSize: '0.8rem' }} />
+                                            <input type="text" value={formData.img4 && !formData.img4.startsWith('data:') ? formData.img4 : ''} onChange={e => setFormData({ ...formData, img4: e.target.value })} placeholder="URL Media 4..." style={{ fontSize: '0.8rem' }} />
                                         </div>
                                     </div>
                                     <div className="form-row">
@@ -609,6 +632,13 @@ export default function AdminPage() {
                             )}
                         </div>
                     </div>
+                </div>
+            )}
+            {/* Toast Notification */}
+            {toast.show && (
+                <div className={`toast-notification ${toast.type}`}>
+                    <i className={`fas fa-${toast.type === 'success' ? 'check-circle' : 'exclamation-circle'}`}></i>
+                    {toast.message}
                 </div>
             )}
         </div>
