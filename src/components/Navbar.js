@@ -26,7 +26,7 @@ const Navbar = () => {
                     <span className="logo-text">CUPANGKLATEN.ID</span>
                 </Link>
 
-                <div className="nav-links" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                <div className="nav-links">
                     <div className="dropdown" style={{ position: 'relative', cursor: 'pointer' }}>
                         <span id="categoryBtn" onClick={toggleDropdown}>
                             Kategori <i className={`fas fa-chevron-${dropdownOpen ? 'up' : 'down'}`}></i>
@@ -41,7 +41,7 @@ const Navbar = () => {
                             <Link href="/stok?category=kebutuhan%20ikan" className="filter-option">Kebutuhan Ikan</Link>
                         </div>
                     </div>
-                    <Link href="/stok" className="nav-btn" style={{ textDecoration: 'none', padding: '0.6rem 1.5rem', background: 'var(--primary-cyan)', color: 'white', borderRadius: '50px', fontWeight: '600' }}>
+                    <Link href="/stok" className="nav-btn">
                         Cek Semua Stok
                     </Link>
                 </div>

@@ -6,3 +6,7 @@ const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 export const supabase = (SUPABASE_URL && SUPABASE_KEY) 
     ? createClient(SUPABASE_URL, SUPABASE_KEY) 
     : null;
+
+if (!supabase) {
+    console.error('Supabase client failed to initialize. Check your .env.local for NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY.');
+}

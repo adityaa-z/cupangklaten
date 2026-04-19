@@ -44,10 +44,18 @@ export default function AdminPage() {
     const fetchData = async () => {
         if (!supabase) return;
         setLoading(true);
-        const { data: pData } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-        const { data: fData } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
-        setProducts(pData || []);
-        setFaqs(fData || []);
+        try {
+            const { data: pData, error: pError } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+            const { data: fData, error: fError } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
+            
+            if (pError) console.error('Error fetching products:', pError);
+            if (fError) console.error('Error fetching faqs:', fError);
+
+            setProducts(pData || []);
+            setFaqs(fData || []);
+        } catch (err) {
+            console.error('Unexpected error fetching data:', err);
+        }
         setLoading(false);
     };
 
@@ -199,17 +207,17 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.map(p => (
                                             <tr key={p.id}>
-                                                <td className="td-img">
+                                                <td className="td-img" data-label="Media">
                                                     {p.is_video ? (
                                                         <video src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} muted />
                                                     ) : (
                                                         <img src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} alt="" />
                                                     )}
                                                 </td>
-                                                <td>{p.code}</td>
-                                                <td>{p.category}</td>
-                                                <td>Rp {p.price.toLocaleString()}</td>
-                                                <td>
+                                                <td data-label="Kode">{p.code}</td>
+                                                <td data-label="Kategori">{p.category}</td>
+                                                <td data-label="Harga">Rp {p.price.toLocaleString()}</td>
+                                                <td data-label="Status">
                                                     <div className="status-control" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                                             <label className="switch">
@@ -231,7 +239,7 @@ export default function AdminPage() {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="action-btns">
+                                                <td className="action-btns" data-label="Aksi">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData(p); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button>
                                                 </td>
@@ -259,21 +267,21 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).map(p => (
                                             <tr key={p.id}>
-                                                <td className="td-img">
+                                                <td className="td-img" data-label="Media">
                                                     {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
                                                 </td>
-                                                <td>
+                                                <td data-label="Info Pesanan">
                                                     <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{p.code}</div>
                                                     <div style={{ fontSize: '0.75rem', color: '#718096' }}>
                                                         <i className="fas fa-clock"></i> Checkout: {p.sold_at ? new Date(p.sold_at).toLocaleDateString('id-ID') : '-'}
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td data-label="Detail Ikan">
                                                     <div style={{ fontWeight: '600' }}>{p.category}</div>
                                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{p.variant || '-'}</div>
                                                 </td>
-                                                <td style={{ fontWeight: '600', color: '#10b981' }}>Rp {p.price.toLocaleString()}</td>
-                                                <td>
+                                                <td style={{ fontWeight: '600', color: '#10b981' }} data-label="Harga">Rp {p.price.toLocaleString()}</td>
+                                                <td data-label="Aksi">
                                                     <button className="btn btn-primary" onClick={() => archiveOrder(p.id)} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: '#6366f1' }}>
                                                         Selesai Pengiriman
                                                     </button>
@@ -305,9 +313,9 @@ export default function AdminPage() {
                                     <tbody>
                                         {faqs.map(f => (
                                             <tr key={f.id}>
-                                                <td style={{ fontWeight: '600' }}>{f.question}</td>
-                                                <td style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{f.answer}</td>
-                                                <td className="action-btns">
+                                                <td style={{ fontWeight: '600' }} data-label="Pertanyaan">{f.question}</td>
+                                                <td style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }} data-label="Jawaban">{f.answer}</td>
+                                                <td className="action-btns" data-label="Aksi">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(f); setFormData(f); setModalType('faq'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteFaq(f.id)}><i className="fas fa-trash"></i></button>
                                                 </td>
