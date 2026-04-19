@@ -3,12 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-// Gunakan Service Role Key (kunci sakti) — hanya bisa diakses di server
 function getSupabase() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) return null;
-    return createClient(url, key);
+    return createClient(url, key, {
+        auth: { persistSession: false }
+    });
 }
 
 function isAuthenticated(request) {
@@ -49,7 +50,7 @@ export async function POST(request) {
 
         const supabase = getSupabase();
         if (!supabase) {
-            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur' }, { status: 500 });
+            return NextResponse.json({ error: 'Service key belum diatur' }, { status: 500 });
         }
 
         const body = await request.json();
@@ -80,7 +81,7 @@ export async function DELETE(request) {
 
         const supabase = getSupabase();
         if (!supabase) {
-            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur' }, { status: 500 });
+            return NextResponse.json({ error: 'Service key belum diatur' }, { status: 500 });
         }
 
         const { searchParams } = new URL(request.url);
