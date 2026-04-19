@@ -268,6 +268,7 @@ header {
 .product-img-container {
     aspect-ratio: 1 / 1;
     overflow: hidden;
+    position: relative;
 }
 
 .product-img-container img {
