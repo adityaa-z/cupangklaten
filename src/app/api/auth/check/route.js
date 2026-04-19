@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
-export async function GET() {
-    const cookieStore = await cookies();
-    const session = cookieStore.get('admin_session');
+export const dynamic = 'force-dynamic';
 
-    if (session && session.value === 'true') {
-        return NextResponse.json({ isLoggedIn: true });
+export async function GET(request) {
+    try {
+        const sessionCookie = request.cookies.get('admin_session');
+
+        if (sessionCookie && sessionCookie.value === 'true') {
+            return NextResponse.json({ isLoggedIn: true });
+        }
+
+        return NextResponse.json({ isLoggedIn: false });
+    } catch (err) {
+        console.error('Auth Check Error:', err);
+        return NextResponse.json({ isLoggedIn: false });
     }
-
-    return NextResponse.json({ isLoggedIn: false });
 }
