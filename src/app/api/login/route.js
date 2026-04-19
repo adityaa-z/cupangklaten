@@ -15,7 +15,7 @@ export async function POST(request) {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 2, // 2 Jam saja
+            maxAge: 60 * 5, // 5 Menit
             path: '/',
         });
 
