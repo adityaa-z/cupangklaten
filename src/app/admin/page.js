@@ -29,7 +29,7 @@ export default function AdminPage() {
     const [formData, setFormData] = useState({
         code: '', category: '', variant: '', gender: 'Jantan',
         age: '', size: 'M', stock: 1, price: 0, shopee: '',
-        img: '', is_video: false
+        img: '', img2: '', img3: '', img4: '', is_video: false
     });
 
     useEffect(() => {
@@ -501,8 +501,17 @@ export default function AdminPage() {
                                             type="text"
                                             value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''}
                                             onChange={e => setFormData({ ...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null })}
-                                            placeholder="https://..."
+                                            placeholder="URL Media Utama..."
                                         />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Gambar Tambahan (Opsional - Max 3 Gambar Lain)</label>
+                                        <div className="form-row">
+                                            <input type="text" value={formData.img2 && !formData.img2.startsWith('data:') ? formData.img2 : ''} onChange={e => setFormData({ ...formData, img2: e.target.value })} placeholder="URL Gambar 2..." />
+                                            <input type="text" value={formData.img3 && !formData.img3.startsWith('data:') ? formData.img3 : ''} onChange={e => setFormData({ ...formData, img3: e.target.value })} placeholder="URL Gambar 3..." />
+                                            <input type="text" value={formData.img4 && !formData.img4.startsWith('data:') ? formData.img4 : ''} onChange={e => setFormData({ ...formData, img4: e.target.value })} placeholder="URL Gambar 4..." />
+                                        </div>
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
@@ -516,8 +525,12 @@ export default function AdminPage() {
                                                 <option value="Plakat">Plakat</option>
                                                 <option value="Halfmoon">Halfmoon</option>
                                                 <option value="HMPK">HMPK</option>
+                                                <option value="Double Tail">Double Tail</option>
                                                 <option value="Crowntail">Crowntail</option>
                                                 <option value="Giant">Giant</option>
+                                                <option value="Dumbo Ear">Dumbo Ear</option>
+                                                <option value="Veiltail">Veiltail</option>
+                                                <option value="Rosetail">Rosetail</option>
                                                 <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
                                             </select>
                                         </div>

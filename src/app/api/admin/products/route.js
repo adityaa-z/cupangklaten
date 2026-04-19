@@ -58,7 +58,7 @@ export async function POST(request) {
 
         const allowedFields = [
             'code', 'category', 'variant', 'gender', 'age', 'size',
-            'stock', 'price', 'shopee', 'img', 'is_video',
+            'stock', 'price', 'shopee', 'img', 'img2', 'img3', 'img4', 'is_video',
             'is_available', 'is_pinned', 'is_archived', 'archived_at', 'sold_at'
         ];
 
