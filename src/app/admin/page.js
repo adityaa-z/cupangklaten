@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import './admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -50,17 +49,15 @@ export default function AdminPage() {
     };
 
     const fetchData = async () => {
-        if (!supabase) return;
         setLoading(true);
         try {
-            const { data: pData, error: pError } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-            const { data: fData, error: fError } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
+            const [pRes, fRes] = await Promise.all([
+                fetch('/api/admin/products'),
+                fetch('/api/admin/faq')
+            ]);
 
-            if (pError) console.error('Error fetching products:', pError);
-            if (fError) console.error('Error fetching faqs:', fError);
-
-            setProducts(pData || []);
-            setFaqs(fData || []);
+            if (pRes.ok) setProducts(await pRes.json());
+            if (fRes.ok) setFaqs(await fRes.json());
         } catch (err) {
             console.error('Unexpected error fetching data:', err);
         }
@@ -96,65 +93,92 @@ export default function AdminPage() {
     // Product Functions
     const deleteProduct = async (id) => {
         if (!confirm('Hapus produk ini?')) return;
-        await supabase.from('products').delete().eq('id', id);
-        fetchData();
+        const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+        if (res.ok) fetchData();
     };
 
     const togglePin = async (product) => {
-        await supabase.from('products').update({ is_pinned: !product.is_pinned }).eq('id', product.id);
-        fetchData();
+        const res = await fetch('/api/admin/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: product.id, is_pinned: !product.is_pinned })
+        });
+        if (res.ok) fetchData();
     };
 
     const toggleStock = async (product) => {
         const update = {
+            id: product.id,
             is_available: !product.is_available,
             sold_at: !product.is_available ? new Date().toISOString() : null,
             is_pinned: false // Unpin if sold out
         };
-        await supabase.from('products').update(update).eq('id', product.id);
-        fetchData();
+        const res = await fetch('/api/admin/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(update)
+        });
+        if (res.ok) fetchData();
     };
 
     const updateStock = async (product, delta) => {
         const newStock = Math.max(0, product.stock + delta);
         const update = {
+            id: product.id,
             stock: newStock,
             is_available: newStock > 0,
             sold_at: newStock === 0 ? (product.sold_at || new Date().toISOString()) : null
         };
-        await supabase.from('products').update(update).eq('id', product.id);
-        fetchData();
+        const res = await fetch('/api/admin/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(update)
+        });
+        if (res.ok) fetchData();
     };
 
     const archiveOrder = async (id) => {
-        await supabase.from('products').update({ is_archived: true, archived_at: new Date().toISOString() }).eq('id', id);
-        fetchData();
+        const res = await fetch('/api/admin/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, is_archived: true, archived_at: new Date().toISOString() })
+        });
+        if (res.ok) fetchData();
     };
 
     const saveProduct = async (e) => {
         e.preventDefault();
+        let res;
         if (modalType === 'product') {
-            if (editingItem) {
-                await supabase.from('products').update(formData).eq('id', editingItem.id);
-            } else {
-                await supabase.from('products').insert([{ ...formData, is_available: formData.stock > 0 }]);
-            }
+            const dataToSave = editingItem ? { ...formData, id: editingItem.id } : { ...formData, is_available: formData.stock > 0 };
+            res = await fetch('/api/admin/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSave)
+            });
         } else if (modalType === 'faq') {
-            const faqData = { question: formData.question, answer: formData.answer };
-            if (editingItem) {
-                await supabase.from('faqs').update(faqData).eq('id', editingItem.id);
-            } else {
-                await supabase.from('faqs').insert([faqData]);
-            }
+            const faqData = editingItem 
+                ? { id: editingItem.id, question: formData.question, answer: formData.answer }
+                : { question: formData.question, answer: formData.answer };
+            res = await fetch('/api/admin/faq', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(faqData)
+            });
         }
-        setIsModalOpen(false);
-        fetchData();
+
+        if (res && res.ok) {
+            setIsModalOpen(false);
+            fetchData();
+        } else {
+            alert('Gagal menyimpan data!');
+        }
     };
 
     const deleteFaq = async (id) => {
         if (!confirm('Hapus FAQ ini?')) return;
-        await supabase.from('faqs').delete().eq('id', id);
-        fetchData();
+        const res = await fetch(`/api/admin/faq?id=${id}`, { method: 'DELETE' });
+        if (res.ok) fetchData();
     };
 
     if (!isMounted) return <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)' }}></div>;
