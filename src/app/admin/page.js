@@ -94,6 +94,7 @@ export default function AdminPage() {
     const deleteProduct = async (id) => {
         if (!confirm('Hapus produk ini?')) return;
         const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
@@ -103,6 +104,7 @@ export default function AdminPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: product.id, is_pinned: !product.is_pinned })
         });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
@@ -118,6 +120,7 @@ export default function AdminPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(update)
         });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
@@ -134,6 +137,7 @@ export default function AdminPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(update)
         });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
@@ -143,6 +147,7 @@ export default function AdminPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, is_archived: true, archived_at: new Date().toISOString() })
         });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
@@ -167,6 +172,8 @@ export default function AdminPage() {
             });
         }
 
+        if (res && res.status === 401) return handleLogout();
+        
         if (res && res.ok) {
             setIsModalOpen(false);
             fetchData();
@@ -178,6 +185,7 @@ export default function AdminPage() {
     const deleteFaq = async (id) => {
         if (!confirm('Hapus FAQ ini?')) return;
         const res = await fetch(`/api/admin/faq?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
 
