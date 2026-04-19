@@ -484,7 +484,54 @@ header {
 .verify-badge {
     color: #3b82f6;
     font-size: 0.8rem;
+    cursor: help;
+}
+
+/* Tooltip Styling */
+.verify-badge-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
     margin-left: 5px;
+}
+
+.verify-badge-container .tooltip {
+    visibility: hidden;
+    width: 240px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 10;
+    bottom: 160%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    pointer-events: none;
+    white-space: normal;
+}
+
+/* Segitiga Tooltip */
+.verify-badge-container .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #000 transparent transparent transparent;
+}
+
+.verify-badge-container:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
 }
 
 

@@ -187,7 +187,10 @@ export default function Home() {
                           </div>
                           <div className="review-stars">
                               {[...Array(r.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
-                              <i className="fas fa-check-circle verify-badge"></i>
+                              <span className="verify-badge-container">
+                                  <i className="fas fa-check-circle verify-badge"></i>
+                                  <span className="tooltip">berhasil terverifikasi bahwa sumber asli dari Google</span>
+                              </span>
                           </div>
                           <p className="review-content">{r.content}</p>
                       </div>
