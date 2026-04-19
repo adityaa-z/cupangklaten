@@ -15,7 +15,7 @@ const StokContent = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentCategory, setCurrentCategory] = useState('all');
-
+    //d
     useEffect(() => {
         async function fetchAllProducts() {
             if (!supabase) return;
