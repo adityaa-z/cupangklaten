@@ -193,6 +193,11 @@ export default function Home() {
                               </span>
                           </div>
                           <p className="review-content">{r.content}</p>
+                          {r.img && (
+                              <div style={{ marginTop: '1rem', borderRadius: '12px', overflow: 'hidden', height: '150px' }}>
+                                  <img src={r.img} alt="Customer's fish" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                          )}
                       </div>
                   )) : (
                       <div style={{ width: '100%', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>

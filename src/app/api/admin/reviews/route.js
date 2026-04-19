@@ -27,21 +27,21 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { id, name, rating, content } = body;
+    const { id, name, rating, content, img } = body;
     const avatar_char = name.charAt(0).toUpperCase();
 
     if (id) {
         // Update
         const { error } = await supabase
             .from('reviews')
-            .update({ name, rating, content, avatar_char })
+            .update({ name, rating, content, img, avatar_char })
             .eq('id', id);
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     } else {
         // Insert
         const { error } = await supabase
             .from('reviews')
-            .insert([{ name, rating, content, avatar_char }]);
+            .insert([{ name, rating, content, img, avatar_char }]);
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

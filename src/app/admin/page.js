@@ -521,6 +521,7 @@ export default function AdminPage() {
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th>Media</th>
                                             <th>Nama</th>
                                             <th>Rating</th>
                                             <th>Komentar</th>
@@ -530,6 +531,9 @@ export default function AdminPage() {
                                     <tbody>
                                         {reviews.map(r => (
                                             <tr key={r.id}>
+                                                <td className="td-img">
+                                                    {r.img ? <img src={r.img} alt="" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} /> : <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}><i className="fas fa-image"></i></div>}
+                                                </td>
                                                 <td style={{ fontWeight: '600' }} data-label="Nama">{r.name}</td>
                                                 <td style={{ color: '#facc15' }} data-label="Rating">{'⭐'.repeat(r.rating)}</td>
                                                 <td style={{ fontSize: '0.9rem', maxWidth: '300px' }} data-label="Komentar">{r.content}</td>
@@ -710,6 +714,15 @@ export default function AdminPage() {
                                 </form>
                             ) : (
                                 <form onSubmit={saveProduct}>
+                                    <div className="form-group">
+                                        <label>Foto Ulasan (Opsional)</label>
+                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                            <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {uploadingField === 'review_img' ? <div className="spinner"></div> : formData.img ? <img src={formData.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-camera" style={{ color: '#94a3b8' }}></i>}
+                                            </div>
+                                            <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'img', 'review_img')} />
+                                        </div>
+                                    </div>
                                     <div className="form-group">
                                         <label>Nama Pengulas</label>
                                         <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
