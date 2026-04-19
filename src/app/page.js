@@ -74,9 +74,8 @@ export default function Home() {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
-            <h1>Koleksi <span>Cupang Terbaik</span> dari Klaten untuk Anda</h1>
-            <p>Temukan ikan cupang hias berkualitas tinggi dengan genetik stabil, warna tajam, dan perawatan
-              profesional langsung dari pembudidaya Klaten.</p>
+            <h1>Pusat Ikan <span>Cupang Klaten</span> Terbaik & Bergaransi</h1>
+            <p>Beli Ikan Cupang Klaten berkualitas tinggi langsung dari pembudidaya. Koleksi genetik stabil, warna tajam, dan pengiriman aman ke seluruh Indonesia.</p>
             <div className="hero-btns" style={{ display: 'flex', gap: '1rem' }}>
               <Link href="#products" className="filter-btn active" style={{ textDecoration: 'none' }}>
                 Lihat Koleksi
