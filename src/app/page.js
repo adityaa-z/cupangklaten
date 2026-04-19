@@ -23,29 +23,37 @@ export default function Home() {
 
         if (error) throw error;
 
-        // "Terpopuler" logic ported from script.js
-        const readyProducts = data.filter(p => p.is_available && p.stock > 0);
-        const categories = ['Plakat', 'Halfmoon', 'HMPK', 'Crowntail', 'Giant'];
-        let featured = [];
+        // Logic: Strictly 6 items total, prioritized by pinned and diverse categories
+        const readyProducts = data.filter(p => (p.is_available && p.stock > 0) && !p.is_archived);
+        const categories = ['Plakat', 'Halfmoon', 'HMPK', 'Crowntail', 'Giant', 'Kebutuhan Ikan'];
         
-        // 1. Multi-category requirement: try to get 1 from each category first
-        categories.forEach(cat => {
-            const itemFromCat = readyProducts.find(p => 
-                p.category.toLowerCase() === cat.toLowerCase()
-            );
-            if (itemFromCat) featured.push(itemFromCat);
-        });
+        let selected = [];
+        
+        // 1. First, take all pinned products (limit to 6)
+        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 6);
+        selected = [...pinned];
 
-        // 2. Fill up to 6 items from other ready products
-        const remainingCount = 6 - featured.length;
-        if (remainingCount > 0) {
-            const fillers = readyProducts.filter(p => 
-                !featured.find(fi => fi.id === p.id)
-            ).slice(0, remainingCount);
-            featured = [...featured, ...fillers];
+        // 2. If less than 6, try to fill with 1 from each category that isn't already selected
+        if (selected.length < 6) {
+            categories.forEach(cat => {
+                if (selected.length >= 6) return;
+                const item = readyProducts.find(p => 
+                    p.category.toLowerCase() === cat.toLowerCase() && 
+                    !selected.find(s => s.id === p.id)
+                );
+                if (item) selected.push(item);
+            });
         }
 
-        setFeaturedProducts(featured.slice(0, 6));
+        // 3. If still less than 6, fill with newest available
+        if (selected.length < 6) {
+            const remaining = readyProducts
+                .filter(p => !selected.find(s => s.id === p.id))
+                .slice(0, 6 - selected.length);
+            selected = [...selected, ...remaining];
+        }
+
+        setFeaturedProducts(selected.slice(0, 6));
       } catch (err) {
         console.error('Error fetching featured products:', err);
       } finally {
@@ -83,13 +91,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Popular Products Section */}
+      {/* Best Collection Section (Max 6) */}
       <section className="products-section" id="products">
-        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terpopuler</span>
+            Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaik</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan terbaik dari pembudidaya Klaten yang paling banyak diminati.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan unggulan dari pembudidaya Klaten (Max 6 Ikan).</p>
+          <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
         <div className="product-grid">

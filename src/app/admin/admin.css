@@ -273,6 +273,25 @@ tbody tr:hover {
     color: var(--primary-cyan);
 }
 
+.btn-icon.pinned {
+    color: #f59e0b !important;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.btn-icon.pinned i {
+    animation: pulse-gold 2s infinite;
+}
+
+@keyframes pulse-gold {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.btn-icon.delete {
+    color: var(--danger);
+}
+
 .btn-icon.delete:hover {
     color: var(--danger);
     border-color: var(--danger);

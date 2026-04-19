@@ -82,10 +82,16 @@ export default function AdminPage() {
         fetchData();
     };
 
+    const togglePin = async (product) => {
+        await supabase.from('products').update({ is_pinned: !product.is_pinned }).eq('id', product.id);
+        fetchData();
+    };
+
     const toggleStock = async (product) => {
         const update = { 
             is_available: !product.is_available,
-            sold_at: !product.is_available ? new Date().toISOString() : null
+            sold_at: !product.is_available ? new Date().toISOString() : null,
+            is_pinned: false // Unpin if sold out
         };
         await supabase.from('products').update(update).eq('id', product.id);
         fetchData();
@@ -196,6 +202,7 @@ export default function AdminPage() {
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th>Pin</th>
                                             <th>Media</th>
                                             <th>Kode</th>
                                             <th>Kategori</th>
@@ -207,6 +214,17 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.map(p => (
                                             <tr key={p.id}>
+                                <td data-label="Pin" style={{ textAlign: 'center' }}>
+                                    <button 
+                                        className={`btn-icon ${p.is_pinned ? 'pinned' : ''}`} 
+                                        onClick={() => togglePin(p)}
+                                        title={p.is_pinned ? 'Unpin dari Beranda' : 'Pin ke Beranda'}
+                                        style={{ color: (p.is_pinned) ? '#f59e0b' : '#cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}
+                                    >
+                                        <i className={`fas fa-star`} style={{ fontSize: '1.4rem' }}></i>
+                                        <header style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>PIN</header>
+                                    </button>
+                                </td>
                                                 <td className="td-img" data-label="Media">
                                                     {p.is_video ? (
                                                         <video src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} muted />
@@ -257,6 +275,7 @@ export default function AdminPage() {
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th>Pin</th>
                                             <th>Media</th>
                                             <th>Info Pesanan</th>
                                             <th>Detail Ikan</th>
@@ -267,6 +286,15 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).map(p => (
                                             <tr key={p.id}>
+                                                <td data-label="Pin" style={{ textAlign: 'center' }}>
+                                                    <button 
+                                                        className={`btn-icon ${p.is_pinned ? 'pinned' : ''}`} 
+                                                        onClick={() => togglePin(p)}
+                                                        style={{ color: (p.is_pinned) ? '#f59e0b' : '#cbd5e1' }}
+                                                    >
+                                                        <i className={`fas fa-star`}></i>
+                                                    </button>
+                                                </td>
                                                 <td className="td-img" data-label="Media">
                                                     {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
                                                 </td>
