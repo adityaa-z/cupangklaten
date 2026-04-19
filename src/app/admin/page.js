@@ -507,14 +507,14 @@ export default function AdminPage() {
                             {modalType === 'product' ? (
                                 <form onSubmit={saveProduct}>
                                     {/* Media Pickers Grid */}
-                                    <div className="media-grid-admin" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                                    <div className="media-grid-admin">
                                         {[
                                             { label: 'Media Utama (Gambar/Video)', field: 'img', isPrimary: true },
                                             { label: 'Gambar 2', field: 'img2' },
                                             { label: 'Gambar 3', field: 'img3' },
                                             { label: 'Gambar 4', field: 'img4' }
                                         ].map((slot, index) => (
-                                            <div key={slot.field} className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                            <div key={slot.field} className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '0' }}>
                                                 <label style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', fontWeight: '700' }}>{slot.label}</label>
                                                 
                                                 {/* Preview Box */}

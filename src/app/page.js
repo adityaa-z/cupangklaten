@@ -104,7 +104,15 @@ export default function Home() {
 
         <div className="product-grid">
           {loading ? (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>Memuat koleksi...</p>
+            // Skeleton Loader
+            [...Array(6)].map((_, i) => (
+              <div key={i} className="skeleton-card">
+                <div className="skeleton-img skeleton"></div>
+                <div className="skeleton-text skeleton"></div>
+                <div className="skeleton-price skeleton"></div>
+                <div className="skeleton-btn skeleton"></div>
+              </div>
+            ))
           ) : featuredProducts.length > 0 ? (
             featuredProducts.map(product => (
               <ProductCard key={product.id} product={product} />

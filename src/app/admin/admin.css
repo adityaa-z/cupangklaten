@@ -671,3 +671,17 @@ input:checked + .slider:before {
         justify-content: center;
     }
 }
+
+/* --- Admin Media Grid --- */
+.media-grid-admin {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .media-grid-admin {
+        grid-template-columns: 1fr; /* Jadi satu baris besar di HP */
+    }
+}

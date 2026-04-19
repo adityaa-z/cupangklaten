@@ -114,16 +114,29 @@ const StokContent = () => {
                 </div>
 
                 <div className="product-grid">
-                    {loading ? (
-                        <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>Memuat stok...</p>
-                    ) : filteredProducts.length > 0 ? (
+                {loading ? (
+                    // Skeleton Loader
+                    [...Array(8)].map((_, i) => (
+                        <div key={i} className="skeleton-card">
+                            <div className="skeleton-img skeleton"></div>
+                            <div className="skeleton-text skeleton"></div>
+                            <div className="skeleton-price skeleton"></div>
+                            <div className="skeleton-btn skeleton"></div>
+                        </div>
+                    ))
+                ) : (
+                    filteredProducts.length > 0 ? (
                         filteredProducts.map(product => (
                             <ProductCard key={product.id} product={product} />
                         ))
                     ) : (
-                        <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--text-muted)' }}>Ikan tidak ditemukan.</p>
-                    )}
-                </div>
+                        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                            <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.2 }}></i>
+                            <p>Tidak ada produk yang ditemukan dengan kata kunci ini.</p>
+                        </div>
+                    )
+                )}
+            </div>
             </section>
 
             <Footer />

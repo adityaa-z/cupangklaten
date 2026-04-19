@@ -52,7 +52,7 @@ const ProductCard = ({ product }) => {
                     {product.is_video ? (
                         <video src={product.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                        <img src={product.img} alt={product.code} />
+                        <img src={product.img} alt={product.code} loading="lazy" decoding="async" />
                     )}
                     {images.length > 1 && <div className="img-count-badge"><i className="fas fa-images"></i> {images.length}</div>}
                 </div>
