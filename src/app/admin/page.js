@@ -12,6 +12,7 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState('Produk');
     const [products, setProducts] = useState([]);
     const [faqs, setFaqs] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Auth State
@@ -58,13 +59,15 @@ export default function AdminPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [pRes, fRes] = await Promise.all([
+            const [pRes, fRes, rRes] = await Promise.all([
                 fetch('/api/admin/products/'),
-                fetch('/api/admin/faq/')
+                fetch('/api/admin/faq/'),
+                fetch('/api/admin/reviews/')
             ]);
 
             if (pRes.ok) setProducts(await pRes.json());
             if (fRes.ok) setFaqs(await fRes.json());
+            if (rRes.ok) setReviews(await rRes.json());
         } catch (err) {
             console.error('Unexpected error fetching data:', err);
         }
@@ -216,6 +219,12 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(faqData)
             });
+        } else if (modalType === 'review') {
+            res = await fetch('/api/admin/reviews/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+            });
         }
 
         if (res && res.status === 401) return handleLogout();
@@ -237,6 +246,13 @@ export default function AdminPage() {
     const deleteFaq = async (id) => {
         if (!confirm('Hapus FAQ ini?')) return;
         const res = await fetch(`/api/admin/faq/?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
+    };
+
+    const deleteReview = async (id) => {
+        if (!confirm('Hapus ulasan ini?')) return;
+        const res = await fetch(`/api/admin/reviews/?id=${id}`, { method: 'DELETE' });
         if (res.status === 401) return handleLogout();
         if (res.ok) fetchData();
     };
@@ -305,9 +321,9 @@ export default function AdminPage() {
                     HQ Panel
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Pesanan', 'FAQ', 'Statistik'].map(tab => (
+                    {['Produk', 'Pesanan', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'FAQ' ? 'question-circle' : 'chart-line'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
                             {tab}
                         </div>
                     ))}
@@ -493,6 +509,41 @@ export default function AdminPage() {
                             </div>
                         </div>
                     )}
+
+                    {activeTab === 'Ulasan' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls">
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ name: '', rating: 5, content: '' }); setModalType('review'); setIsModalOpen(true); }}>
+                                    <i className="fas fa-plus"></i> Tambah Ulasan Baru
+                                </button>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Rating</th>
+                                            <th>Komentar</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reviews.map(r => (
+                                            <tr key={r.id}>
+                                                <td style={{ fontWeight: '600' }} data-label="Nama">{r.name}</td>
+                                                <td style={{ color: '#facc15' }} data-label="Rating">{'⭐'.repeat(r.rating)}</td>
+                                                <td style={{ fontSize: '0.9rem', maxWidth: '300px' }} data-label="Komentar">{r.content}</td>
+                                                <td className="action-btns" data-label="Aksi">
+                                                    <button className="btn-icon" onClick={() => { setEditingItem(r); setFormData(r); setModalType('review'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
+                                                    <button className="btn-icon delete" onClick={() => deleteReview(r.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
 
@@ -500,7 +551,7 @@ export default function AdminPage() {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType}</h3>
+                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : 'Ulasan'}</h3>
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
@@ -640,7 +691,7 @@ export default function AdminPage() {
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
                                 </form>
-                            ) : (
+                            ) : modalType === 'faq' ? (
                                 <form onSubmit={saveProduct}>
                                     <div className="form-group">
                                         <label>Pertanyaan</label>
@@ -656,6 +707,29 @@ export default function AdminPage() {
                                         ></textarea>
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan FAQ</button>
+                                </form>
+                            ) : (
+                                <form onSubmit={saveProduct}>
+                                    <div className="form-group">
+                                        <label>Nama Pengulas</label>
+                                        <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Rating (1-5 Bintang)</label>
+                                        <select value={formData.rating} onChange={e => setFormData({ ...formData, rating: parseInt(e.target.value) })}>
+                                            {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Bintang</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Komentar</label>
+                                        <textarea
+                                            value={formData.content}
+                                            onChange={e => setFormData({ ...formData, content: e.target.value })}
+                                            required
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '100px' }}
+                                        ></textarea>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary">Simpan Ulasan</button>
                                 </form>
                             )}
                         </div>

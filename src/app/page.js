@@ -12,7 +12,17 @@ export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      if (!supabase) return;
+      const { data } = await supabase.from('reviews').select('*').order('id', { ascending: false });
+      if (data) setReviews(data);
+    }
+    fetchReviews();
+  }, []);
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -157,6 +167,37 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section className="reviews-section">
+          <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+              <h2 className="section-title">Kata Pelanggan MJI</h2>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Ulasan asli dari Google Maps</p>
+              
+              <div className="reviews-grid">
+                  {reviews.length > 0 ? reviews.map(r => (
+                      <div key={r.id} className="review-card">
+                          <i className="fab fa-google google-icon"></i>
+                          <div className="review-header">
+                              <div className="review-avatar">{r.avatar_char || r.name.charAt(0).toUpperCase()}</div>
+                              <div className="review-info">
+                                  <h4>{r.name}</h4>
+                              </div>
+                          </div>
+                          <div className="review-stars">
+                              {[...Array(r.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
+                              <i className="fas fa-check-circle verify-badge"></i>
+                          </div>
+                          <p className="review-content">{r.content}</p>
+                      </div>
+                  )) : (
+                      <div style={{ width: '100%', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                          <p>Belum ada ulasan. Tambahkan ulasan pertama Anda di Admin Panel!</p>
+                      </div>
+                  )}
+              </div>
+          </div>
       </section>
 
       <Footer />
