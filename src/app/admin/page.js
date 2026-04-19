@@ -6,9 +6,6 @@ import './admin.css';
 
 export const dynamic = 'force-dynamic';
 
-const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
 export default function AdminPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,10 +33,21 @@ export default function AdminPage() {
 
     useEffect(() => {
         setIsMounted(true);
-        const loggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-        setIsLoggedIn(loggedIn);
-        if (loggedIn) fetchData();
+        checkSession();
     }, []);
+
+    const checkSession = async () => {
+        try {
+            const res = await fetch('/api/auth/check');
+            const data = await res.json();
+            if (data.isLoggedIn) {
+                setIsLoggedIn(true);
+                fetchData();
+            }
+        } catch (err) {
+            console.error('Session check failed:', err);
+        }
+    };
 
     const fetchData = async () => {
         if (!supabase) return;
@@ -59,19 +67,29 @@ export default function AdminPage() {
         setLoading(false);
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-            localStorage.setItem('adminLoggedIn', 'true');
-            setIsLoggedIn(true);
-            fetchData();
-        } else {
+        setLoginError(false);
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (res.ok) {
+                setIsLoggedIn(true);
+                fetchData();
+            } else {
+                setLoginError(true);
+            }
+        } catch (err) {
             setLoginError(true);
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('adminLoggedIn');
+    const handleLogout = async () => {
+        await fetch('/api/logout', { method: 'POST' });
         setIsLoggedIn(false);
     };
 
