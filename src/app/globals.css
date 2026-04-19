@@ -518,13 +518,25 @@ footer {
         display: none;
     }
     .logo-text {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    .logo img {
+        height: 32px;
     }
 }
 
 @media (max-width: 640px) {
     .nav-container {
-        padding: 0.8rem 1rem;
+        padding: 0.6rem 1rem;
+    }
+    .logo img {
+        height: 28px;
+    }
+    .logo-text {
+        font-size: 0.9rem;
+    }
+    .logo {
+        gap: 0.5rem;
     }
     .hero {
         padding: 2.5rem 1rem;
