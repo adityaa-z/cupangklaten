@@ -549,6 +549,9 @@ footer {
     .hero {
         padding: 2.5rem 1rem;
     }
+    .hero-image {
+        display: none; /* Hapus gambar ikan besar di tampilan mobile */
+    }
     .hero-text h1 {
         font-size: 2.2rem;
         margin-bottom: 1rem;
