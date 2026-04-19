@@ -715,7 +715,7 @@ export default function AdminPage() {
                             ) : (
                                 <form onSubmit={saveProduct}>
                                     <div className="form-group">
-                                        <label>Foto Ulasan (Opsional)</label>
+                                        <label>Foto Profil Pengulas (Opsional)</label>
                                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                             <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 {uploadingField === 'review_img' ? <div className="spinner"></div> : formData.img ? <img src={formData.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-camera" style={{ color: '#94a3b8' }}></i>}
