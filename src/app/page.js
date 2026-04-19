@@ -8,6 +8,8 @@ import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -98,6 +100,7 @@ export default function Home() {
             Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaik</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan unggulan dari pembudidaya Klaten (Max 6 Ikan).</p>
+          <div style={{ padding: '2px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.6rem', color: '#94a3b8', marginTop: '5px' }}>v.1.0.6-fresh</div>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 

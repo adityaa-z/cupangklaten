@@ -16,7 +16,7 @@ export default function AdminPage() {
     const [products, setProducts] = useState([]);
     const [faqs, setFaqs] = useState([]);
     const [loading, setLoading] = useState(false);
-    
+
     // Auth State
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -47,7 +47,7 @@ export default function AdminPage() {
         try {
             const { data: pData, error: pError } = await supabase.from('products').select('*').order('created_at', { ascending: false });
             const { data: fData, error: fError } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
-            
+
             if (pError) console.error('Error fetching products:', pError);
             if (fError) console.error('Error fetching faqs:', fError);
 
@@ -88,7 +88,7 @@ export default function AdminPage() {
     };
 
     const toggleStock = async (product) => {
-        const update = { 
+        const update = {
             is_available: !product.is_available,
             sold_at: !product.is_available ? new Date().toISOString() : null,
             is_pinned: false // Unpin if sold out
@@ -99,7 +99,7 @@ export default function AdminPage() {
 
     const updateStock = async (product, delta) => {
         const newStock = Math.max(0, product.stock + delta);
-        const update = { 
+        const update = {
             stock: newStock,
             is_available: newStock > 0,
             sold_at: newStock === 0 ? (product.sold_at || new Date().toISOString()) : null
@@ -214,17 +214,16 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.map(p => (
                                             <tr key={p.id}>
-                                <td data-label="Pin" style={{ textAlign: 'center' }}>
-                                    <button 
-                                        className={`btn-icon ${p.is_pinned ? 'pinned' : ''}`} 
-                                        onClick={() => togglePin(p)}
-                                        title={p.is_pinned ? 'Unpin dari Beranda' : 'Pin ke Beranda'}
-                                        style={{ color: (p.is_pinned) ? '#f59e0b' : '#cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}
-                                    >
-                                        <i className={`fas fa-star`} style={{ fontSize: '1.4rem' }}></i>
-                                        <header style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>PIN</header>
-                                    </button>
-                                </td>
+                                                <td data-label="Pin" style={{ textAlign: 'center' }}>
+                                                    <button
+                                                        className={`btn-icon ${p.is_pinned ? 'pinned' : ''}`}
+                                                        onClick={() => togglePin(p)}
+                                                        title={p.is_pinned ? 'Unpin dari Beranda' : 'Pin ke Beranda'}
+                                                        style={{ color: p.is_pinned ? '#f59e0b' : '#cbd5e1', fontSize: '1.2rem' }}
+                                                    >
+                                                        <i className={`fas fa-star`}></i>
+                                                    </button>
+                                                </td>
                                                 <td className="td-img" data-label="Media">
                                                     {p.is_video ? (
                                                         <video src={p.img?.startsWith('http') || p.img?.startsWith('data:') ? p.img : '/logo.png'} muted />
@@ -239,10 +238,10 @@ export default function AdminPage() {
                                                     <div className="status-control" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                                             <label className="switch">
-                                                                <input 
-                                                                    type="checkbox" 
-                                                                    checked={p.is_available && p.stock > 0} 
-                                                                    onChange={() => toggleStock(p)} 
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={p.is_available && p.stock > 0}
+                                                                    onChange={() => toggleStock(p)}
                                                                 />
                                                                 <span className="slider"></span>
                                                             </label>
@@ -275,7 +274,6 @@ export default function AdminPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Pin</th>
                                             <th>Media</th>
                                             <th>Info Pesanan</th>
                                             <th>Detail Ikan</th>
@@ -286,15 +284,6 @@ export default function AdminPage() {
                                     <tbody>
                                         {products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).map(p => (
                                             <tr key={p.id}>
-                                                <td data-label="Pin" style={{ textAlign: 'center' }}>
-                                                    <button 
-                                                        className={`btn-icon ${p.is_pinned ? 'pinned' : ''}`} 
-                                                        onClick={() => togglePin(p)}
-                                                        style={{ color: (p.is_pinned) ? '#f59e0b' : '#cbd5e1' }}
-                                                    >
-                                                        <i className={`fas fa-star`}></i>
-                                                    </button>
-                                                </td>
                                                 <td className="td-img" data-label="Media">
                                                     {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
                                                 </td>
@@ -386,9 +375,9 @@ export default function AdminPage() {
                                 <form onSubmit={saveProduct}>
                                     <div className="form-group">
                                         <label>Upload Media (Gambar/Video)</label>
-                                        <input 
-                                            type="file" 
-                                            accept="image/*,video/*" 
+                                        <input
+                                            type="file"
+                                            accept="image/*,video/*"
                                             onChange={(e) => {
                                                 const file = e.target.files[0];
                                                 if (file) {
@@ -403,7 +392,7 @@ export default function AdminPage() {
                                                     };
                                                     reader.readAsDataURL(file);
                                                 }
-                                            }} 
+                                            }}
                                         />
                                         <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
                                             Maksimal 2 MB. File akan dikonversi ke Base64.
@@ -422,21 +411,21 @@ export default function AdminPage() {
 
                                     <div className="form-group">
                                         <label>Atau Gunakan URL Media (Opsional)</label>
-                                        <input 
-                                            type="text" 
-                                            value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''} 
-                                            onChange={e => setFormData({...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null})} 
-                                            placeholder="https://..." 
+                                        <input
+                                            type="text"
+                                            value={formData.img && !formData.img.startsWith('data:') ? formData.img : ''}
+                                            onChange={e => setFormData({ ...formData, img: e.target.value, is_video: e.target.value.match(/\.(mp4|webm|ogg)$/i) !== null })}
+                                            placeholder="https://..."
                                         />
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Kode Ikan</label>
-                                            <input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} placeholder="Contoh: PK-001" required />
+                                            <input type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} placeholder="Contoh: PK-001" required />
                                         </div>
                                         <div className="form-group">
                                             <label>Kategori</label>
-                                            <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required>
+                                            <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required>
                                                 <option value="">Pilih...</option>
                                                 <option value="Plakat">Plakat</option>
                                                 <option value="Halfmoon">Halfmoon</option>
@@ -450,11 +439,11 @@ export default function AdminPage() {
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Varian (Warna/Jenis)</label>
-                                            <input type="text" value={formData.variant} onChange={e => setFormData({...formData, variant: e.target.value})} placeholder="Contoh: Nemo, Galaxy" />
+                                            <input type="text" value={formData.variant} onChange={e => setFormData({ ...formData, variant: e.target.value })} placeholder="Contoh: Nemo, Galaxy" />
                                         </div>
                                         <div className="form-group">
                                             <label>Gender</label>
-                                            <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} required>
+                                            <select value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })} required>
                                                 <option value="Jantan">Jantan</option>
                                                 <option value="Betina">Betina</option>
                                                 <option value="-">- (Unisex/Peralatan)</option>
@@ -464,17 +453,17 @@ export default function AdminPage() {
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Usia</label>
-                                            <select value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} required>
+                                            <select value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} required>
                                                 <option value="">Pilih...</option>
                                                 {[...Array(12)].map((_, i) => (
-                                                    <option key={i+1} value={(i+1).toString()}>{i+1} Bulan</option>
+                                                    <option key={i + 1} value={(i + 1).toString()}>{i + 1} Bulan</option>
                                                 ))}
                                                 <option value="Tidak Ada">Tidak Ada (Non-Living)</option>
                                             </select>
                                         </div>
                                         <div className="form-group">
                                             <label>Size</label>
-                                            <select value={formData.size} onChange={e => setFormData({...formData, size: e.target.value})} required>
+                                            <select value={formData.size} onChange={e => setFormData({ ...formData, size: e.target.value })} required>
                                                 <option value="S">S</option>
                                                 <option value="S+">S+</option>
                                                 <option value="M">M</option>
@@ -488,16 +477,16 @@ export default function AdminPage() {
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Harga (Rp)</label>
-                                            <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} required />
+                                            <input type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })} required />
                                         </div>
                                         <div className="form-group">
                                             <label>Stok</label>
-                                            <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})} required />
+                                            <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })} required />
                                         </div>
                                     </div>
                                     <div className="form-group">
                                         <label>Link Shopee</label>
-                                        <input type="url" value={formData.shopee} onChange={e => setFormData({...formData, shopee: e.target.value})} placeholder="https://shopee.co.id/..." required />
+                                        <input type="url" value={formData.shopee} onChange={e => setFormData({ ...formData, shopee: e.target.value })} placeholder="https://shopee.co.id/..." required />
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
                                 </form>
@@ -509,10 +498,10 @@ export default function AdminPage() {
                                     </div>
                                     <div className="form-group">
                                         <label>Jawaban</label>
-                                        <textarea 
-                                            value={formData.answer} 
-                                            onChange={e => setFormData({ ...formData, answer: e.target.value })} 
-                                            required 
+                                        <textarea
+                                            value={formData.answer}
+                                            onChange={e => setFormData({ ...formData, answer: e.target.value })}
+                                            required
                                             style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '100px' }}
                                         ></textarea>
                                     </div>
