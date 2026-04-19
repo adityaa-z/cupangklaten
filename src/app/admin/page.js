@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export default function AdminPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Produk');
     const [products, setProducts] = useState([]);
     const [faqs, setFaqs] = useState([]);
@@ -37,6 +38,7 @@ export default function AdminPage() {
     }, []);
 
     const checkSession = async () => {
+        setAuthLoading(true);
         try {
             const res = await fetch('/api/auth/check');
             const data = await res.json();
@@ -46,6 +48,8 @@ export default function AdminPage() {
             }
         } catch (err) {
             console.error('Session check failed:', err);
+        } finally {
+            setAuthLoading(false);
         }
     };
 
@@ -190,7 +194,16 @@ export default function AdminPage() {
         if (res.ok) fetchData();
     };
 
-    if (!isMounted) return <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)' }}></div>;
+    if (!isMounted || authLoading) {
+        return (
+            <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div className="spinner" style={{ marginBottom: '1rem' }}></div>
+                    <p style={{ color: 'var(--text-muted)' }}>Memeriksa Sesi...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!isLoggedIn) {
         return (
