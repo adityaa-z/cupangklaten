@@ -98,8 +98,7 @@ export default function Home() {
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
             Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaik</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan unggulan dari pembudidaya Klaten (Max 6 Ikan).</p>
-          <div style={{ padding: '2px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.6rem', color: '#94a3b8', marginTop: '5px' }}>v.1.0.6-fresh</div>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pilihan unggulan dari cupangklaten.id</p>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
