@@ -4,10 +4,12 @@ import { createClient } from '@supabase/supabase-js';
 export const dynamic = 'force-dynamic';
 
 // Gunakan Service Role Key (kunci sakti) — hanya bisa diakses di server
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getSupabase() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    return createClient(url, key);
+}
 
 function isAuthenticated(request) {
     const session = request.cookies.get('admin_session');
@@ -18,6 +20,11 @@ export async function GET(request) {
     try {
         if (!isAuthenticated(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const supabase = getSupabase();
+        if (!supabase) {
+            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur di Environment Variables' }, { status: 500 });
         }
 
         const { data, error } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
@@ -40,10 +47,14 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const supabase = getSupabase();
+        if (!supabase) {
+            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur' }, { status: 500 });
+        }
+
         const body = await request.json();
         const { id, question, answer } = body;
 
-        // Filter input (Whitelist)
         const data = { question, answer };
 
         let result;
@@ -65,6 +76,11 @@ export async function DELETE(request) {
     try {
         if (!isAuthenticated(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const supabase = getSupabase();
+        if (!supabase) {
+            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur' }, { status: 500 });
         }
 
         const { searchParams } = new URL(request.url);
