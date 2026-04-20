@@ -219,8 +219,35 @@ export default function KalkulatorModal() {
                                 </div>
                             </div>
 
-                            <button onClick={handlePrint} className="no-print" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--primary-cyan)', color: 'var(--primary-dark)', border: 'none', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
-                                <i className="fas fa-print"></i> Cetak & Simpan Laporan
+                            <button 
+                                onClick={handlePrint} 
+                                className="no-print" 
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '1.2rem', 
+                                    borderRadius: '16px', 
+                                    background: 'linear-gradient(135deg, var(--primary-cyan) 0%, #06b6d4 100%)', 
+                                    color: 'var(--primary-dark)', 
+                                    border: 'none', 
+                                    fontWeight: '800', 
+                                    cursor: 'pointer', 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    gap: '0.3rem', 
+                                    marginTop: '2.5rem',
+                                    boxShadow: '0 10px 15px -3px rgba(6, 182, 212, 0.4)',
+                                    transition: 'transform 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <i className="fas fa-file-pdf" style={{ fontSize: '1.2rem' }}></i> 
+                                    <span>SIMPAN LAPORAN & NOTA</span>
+                                </div>
+                                <span style={{ fontSize: '0.65rem', opacity: 0.7, fontWeight: '600' }}>Klik untuk Simpan sebagai PDF / Cetak</span>
                             </button>
                         </div>
                     </div>
@@ -228,87 +255,70 @@ export default function KalkulatorModal() {
 
                 {/* DEDICATED PRINT REPORT VIEW */}
                 <div className="print-report">
-                    <div style={{ borderBottom: '4px solid var(--primary-cyan)', paddingBottom: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div style={{ borderBottom: '2px solid var(--primary-cyan)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
-                            <h2 style={{ color: 'var(--primary-dark)', marginBottom: '0.2rem' }}>CUPANG KLATEN</h2>
-                            <p style={{ fontSize: '0.8rem', color: '#666' }}>Laporan Analisis Bisnis Internal</p>
+                            <h3 style={{ color: 'var(--primary-dark)', margin: 0 }}>CUPANG KLATEN</h3>
+                            <p style={{ fontSize: '0.7rem', color: '#666', margin: 0 }}>Laporan Analisis Bisnis</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            <p style={{ fontSize: '0.7rem', fontWeight: 'bold', margin: 0 }}>{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                         </div>
                     </div>
 
-                    <h3 style={{ marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Rincian Biaya Modal</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2rem' }}>
+                    <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase' }}>Rincian Biaya Modal</h4>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1rem', fontSize: '0.8rem' }}>
                         <thead>
                             <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
-                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Item</th>
-                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Qty</th>
-                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Harga/Unit</th>
-                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Subtotal</th>
+                                <th style={{ padding: '8px', borderBottom: '2px solid #e2e8f0' }}>Item</th>
+                                <th style={{ padding: '8px', borderBottom: '2px solid #e2e8f0' }}>Qty</th>
+                                <th style={{ padding: '8px', borderBottom: '2px solid #e2e8f0' }}>Harga Satuan</th>
+                                <th style={{ padding: '8px', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             {items.map(item => (
                                 <tr key={item.id}>
-                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{item.name || '-'}</td>
-                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{item.qty || 0}</td>
-                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{formatRupiah(item.price || 0)}</td>
-                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{formatRupiah((item.qty || 0) * (item.price || 0))}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #e2e8f0' }}>{item.name || '-'}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #e2e8f0' }}>{item.qty || 0}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #e2e8f0' }}>{formatRupiah(item.price || 0)}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{formatRupiah((item.qty || 0) * (item.price || 0))}</td>
                                 </tr>
                             ))}
                             <tr style={{ fontWeight: 'bold', background: '#f1f5f9' }}>
-                                <td colSpan="3" style={{ padding: '12px', textAlign: 'right' }}>TOTAL MODAL KESELURUHAN (BATCH)</td>
-                                <td style={{ padding: '12px', textAlign: 'right' }}>{formatRupiah(totalModal)}</td>
+                                <td colSpan="3" style={{ padding: '8px', textAlign: 'right' }}>TOTAL MODAL BATCH</td>
+                                <td style={{ padding: '8px', textAlign: 'right' }}>{formatRupiah(totalModal)}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                        <div style={{ border: '2px solid #e2e8f0', padding: '1.5rem', borderRadius: '15px' }}>
-                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Ringkasan Unit</h4>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                <span>Jumlah Ikan:</span>
-                                <span style={{ fontWeight: 'bold' }}>{numFish} Ekor</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                <span>Modal per Ekor:</span>
-                                <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)' }}>{formatRupiah(modalPerFish)}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span>Pajak Shopee diatur:</span>
-                                <span style={{ fontWeight: 'bold' }}>{shopeeFee}%</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                        <div style={{ border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '10px' }}>
+                            <h5 style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.8rem' }}>Ringkasan Unit</h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.3rem' }}>
+                                <span>Ikan: {numFish} Ekor</span>
+                                <span style={{ fontWeight: 'bold' }}>Modal/Ekor: {formatRupiah(modalPerFish)}</span>
                             </div>
                         </div>
 
-                        <div>
-                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Rekomendasi Harga Jual</h4>
-                            <div style={{ display: 'grid', gap: '0.5rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
-                                    <span>Target 2x (Min):</span>
-                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(2))}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
-                                    <span>Target 3x (Ideal):</span>
-                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(3))}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
-                                    <span>Target 5x (Sultan):</span>
-                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(5))}</span>
-                                </div>
+                        <div style={{ border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '10px' }}>
+                            <h5 style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.8rem' }}>Target Jual (+ Pajak {shopeeFee}%)</h5>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.75rem' }}>
+                                <span>Min: <strong>{formatRupiah(calculateTarget(2))}</strong></span>
+                                <span>Ideal: <strong>{formatRupiah(calculateTarget(3))}</strong></span>
+                                <span>Sultan: <strong>{formatRupiah(calculateTarget(5))}</strong></span>
                             </div>
                         </div>
                     </div>
 
                     {receiptImage && (
-                        <div style={{ marginTop: '2rem' }}>
-                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Lampiran Bukti Nota</h4>
-                            <img src={receiptImage} alt="Bukti Nota" style={{ width: '100%', maxWidth: '500px', border: '1px solid #ddd', borderRadius: '10px' }} />
+                        <div>
+                            <h5 style={{ marginBottom: '0.5rem', color: '#64748b', fontSize: '0.8rem' }}>Lampiran Bukti Nota:</h5>
+                            <img src={receiptImage} alt="Bukti Nota" style={{ width: 'auto', maxHeight: '350px', border: '1px solid #ddd', borderRadius: '8px', display: 'block', margin: '0 auto' }} />
                         </div>
                     )}
 
-                    <div style={{ marginTop: '4rem', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '1rem', fontSize: '0.7rem', color: '#999' }}>
-                        Laporan ini dihasilkan secara otomatis oleh Sistem Manajemen Cupang Klaten.
+                    <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.6rem', color: '#999' }}>
+                        Laporan Analisis Bisnis Cupang Klaten
                     </div>
                 </div>
 
@@ -317,13 +327,12 @@ export default function KalkulatorModal() {
                     .print-report { display: none; }
                     @media (max-width: 900px) { .calculator-grid { grid-template-columns: 1fr; } .item-row { grid-template-columns: 1fr 1fr !important; } .item-row input:first-child { grid-column: 1 / -1; } }
                     @media print {
-                        @page { margin: 1cm; }
-                        body { background: white !important; color: black !important; }
+                        @page { size: A4; margin: 0.5cm; }
+                        body { background: white !important; color: black !important; padding: 0 !important; }
                         .no-print { display: none !important; }
-                        .print-report { display: block !important; }
-                        .printable-content { max-width: 100% !important; padding: 0 !important; }
-                        .calculator-grid { display: none !important; }
-                        .summary-section { display: none !important; }
+                        .print-report { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+                        .printable-content { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+                        .calculator-grid, .summary-section { display: none !important; }
                     }
                 `}</style>
             </div>
