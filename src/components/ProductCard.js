@@ -54,17 +54,14 @@ const ProductCard = ({ product }) => {
                     ) : (
                         <img src={product.img} alt={product.code} loading="lazy" decoding="async" />
                     )}
-                    {!isSoldOut && (
-                        <div className="price-badge-on-photo">
-                            <span className="ready-text">Ready</span>
-                            <span className="price-text">{formatRupiah(product.price)}</span>
-                        </div>
-                    )}
                     {images.length > 1 && <div className="img-count-badge"><i className="fas fa-images"></i> {images.length}</div>}
                 </div>
                 <div className="product-info">
                     <span className="product-code">{titleDisplay} - {product.code}</span>
-                    <div className="product-price">{formatRupiah(product.price)}</div>
+                    <div className="product-price-row">
+                        <div className="product-price">{formatRupiah(product.price)}</div>
+                        {!isSoldOut && <span className="ready-badge-inline">Ready</span>}
+                    </div>
                     <button className="buy-btn" onClick={() => setIsLightboxOpen(true)}>
                         {isSoldOut ? 'Detail Produk' : 'Beli di Sini'} <i className="fas fa-search-plus" style={{ marginLeft: '0.5rem' }}></i>
                     </button>
