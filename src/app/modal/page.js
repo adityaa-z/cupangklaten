@@ -97,13 +97,42 @@ export default function KalkulatorModal() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
                                 {items.map((item) => (
-                                    <div key={item.id} className="item-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 40px', gap: '1rem', alignItems: 'center', background: 'var(--bg-light)', padding: '0.6rem', borderRadius: '12px' }}>
-                                        <input type="text" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', width: '100%' }} />
-                                        <input type="number" value={item.qty} onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 0)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', width: '100%' }} />
-                                        <input type="number" value={item.price} onChange={(e) => updateItem(item.id, 'price', parseInt(e.target.value) || 0)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.5rem', fontSize: '0.8rem', width: '100%' }} />
-                                        <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444' }}><i className="fas fa-times"></i></button>
+                                    <div key={item.id} className="item-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 40px', gap: '0.8rem', alignItems: 'center', background: 'var(--bg-light)', padding: '1rem', borderRadius: '15px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Nama Biaya</span>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Contoh: Ikan HM"
+                                                value={item.name} 
+                                                onChange={(e) => updateItem(item.id, 'name', e.target.value)} 
+                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Jumlah</span>
+                                            <input 
+                                                type="number" 
+                                                placeholder="Qty"
+                                                value={item.qty} 
+                                                onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 0)} 
+                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Harga Satuan</span>
+                                            <input 
+                                                type="number" 
+                                                placeholder="Rp"
+                                                value={item.price} 
+                                                onChange={(e) => updateItem(item.id, 'price', parseInt(e.target.value) || 0)} 
+                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
+                                            />
+                                        </div>
+                                        <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', marginTop: '1rem', cursor: 'pointer' }}>
+                                            <i className="fas fa-trash-alt"></i>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
