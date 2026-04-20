@@ -149,12 +149,8 @@ export default function Home() {
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Ikan Cupang hias kualitas kontes & genetik mantap</p>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
-          
-          <div className="swipe-hint" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-dark)', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
-            <i className="fas fa-arrows-alt-h"></i>
-            <span>Geser untuk lihat ikan lainnya</span>
-          </div>
         </div>
+
 
         <div className="slider-container">
           <button className="slider-nav-btn prev" onClick={() => scroll(fishSliderRef, 'left')} disabled={!scrollFish.left} aria-label="Previous fish">
@@ -173,7 +169,15 @@ export default function Home() {
             <i className="fas fa-chevron-right"></i>
           </button>
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <div className="swipe-hint" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-dark)', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
+            <i className="fas fa-arrows-alt-h"></i>
+            <span>Geser untuk lihat ikan lainnya</span>
+          </div>
+        </div>
       </section>
+
 
       {/* Supplies Collection Section */}
       <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
@@ -183,12 +187,8 @@ export default function Home() {
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pakan, obat, dan perlengkapan ikan cupang terbaik</p>
           <div style={{ width: '60px', height: '4px', background: '#ff7043', borderRadius: '10px', marginTop: '1rem' }}></div>
-          
-          <div className="swipe-hint" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f4511e', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
-            <i className="fas fa-arrows-alt-h"></i>
-            <span>Geser untuk lihat perlengkapan lainnya</span>
-          </div>
         </div>
+
 
         <div className="slider-container">
           <button className="slider-nav-btn prev" onClick={() => scroll(suppliesSliderRef, 'left')} disabled={!scrollSupp.left} aria-label="Previous supplies">
@@ -202,12 +202,19 @@ export default function Home() {
             ) : (
               <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Stok perlengkapan sedang disiapkan.</p>
             )}
-
           </div>
           <button className="slider-nav-btn next" onClick={() => scroll(suppliesSliderRef, 'right')} disabled={!scrollSupp.right} aria-label="Next supplies">
             <i className="fas fa-chevron-right"></i>
           </button>
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <div className="swipe-hint" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f4511e', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
+            <i className="fas fa-arrows-alt-h"></i>
+            <span>Geser untuk lihat perlengkapan lainnya</span>
+          </div>
+        </div>
+
 
         <div style={{ textAlign: 'center', marginTop: '4rem' }}>
           <Link href="/stok" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
