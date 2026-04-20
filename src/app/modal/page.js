@@ -5,14 +5,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
 
-export const metadata = {
-    title: 'Kalkulator Modal Internal',
-    robots: {
-        index: false,
-        follow: false,
-    },
-};
-
 export default function KalkulatorModal() {
     const [items, setItems] = useState([
         { id: 1, name: 'Ikan Indukan', qty: 1, price: 0 },
