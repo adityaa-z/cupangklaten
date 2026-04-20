@@ -9,7 +9,7 @@ export default function CaraOrderPage() {
             <Navbar />
             <div style={{ padding: '4rem 2rem', maxWidth: '800px', margin: '0 auto' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center' }}>Cara <span style={{ color: 'var(--primary-cyan)' }}>Order</span></h1>
-                <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: 'var(--card-shadow)' }}>
+                <div style={{ background: 'var(--bg-white)', padding: '2rem', borderRadius: '15px', boxShadow: 'var(--card-shadow)' }}>
                     <div style={{ marginBottom: '2rem' }}>
                         <h3>1. Pilih Ikan</h3>
                         <p>Cek katalog stok kami di menu "Stok". Pilih ikan yang Anda sukai.</p>

@@ -74,7 +74,7 @@ const StokContent = () => {
             <Navbar />
             
             {/* Page Header */}
-            <div style={{ background: 'linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%)', padding: '3rem 2rem', textAlign: 'center' }}>
+            <div style={{ background: 'var(--bg-light)', padding: '3rem 2rem', textAlign: 'center', borderBottom: '1px solid var(--border-color)' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
                     Stok Ikan <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ready</span>
                 </h1>

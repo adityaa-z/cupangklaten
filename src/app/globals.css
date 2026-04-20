@@ -98,6 +98,8 @@ header {
     border-radius: 50px;
     outline: none;
     transition: var(--transition-smooth);
+    background: var(--bg-white);
+    color: var(--text-dark);
 }
 
 .search-bar input:focus {

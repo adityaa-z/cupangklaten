@@ -9,7 +9,7 @@ export default function TipsPerawatanPage() {
             <Navbar />
             <div style={{ padding: '4rem 2rem', maxWidth: '800px', margin: '0 auto' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center' }}>Tips <span style={{ color: 'var(--primary-cyan)' }}>Perawatan</span></h1>
-                <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: 'var(--card-shadow)' }}>
+                <div style={{ background: 'var(--bg-white)', padding: '2rem', borderRadius: '15px', boxShadow: 'var(--card-shadow)' }}>
                     <h3 style={{ marginBottom: '1rem' }}>Menjaga Kualitas Air</h3>
                     <p style={{ marginBottom: '2rem' }}>Gunakan air yang sudah diendapkan minimal 24 jam. Tambahkan sedikit garam ikan dan ekstrak ketapang untuk menjaga pH air tetap stabil.</p>
                     

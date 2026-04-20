@@ -44,7 +44,7 @@ export default function FAQPage() {
                     ) : faqs.length > 0 ? (
                         faqs.map(faq => (
                             <div key={faq.id} className="faq-item" style={{ 
-                                background: 'white', 
+                                background: 'var(--bg-white)', 
                                 borderRadius: '12px', 
                                 marginBottom: '1rem', 
                                 padding: '1.5rem', 
