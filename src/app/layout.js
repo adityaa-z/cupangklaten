@@ -77,9 +77,10 @@ export default function RootLayout({ children }) {
               "@type": "LocalBusiness",
               "name": "Cupang Klaten",
               "image": "https://www.cupangklaten.my.id/logo.png",
+              "logo": "https://www.cupangklaten.my.id/logo.png",
               "@id": "https://www.cupangklaten.my.id",
               "url": "https://www.cupangklaten.my.id",
-              "telephone": "+6281234567890", // Ganti dengan nomor asli jika ada
+              "telephone": "+6281234567890",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Klaten",
@@ -88,29 +89,29 @@ export default function RootLayout({ children }) {
                 "postalCode": "57411",
                 "addressCountry": "ID"
               },
-              "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -7.7028,
-                "longitude": 110.6031
-              },
-              "openingHoursSpecification": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday"
-                ],
-                "opens": "00:00",
-                "closes": "23:59"
-              },
               "sameAs": [
                 "https://www.instagram.com/cupangklaten.id",
                 "https://www.tiktok.com/@cupangklaten.id"
               ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Cupang Klaten",
+              "url": "https://www.cupangklaten.my.id",
+              "publisher": {
+                "@type": "Organization",
+                "name": "Cupang Klaten",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.cupangklaten.my.id/logo.png"
+                }
+              }
             })
           }}
         />
