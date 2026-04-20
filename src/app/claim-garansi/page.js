@@ -57,19 +57,19 @@ export default function ClaimGaransiPage() {
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ fontSize: '1.2rem', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--text-dark)' }}>
                                 <span style={{ background: 'var(--primary-cyan)', color: 'white', width: '28px', height: '28px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyCenter: 'center', fontSize: '0.9rem', justifyContent: 'center' }}>4</span>
-                                Layanan Pengiriman
+                                Jangkauan Garansi
                             </h3>
                             <p style={{ color: 'var(--text-muted)', paddingLeft: '2.5rem', lineHeight: '1.6' }}>
-                                Garansi hanya berlaku untuk pengiriman menggunakan layanan **Express / Next Day**. Pengiriman reguler yang memakan waktu lebih dari 4 hari di luar tanggung jawab garansi kami.
+                                Kami memberikan **Garansi 100% untuk Semua Jenis Pengiriman**, baik Express maupun Reguler. Kami berkomitmen menjaga keamanan ikan Anda hingga sampai di tujuan.
                             </p>
                         </div>
 
                         <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Opsi Penggantian:</h3>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Kebijakan Penggantian & Refund:</h3>
                             <ul style={{ color: 'var(--text-muted)', paddingLeft: '3.5rem', lineHeight: '1.8' }}>
-                                <li>Ikan akan diganti dengan jenis dan kualitas yang setara.</li>
-                                <li>Biaya pengiriman ikan ganti ditanggung sepenuhnya oleh pembeli (atau bisa dikirim bersamaan dengan orderan berikutnya).</li>
-                                <li>Uang kembali (refund) hanya berlaku senilai harga ikan saja (tidak termasuk ongkos kirim).</li>
+                                <li><strong>Uang Kembali 100%:</strong> Kami memberikan garansi uang kembali senilai harga ikan (tidak termasuk ongkos kirim) jika ikan mati saat diterima.</li>
+                                <li><strong>Ganti Ikan Baru:</strong> Ikan dapat diganti dengan jenis yang setara (biaya ongkos kirim ikan baru ditanggung pembeli).</li>
+                                <li>Semua klaim wajib menyertakan video unboxing sesuai poin nomor 1.</li>
                             </ul>
                         </div>
                     </div>
