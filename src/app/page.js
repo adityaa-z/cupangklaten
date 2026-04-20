@@ -11,12 +11,19 @@ import { supabase } from '@/lib/supabase';
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [fishProducts, setFishProducts] = useState([]);
+  const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const sliderRef = React.useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Refs for sliders
+  const fishSliderRef = React.useRef(null);
+  const suppliesSliderRef = React.useRef(null);
+
+  // Scroll states
+  const [scrollFish, setScrollFish] = useState({ left: false, right: true });
+  const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
+
 
 
   useEffect(() => {
@@ -39,37 +46,13 @@ export default function Home() {
 
         if (error) throw error;
 
-        // Logic: Strictly 6 items total, prioritized by pinned and diverse categories
-        const readyProducts = data.filter(p => (p.is_available && p.stock > 0) && !p.is_archived);
-        const categories = ['Plakat', 'Halfmoon', 'HMPK', 'Crowntail', 'Giant', 'Kebutuhan Ikan'];
-        
-        let selected = [];
-        
-        // 1. First, take all pinned products (limit to 12)
-        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 12);
-        selected = [...pinned];
+        // Separate products
+        const fish = readyProducts.filter(p => p.category?.toLowerCase() !== 'kebutuhan ikan');
+        const supplies = readyProducts.filter(p => p.category?.toLowerCase() === 'kebutuhan ikan');
 
-        // 2. If less than 12, try to fill with 1 from each category that isn't already selected
-        if (selected.length < 12) {
-            categories.forEach(cat => {
-                if (selected.length >= 12) return;
-                const item = readyProducts.find(p => 
-                    p.category.toLowerCase() === cat.toLowerCase() && 
-                    !selected.find(s => s.id === p.id)
-                );
-                if (item) selected.push(item);
-            });
-        }
+        setFishProducts(fish.slice(0, 10)); // Top 10 fish
+        setSuppliesProducts(supplies.slice(0, 10)); // Top 10 supplies
 
-        // 3. If still less than 12, fill with newest available
-        if (selected.length < 12) {
-            const remaining = readyProducts
-                .filter(p => !selected.find(s => s.id === p.id))
-                .slice(0, 12 - selected.length);
-            selected = [...selected, ...remaining];
-        }
-
-        setFeaturedProducts(selected.slice(0, 12));
       } catch (err) {
         console.error('Error fetching featured products:', err);
       } finally {
@@ -80,34 +63,49 @@ export default function Home() {
     fetchFeatured();
   }, []);
 
-  const handleScroll = () => {
-    if (sliderRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-      setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  const handleScroll = (ref, setScrollState) => {
+    if (ref.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = ref.current;
+      setScrollState({
+        left: scrollLeft > 10,
+        right: scrollLeft < scrollWidth - clientWidth - 10
+      });
     }
   };
 
   useEffect(() => {
-    const slider = sliderRef.current;
-    if (slider) {
-      slider.addEventListener('scroll', handleScroll);
-      // Initial check
-      handleScroll();
-      return () => slider.removeEventListener('scroll', handleScroll);
-    }
-  }, [loading, featuredProducts]);
+    const fSlider = fishSliderRef.current;
+    const sSlider = suppliesSliderRef.current;
+    
+    const onFishScroll = () => handleScroll(fishSliderRef, setScrollFish);
+    const onSuppScroll = () => handleScroll(suppliesSliderRef, setScrollSupp);
 
-  const scroll = (direction) => {
-    if (sliderRef.current) {
-      const { clientWidth } = sliderRef.current;
+    if (fSlider) fSlider.addEventListener('scroll', onFishScroll);
+    if (sSlider) sSlider.addEventListener('scroll', onSuppScroll);
+    
+    // Initial checks
+    setTimeout(() => {
+      onFishScroll();
+      onSuppScroll();
+    }, 500);
+
+    return () => {
+      if (fSlider) fSlider.removeEventListener('scroll', onFishScroll);
+      if (sSlider) sSlider.removeEventListener('scroll', onSuppScroll);
+    };
+  }, [loading, fishProducts, suppliesProducts]);
+
+  const scroll = (ref, direction) => {
+    if (ref.current) {
+      const { clientWidth } = ref.current;
       const scrollAmount = clientWidth * 0.8;
-      sliderRef.current.scrollBy({
+      ref.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
       });
     }
   };
+
 
 
   return (
@@ -136,69 +134,81 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Best Collection Section (Max 6) */}
-      <section className="products-section" id="products">
+      {/* Fish Collection Section */}
+      <section className="products-section" id="products" style={{ paddingBottom: '2rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaik</span>
+            Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Pilihan</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Produk Unggulan dari cupangklaten.id</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Ikan Cupang hias kualitas kontes & genetik mantap</p>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
           
           <div className="swipe-hint" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-dark)', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
             <i className="fas fa-arrows-alt-h"></i>
-            <span>Geser kanan-kiri untuk melihat koleksi</span>
+            <span>Geser untuk lihat ikan lainnya</span>
           </div>
         </div>
 
         <div className="slider-container">
-          <button 
-            className="slider-nav-btn prev" 
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            aria-label="Previous products"
-          >
+          <button className="slider-nav-btn prev" onClick={() => scroll(fishSliderRef, 'left')} disabled={!scrollFish.left} aria-label="Previous fish">
             <i className="fas fa-chevron-left"></i>
           </button>
-
-          <div className="product-slider" ref={sliderRef}>
+          <div className="product-slider" ref={fishSliderRef}>
             {loading ? (
-              // Skeleton Loader
-              [...Array(6)].map((_, i) => (
-                <div key={i} className="skeleton-card">
-                  <div className="skeleton-img skeleton"></div>
-                  <div className="skeleton-text skeleton"></div>
-                  <div className="skeleton-price skeleton"></div>
-                  <div className="skeleton-btn skeleton"></div>
-                </div>
-              ))
-            ) : featuredProducts.length > 0 ? (
-              featuredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))
+              [...Array(4)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div><div className="skeleton-price skeleton"></div><div className="skeleton-btn skeleton"></div></div>)
+            ) : fishProducts.length > 0 ? (
+              fishProducts.map(product => <ProductCard key={product.id} product={product} />)
             ) : (
-              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Belum ada stok tersedia.</p>
+              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Stok ikan sedang disiapkan.</p>
             )}
           </div>
+          <button className="slider-nav-btn next" onClick={() => scroll(fishSliderRef, 'right')} disabled={!scrollFish.right} aria-label="Next fish">
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
 
-          <button 
-            className="slider-nav-btn next" 
-            onClick={() => scroll('right')}
-            disabled={!canScrollRight}
-            aria-label="Next products"
-          >
+      {/* Supplies Collection Section */}
+      <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+            Kebutuhan <span style={{ background: 'linear-gradient(to right, #ff7043, #f4511e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan & Aksesoris</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pakan, obat, dan perlengkapan ikan cupang terbaik</p>
+          <div style={{ width: '60px', height: '4px', background: '#ff7043', borderRadius: '10px', marginTop: '1rem' }}></div>
+          
+          <div className="swipe-hint" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f4511e', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
+            <i className="fas fa-arrows-alt-h"></i>
+            <span>Geser untuk lihat perlengkapan lainnya</span>
+          </div>
+        </div>
+
+        <div className="slider-container">
+          <button className="slider-nav-btn prev" onClick={() => scroll(suppliesSliderRef, 'left')} disabled={!scrollSupp.left} aria-label="Previous supplies">
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <div className="product-slider" ref={suppliesSliderRef}>
+            {loading ? (
+              [...Array(4)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div><div className="skeleton-price skeleton"></div><div className="skeleton-btn skeleton"></div></div>)
+            ) : suppliesProducts.length > 0 ? (
+              suppliesProducts.map(product => <ProductCard key={product.id} product={product} />)
+            ) : (
+              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Stok perlengkapan sedang disiapakan.</p>
+            )}
+          </div>
+          <button className="slider-nav-btn next" onClick={() => scroll(suppliesSliderRef, 'right')} disabled={!scrollSupp.right} aria-label="Next supplies">
             <i className="fas fa-chevron-right"></i>
           </button>
         </div>
 
-
         <div style={{ textAlign: 'center', marginTop: '4rem' }}>
           <Link href="/stok" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
-            Lihat Semua Stok Ready 
+            Lihat Semua Produk
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>
       </section>
+
 
       {/* Education Section */}
       <section className="blog-section">
