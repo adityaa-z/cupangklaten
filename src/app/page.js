@@ -46,12 +46,19 @@ export default function Home() {
 
         if (error) throw error;
 
-        // Separate products
-        const fish = readyProducts.filter(p => p.category?.toLowerCase() !== 'kebutuhan ikan');
-        const supplies = readyProducts.filter(p => p.category?.toLowerCase() === 'kebutuhan ikan');
+        // Separate products - include sold out but exclude archived
+        const filtered = (data || []).filter(p => !p.is_archived);
+        
+        const fish = filtered.filter(p => p.category?.toLowerCase() !== 'kebutuhan ikan');
+        const supplies = filtered.filter(p => p.category?.toLowerCase() === 'kebutuhan ikan');
 
-        setFishProducts(fish.slice(0, 10)); // Top 10 fish
-        setSuppliesProducts(supplies.slice(0, 10)); // Top 10 supplies
+        // Prioritize pinned products for the featured sliders
+        const sortedFish = [...fish].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
+        const sortedSupplies = [...supplies].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
+
+        setFishProducts(sortedFish.slice(0, 10)); 
+        setSuppliesProducts(sortedSupplies.slice(0, 10));
+
 
       } catch (err) {
         console.error('Error fetching featured products:', err);
@@ -193,8 +200,9 @@ export default function Home() {
             ) : suppliesProducts.length > 0 ? (
               suppliesProducts.map(product => <ProductCard key={product.id} product={product} />)
             ) : (
-              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Stok perlengkapan sedang disiapakan.</p>
+              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Stok perlengkapan sedang disiapkan.</p>
             )}
+
           </div>
           <button className="slider-nav-btn next" onClick={() => scroll(suppliesSliderRef, 'right')} disabled={!scrollSupp.right} aria-label="Next supplies">
             <i className="fas fa-chevron-right"></i>

@@ -64,8 +64,9 @@ const ProductCard = ({ product }) => {
                     <span className="product-code">{titleDisplay}</span>
                     <div className="product-price-row">
                         <div className="product-price">{formatRupiah(product.price)}</div>
-                        {!isSoldOut && <span className="ready-badge-inline">Ready</span>}
+                        {!isSoldOut && <span className="ready-badge-inline">Stock: {product.stock}</span>}
                     </div>
+
                     <button className="buy-btn" onClick={() => setIsLightboxOpen(true)}>
                         {isSoldOut ? 'Detail Produk' : 'Beli di Sini'} <i className="fas fa-search-plus" style={{ marginLeft: '0.5rem' }}></i>
                     </button>
