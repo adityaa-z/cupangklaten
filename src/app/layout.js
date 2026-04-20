@@ -15,6 +15,10 @@ export const metadata = {
   verification: {
     google: "Cm3Ij7HVbOgV1-1DpBXwz4qqYm9Yjgftqt8HN5m0qsM",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     title: "Cupang Klaten | Koleksi Ikan Cupang Terbaik",
     description: "Jual Ikan Cupang Klaten berkualitas. Koleksi Cupang HMPK, Giant, Plakat, dan Crowntail terbaik dari Klaten.",
