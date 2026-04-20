@@ -11,9 +11,9 @@ export default function KalkulatorModal() {
     const [receiptImage, setReceiptImage] = useState(null);
     const [customPrice, setCustomPrice] = useState('');
     const [items, setItems] = useState([
-        { id: 1, name: 'Total Nota Pembelian', qty: 1, price: 0 },
-        { id: 2, name: 'Plastik & Packing', qty: 1, price: 0 },
-        { id: 3, name: 'Pakan & Perawatan', qty: 1, price: 0 },
+        { id: 1, name: '', qty: 1, price: 0 },
+        { id: 2, name: '', qty: 1, price: 0 },
+        { id: 3, name: '', qty: 1, price: 0 },
     ]);
 
     const handleImageUpload = (e) => {
