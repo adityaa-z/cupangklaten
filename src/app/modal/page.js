@@ -41,12 +41,23 @@ export default function KalkulatorModal() {
         }));
     };
 
-    const totalModal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
-    const modalPerFish = totalModal / (numFish > 0 ? numFish : 1);
+    const totalModal = items.reduce((sum, item) => {
+        const q = parseFloat(item.qty) || 0;
+        const p = parseFloat(item.price) || 0;
+        return sum + (q * p);
+    }, 0);
+    
+    const modalPerFish = totalModal / (parseFloat(numFish) > 0 ? parseFloat(numFish) : 1);
 
     const calculateTarget = (multiplier) => {
         const baseTarget = modalPerFish * multiplier;
-        return baseTarget / (1 - (shopeeFee / 100));
+        const tax = baseTarget * (shopeeFee / 100);
+        return baseTarget + tax;
+    };
+
+    const getTaxBreakdown = (multiplier) => {
+        const baseTarget = modalPerFish * multiplier;
+        return baseTarget * (shopeeFee / 100);
     };
 
     const formatRupiah = (number) => {
@@ -82,7 +93,7 @@ export default function KalkulatorModal() {
                                     <input 
                                         type="number" 
                                         value={numFish}
-                                        onChange={(e) => setNumFish(parseInt(e.target.value) || 1)}
+                                        onChange={(e) => setNumFish(e.target.value)}
                                         style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-white)', fontWeight: '700' }}
                                     />
                                 </div>
@@ -91,7 +102,7 @@ export default function KalkulatorModal() {
                                     <input 
                                         type="number" 
                                         value={shopeeFee}
-                                        onChange={(e) => setShopeeFee(parseFloat(e.target.value) || 0)}
+                                        onChange={(e) => setShopeeFee(e.target.value)}
                                         style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #fed7aa', background: 'white', fontWeight: '700' }}
                                     />
                                 </div>
@@ -116,7 +127,7 @@ export default function KalkulatorModal() {
                                                 type="number" 
                                                 placeholder="Qty"
                                                 value={item.qty} 
-                                                onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 0)} 
+                                                onChange={(e) => updateItem(item.id, 'qty', e.target.value)} 
                                                 style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
                                             />
                                         </div>
@@ -126,7 +137,7 @@ export default function KalkulatorModal() {
                                                 type="number" 
                                                 placeholder="Rp"
                                                 value={item.price} 
-                                                onChange={(e) => updateItem(item.id, 'price', parseInt(e.target.value) || 0)} 
+                                                onChange={(e) => updateItem(item.id, 'price', e.target.value)} 
                                                 style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
                                             />
                                         </div>
@@ -167,13 +178,19 @@ export default function KalkulatorModal() {
                                 </div>
 
                                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '15px', borderLeft: '4px solid #f97316', marginBottom: '1rem' }}>
-                                    <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 'bold' }}>HARGA JUAL MINIMUM (2x + Shopee):</p>
+                                    <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 'bold' }}>TARGET JUAL MINIMUM (2x + Pajak):</p>
                                     <h3 style={{ fontSize: '1.4rem' }}>{formatRupiah(calculateTarget(2))}</h3>
+                                    <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.3rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 2)} + Pajak Shopee: {formatRupiah(getTaxBreakdown(2))})
+                                    </p>
                                 </div>
 
                                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '15px', borderLeft: '4px solid #10b981' }}>
-                                    <p style={{ color: '#34d399', fontSize: '0.75rem', fontWeight: 'bold' }}>HARGA JUAL IDEAL (3x + Shopee):</p>
+                                    <p style={{ color: '#34d399', fontSize: '0.75rem', fontWeight: 'bold' }}>TARGET JUAL IDEAL (3x + Pajak):</p>
                                     <h3 style={{ fontSize: '1.4rem' }}>{formatRupiah(calculateTarget(3))}</h3>
+                                    <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.3rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 3)} + Pajak Shopee: {formatRupiah(getTaxBreakdown(3))})
+                                    </p>
                                 </div>
                             </div>
 
