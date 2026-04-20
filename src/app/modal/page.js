@@ -71,7 +71,7 @@ export default function KalkulatorModal() {
 
     return (
         <>
-            <div className="no-print"><Navbar /></div>
+            <div className="no-print" style={{ display: 'contents' }}><Navbar /></div>
             <div className="modal-calculator-page printable-content" style={{ padding: '2rem 1rem', maxWidth: '1000px', margin: '0 auto', minHeight: '80vh' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.5rem' }}>
@@ -328,10 +328,10 @@ export default function KalkulatorModal() {
                     @media (max-width: 900px) { .calculator-grid { grid-template-columns: 1fr; } .item-row { grid-template-columns: 1fr 1fr !important; } .item-row input:first-child { grid-column: 1 / -1; } }
                     @media print {
                         @page { size: A4; margin: 0.5cm; }
-                        body { background: white !important; color: black !important; padding: 0 !important; }
-                        .no-print { display: none !important; }
-                        .print-report { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-                        .printable-content { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+                        html, body { height: auto !important; min-height: 0 !important; background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+                        .no-print, header, footer, nav, .fab-container { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
+                        .print-report { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
+                        .printable-content { max-width: 100% !important; padding: 0 !important; margin: 0 !important; min-height: 0 !important; }
                         .calculator-grid, .summary-section { display: none !important; }
                     }
                 `}</style>
