@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
+import { toPng } from 'html-to-image';
 
 export default function KalkulatorModal() {
     const [numFish, setNumFish] = useState(1);
@@ -65,8 +66,34 @@ export default function KalkulatorModal() {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
     };
 
+    const reportRef = useRef(null);
+
     const handlePrint = () => {
         window.print();
+    };
+
+    const handleSaveImage = async () => {
+        if (!reportRef.current) return;
+        
+        try {
+            // Background process to capture the hidden report
+            const dataUrl = await toPng(reportRef.current, {
+                cacheBust: true,
+                backgroundColor: '#ffffff',
+                style: {
+                    display: 'block',
+                    position: 'static',
+                    width: '600px' // Optimal width for gallery
+                }
+            });
+            const link = document.createElement('a');
+            link.download = `Cupang-Klaten-Report-${Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            console.error('Error saving image:', err);
+            alert('Gagal menyimpan gambar. Silakan coba gunakan tombol Simpan PDF.');
+        }
     };
 
     return (
@@ -219,42 +246,73 @@ export default function KalkulatorModal() {
                                 </div>
                             </div>
 
-                            <button 
-                                onClick={handlePrint} 
-                                className="no-print" 
-                                style={{ 
-                                    width: '100%', 
-                                    padding: '1.2rem', 
-                                    borderRadius: '16px', 
-                                    background: 'linear-gradient(135deg, var(--primary-cyan) 0%, #06b6d4 100%)', 
-                                    color: 'var(--primary-dark)', 
-                                    border: 'none', 
-                                    fontWeight: '800', 
-                                    cursor: 'pointer', 
-                                    display: 'flex', 
-                                    flexDirection: 'column',
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
-                                    gap: '0.3rem', 
-                                    marginTop: '2.5rem',
-                                    boxShadow: '0 10px 15px -3px rgba(6, 182, 212, 0.4)',
-                                    transition: 'transform 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <i className="fas fa-file-pdf" style={{ fontSize: '1.2rem' }}></i> 
-                                    <span>SIMPAN LAPORAN & NOTA</span>
-                                </div>
-                                <span style={{ fontSize: '0.65rem', opacity: 0.7, fontWeight: '600' }}>Klik untuk Simpan sebagai PDF / Cetak</span>
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2.5rem' }}>
+                                <button 
+                                    onClick={handlePrint} 
+                                    className="no-print" 
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '1.2rem', 
+                                        borderRadius: '16px', 
+                                        background: 'linear-gradient(135deg, var(--primary-cyan) 0%, #06b6d4 100%)', 
+                                        color: 'var(--primary-dark)', 
+                                        border: 'none', 
+                                        fontWeight: '800', 
+                                        cursor: 'pointer', 
+                                        display: 'flex', 
+                                        flexDirection: 'column',
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        gap: '0.3rem', 
+                                        boxShadow: '0 10px 15px -3px rgba(6, 182, 212, 0.4)',
+                                        transition: 'transform 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <i className="fas fa-file-pdf" style={{ fontSize: '1.2rem' }}></i> 
+                                        <span>SIMPAN LAPORAN (PDF)</span>
+                                    </div>
+                                    <span style={{ fontSize: '0.65rem', opacity: 0.7, fontWeight: '600' }}>Hasil tajam & bisa dicetak</span>
+                                </button>
+
+                                <button 
+                                    onClick={handleSaveImage} 
+                                    className="no-print" 
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '1.2rem', 
+                                        borderRadius: '16px', 
+                                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
+                                        color: 'white', 
+                                        border: 'none', 
+                                        fontWeight: '800', 
+                                        cursor: 'pointer', 
+                                        display: 'flex', 
+                                        flexDirection: 'column',
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        gap: '0.3rem', 
+                                        boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)',
+                                        transition: 'transform 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <i className="fas fa-image" style={{ fontSize: '1.2rem' }}></i> 
+                                        <span>SIMPAN KE GALERI (FOTO)</span>
+                                    </div>
+                                    <span style={{ fontSize: '0.65rem', opacity: 0.8, fontWeight: '600' }}>Simpan sebagai gambar PNG</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* DEDICATED PRINT REPORT VIEW */}
-                <div className="print-report">
+                <div className="print-report" ref={reportRef}>
                     <div style={{ borderBottom: '2px solid var(--primary-cyan)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
                             <h3 style={{ color: 'var(--primary-dark)', margin: 0 }}>CUPANG KLATEN</h3>
