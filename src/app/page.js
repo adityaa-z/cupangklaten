@@ -14,6 +14,10 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const sliderRef = React.useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
 
   useEffect(() => {
     async function fetchReviews() {
@@ -76,6 +80,36 @@ export default function Home() {
     fetchFeatured();
   }, []);
 
+  const handleScroll = () => {
+    if (sliderRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (slider) {
+      slider.addEventListener('scroll', handleScroll);
+      // Initial check
+      handleScroll();
+      return () => slider.removeEventListener('scroll', handleScroll);
+    }
+  }, [loading, featuredProducts]);
+
+  const scroll = (direction) => {
+    if (sliderRef.current) {
+      const { clientWidth } = sliderRef.current;
+      const scrollAmount = clientWidth * 0.8;
+      sliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+
   return (
     <>
       <Navbar />
@@ -112,25 +146,46 @@ export default function Home() {
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
-        <div className="product-grid">
-          {loading ? (
-            // Skeleton Loader
-            [...Array(6)].map((_, i) => (
-              <div key={i} className="skeleton-card">
-                <div className="skeleton-img skeleton"></div>
-                <div className="skeleton-text skeleton"></div>
-                <div className="skeleton-price skeleton"></div>
-                <div className="skeleton-btn skeleton"></div>
-              </div>
-            ))
-          ) : featuredProducts.length > 0 ? (
-            featuredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>Belum ada stok tersedia.</p>
-          )}
+        <div className="slider-container">
+          <button 
+            className="slider-nav-btn prev" 
+            onClick={() => scroll('left')}
+            disabled={!canScrollLeft}
+            aria-label="Previous products"
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+
+          <div className="product-slider" ref={sliderRef}>
+            {loading ? (
+              // Skeleton Loader
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="skeleton-card">
+                  <div className="skeleton-img skeleton"></div>
+                  <div className="skeleton-text skeleton"></div>
+                  <div className="skeleton-price skeleton"></div>
+                  <div className="skeleton-btn skeleton"></div>
+                </div>
+              ))
+            ) : featuredProducts.length > 0 ? (
+              featuredProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', width: '100%', padding: '2rem' }}>Belum ada stok tersedia.</p>
+            )}
+          </div>
+
+          <button 
+            className="slider-nav-btn next" 
+            onClick={() => scroll('right')}
+            disabled={!canScrollRight}
+            aria-label="Next products"
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
         </div>
+
 
         <div style={{ textAlign: 'center', marginTop: '4rem' }}>
           <Link href="/stok" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>

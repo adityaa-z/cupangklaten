@@ -322,6 +322,104 @@ header {
     gap: 2rem;
 }
 
+/* Product Slider Styles */
+.slider-container {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 3rem;
+}
+
+.product-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 2rem;
+    padding: 1.5rem 0.5rem 3.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    margin: -1.5rem -0.5rem -3.5rem; /* Offset padding to prevent clipping */
+}
+
+.product-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.product-slider .product-card,
+.product-slider .skeleton-card {
+    min-width: 300px;
+    flex: 0 0 300px;
+    scroll-snap-align: center;
+}
+
+.slider-nav-btn {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+
+.slider-nav-btn:hover {
+    background: var(--primary-cyan);
+    color: white;
+    border-color: var(--primary-cyan);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 15px 30px rgba(0, 188, 212, 0.3);
+}
+
+.slider-nav-btn.prev {
+    left: 0;
+}
+
+.slider-nav-btn.next {
+    right: 0;
+}
+
+.slider-nav-btn:disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+[data-theme='dark'] .slider-nav-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+    .slider-container {
+        padding: 0 1rem;
+    }
+    .slider-nav-btn {
+        display: none; /* Swipe is primary on mobile */
+    }
+    .product-slider {
+        gap: 1.2rem;
+        padding-bottom: 2.5rem;
+        margin-bottom: -2.5rem;
+    }
+    .product-slider .product-card,
+    .product-slider .skeleton-card {
+        min-width: 260px;
+        flex: 0 0 82vw; /* Standard peek effect: 82% width shows part of the next card */
+    }
+}
+
+
 .product-card {
     background: var(--bg-white);
     border-radius: 20px;
