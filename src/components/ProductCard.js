@@ -61,7 +61,7 @@ const ProductCard = ({ product }) => {
                     {images.length > 1 && <div className="img-count-badge"><i className="fas fa-images"></i> {images.length}</div>}
                 </div>
                 <div className="product-info">
-                    <span className="product-code">{titleDisplay} - {product.code}</span>
+                    <span className="product-code">{titleDisplay}</span>
                     <div className="product-price-row">
                         <div className="product-price">{formatRupiah(product.price)}</div>
                         {!isSoldOut && <span className="ready-badge-inline">Ready</span>}
@@ -99,10 +99,14 @@ const ProductCard = ({ product }) => {
                             </div>
 
                             <div className="modal-info-section">
-                                <h3 className="modal-title">{titleDisplay} - {product.code}</h3>
+                                <h3 className="modal-title">{titleDisplay}</h3>
                                 <div className="modal-price">{formatRupiah(product.price)}</div>
                                 
                                 <div className="modal-details">
+                                    <div className="detail-item">
+                                        <i className="fas fa-fingerprint"></i>
+                                        <span>Kode Produk: <strong>{product.code}</strong></span>
+                                    </div>
                                     <div className="detail-item">
                                         <i className={`fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}`}></i>
                                         <span>Jenis Kelamin: <strong>{product.gender}</strong></span>
