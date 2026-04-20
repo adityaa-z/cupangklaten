@@ -54,6 +54,10 @@ const ProductCard = ({ product }) => {
                     ) : (
                         <img src={product.img} alt={product.code} loading="lazy" decoding="async" />
                     )}
+                    <div className="img-overlay">
+                        <i className="fas fa-search-plus"></i>
+                        <span>Lihat Foto</span>
+                    </div>
                     {images.length > 1 && <div className="img-count-badge"><i className="fas fa-images"></i> {images.length}</div>}
                 </div>
                 <div className="product-info">
