@@ -170,7 +170,7 @@ export default function Home() {
       </section>
 
       {/* Reviews Section */}
-      <section className="reviews-section">
+      <section className="reviews-section" id="reviews">
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <h2 className="section-title">Kata Pelanggan cupangklaten.id</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Ulasan asli dari Google Maps</p>

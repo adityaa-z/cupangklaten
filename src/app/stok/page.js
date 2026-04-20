@@ -101,7 +101,7 @@ const StokContent = () => {
                         </h2>
                     </div>
                     <div className="filter-tabs">
-                        {['all', 'plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'kebutuhan ikan'].map(cat => (
+                        {['all', ...Array.from(new Set(products.map(p => p.category?.toLowerCase()).filter(Boolean)))].map(cat => (
                             <button 
                                 key={cat}
                                 className={`filter-btn ${currentCategory === cat ? 'active' : ''}`}

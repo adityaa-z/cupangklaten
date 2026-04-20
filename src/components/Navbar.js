@@ -5,17 +5,30 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const Navbar = () => {
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [theme, setTheme] = useState('light');
 
     useEffect(() => {
-        const handleClickOutside = () => setDropdownOpen(false);
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        const handleClickOutside = () => setMenuOpen(false);
         window.addEventListener('click', handleClickOutside);
         return () => window.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const toggleDropdown = (e) => {
+    const toggleMenu = (e) => {
         e.stopPropagation();
-        setDropdownOpen(!dropdownOpen);
+        setMenuOpen(!menuOpen);
+    };
+
+    const toggleTheme = (e) => {
+        e.stopPropagation();
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.setAttribute('data-theme', newTheme);
     };
 
     return (
@@ -26,24 +39,32 @@ const Navbar = () => {
                     <span className="logo-text">CUPANGKLATEN.ID</span>
                 </Link>
 
-                <div className="nav-links">
-                    <div className="dropdown" style={{ position: 'relative', cursor: 'pointer' }}>
-                        <span id="categoryBtn" onClick={toggleDropdown} style={{ padding: '0.5rem 0.2rem', display: 'inline-block' }}>
-                            Kategori <i className={`fas fa-chevron-${dropdownOpen ? 'up' : 'down'}`}></i>
-                        </span>
-                        <div className="dropdown-content" id="categoryDropdown" style={{ display: dropdownOpen ? 'block' : 'none' }}>
-                            <Link href="/stok?category=all" className="filter-option">Semua</Link>
-                            <Link href="/stok?category=plakat" className="filter-option">Plakat</Link>
-                            <Link href="/stok?category=halfmoon" className="filter-option">Halfmoon</Link>
-                            <Link href="/stok?category=hmpk" className="filter-option">HMPK</Link>
-                            <Link href="/stok?category=crowntail" className="filter-option">Crowntail (Serit)</Link>
-                            <Link href="/stok?category=giant" className="filter-option">Giant</Link>
-                            <Link href="/stok?category=kebutuhan%20ikan" className="filter-option">Kebutuhan Ikan</Link>
-                        </div>
+                <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem' }}>
+                    <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle Theme">
+                        <i className={theme === 'light' ? "fas fa-moon" : "fas fa-sun"}></i>
+                    </button>
+
+                    <button className="hamburger-btn" onClick={toggleMenu} aria-label="Toggle Menu">
+                        <i className={menuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+                    </button>
+                    
+                    <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
+                        <Link href="/stok" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-fish"></i> Semua Stok
+                        </Link>
+                        <Link href="/tips-perawatan" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-book-open"></i> Tips & Edukasi
+                        </Link>
+                        <Link href="/#reviews" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-star"></i> Testimoni
+                        </Link>
+                        <Link href="/faq" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-shield-alt"></i> Claim Garansi
+                        </Link>
+                        <Link href="/faq" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-question-circle"></i> FAQ
+                        </Link>
                     </div>
-                    <Link href="/stok" className="nav-btn">
-                        Cek Semua Stok
-                    </Link>
                 </div>
             </div>
         </header>
