@@ -9,6 +9,7 @@ export default function KalkulatorModal() {
     const [numFish, setNumFish] = useState(1);
     const [shopeeFee, setShopeeFee] = useState(7);
     const [receiptImage, setReceiptImage] = useState(null);
+    const [customPrice, setCustomPrice] = useState('');
     const [items, setItems] = useState([
         { id: 1, name: 'Total Nota Pembelian', qty: 1, price: 0 },
         { id: 2, name: 'Plastik & Packing', qty: 1, price: 0 },
@@ -177,20 +178,68 @@ export default function KalkulatorModal() {
                                     <h2 style={{ fontSize: '1.8rem' }}>{formatRupiah(modalPerFish)}</h2>
                                 </div>
 
-                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '15px', borderLeft: '4px solid #f97316', marginBottom: '1rem' }}>
-                                    <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 'bold' }}>TARGET JUAL MINIMUM (2x + Pajak):</p>
-                                    <h3 style={{ fontSize: '1.4rem' }}>{formatRupiah(calculateTarget(2))}</h3>
-                                    <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.3rem' }}>
-                                        (Harga: {formatRupiah(modalPerFish * 2)} + Pajak Shopee: {formatRupiah(getTaxBreakdown(2))})
+                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px', borderLeft: '4px solid #f97316', marginBottom: '0.8rem' }}>
+                                    <p style={{ color: '#fb923c', fontSize: '0.7rem', fontWeight: 'bold' }}>TARGET JUAL MINIMUM (2x + Pajak):</p>
+                                    <h3 style={{ fontSize: '1.3rem' }}>{formatRupiah(calculateTarget(2))}</h3>
+                                    <p style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.2rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 2)} + Pajak: {formatRupiah(getTaxBreakdown(2))})
                                     </p>
                                 </div>
 
-                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '15px', borderLeft: '4px solid #10b981' }}>
-                                    <p style={{ color: '#34d399', fontSize: '0.75rem', fontWeight: 'bold' }}>TARGET JUAL IDEAL (3x + Pajak):</p>
-                                    <h3 style={{ fontSize: '1.4rem' }}>{formatRupiah(calculateTarget(3))}</h3>
-                                    <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.3rem' }}>
-                                        (Harga: {formatRupiah(modalPerFish * 3)} + Pajak Shopee: {formatRupiah(getTaxBreakdown(3))})
+                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px', borderLeft: '4px solid #10b981', marginBottom: '0.8rem' }}>
+                                    <p style={{ color: '#34d399', fontSize: '0.7rem', fontWeight: 'bold' }}>TARGET JUAL IDEAL (3x + Pajak):</p>
+                                    <h3 style={{ fontSize: '1.3rem' }}>{formatRupiah(calculateTarget(3))}</h3>
+                                    <p style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.2rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 3)} + Pajak: {formatRupiah(getTaxBreakdown(3))})
                                     </p>
+                                </div>
+
+                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px', borderLeft: '4px solid #6366f1', marginBottom: '0.8rem' }}>
+                                    <p style={{ color: '#818cf8', fontSize: '0.7rem', fontWeight: 'bold' }}>TARGET JUAL EKSLUKSIF (4x + Pajak):</p>
+                                    <h3 style={{ fontSize: '1.3rem' }}>{formatRupiah(calculateTarget(4))}</h3>
+                                    <p style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.2rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 4)} + Pajak: {formatRupiah(getTaxBreakdown(4))})
+                                    </p>
+                                </div>
+
+                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px', borderLeft: '4px solid #a855f7' }}>
+                                    <p style={{ color: '#c084fc', fontSize: '0.7rem', fontWeight: 'bold' }}>TARGET JUAL SULTAN (5x + Pajak):</p>
+                                    <h3 style={{ fontSize: '1.3rem' }}>{formatRupiah(calculateTarget(5))}</h3>
+                                    <p style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.2rem' }}>
+                                        (Harga: {formatRupiah(modalPerFish * 5)} + Pajak: {formatRupiah(getTaxBreakdown(5))})
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Custom Price Check */}
+                            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                <p style={{ fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '1rem', color: 'var(--primary-cyan)' }}>TES HARGA SENDIRI:</p>
+                                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1.2rem', borderRadius: '15px' }}>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', opacity: 0.8, marginBottom: '0.5rem' }}>Mau jual di harga berapa?</label>
+                                    <input 
+                                        type="number"
+                                        placeholder="Ketik harga..."
+                                        value={customPrice}
+                                        onChange={(e) => setCustomPrice(e.target.value)}
+                                        style={{ width: '100%', background: 'white', border: 'none', padding: '0.8rem', borderRadius: '8px', color: 'black', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '1rem' }}
+                                    />
+                                    
+                                    {customPrice > 0 && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                                                <span>Pajak Shopee ({shopeeFee}%):</span>
+                                                <span style={{ color: '#f87171' }}>+ {formatRupiah(customPrice * (shopeeFee / 100))}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: '800', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
+                                                <span>Harga List Shopee:</span>
+                                                <span style={{ color: 'var(--primary-cyan)' }}>{formatRupiah(parseFloat(customPrice) + (customPrice * (shopeeFee / 100)))}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.8 }}>
+                                                <span>Kelipatan Untung:</span>
+                                                <span>{(customPrice / (modalPerFish || 1)).toFixed(1)}x Lipat</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -199,7 +248,7 @@ export default function KalkulatorModal() {
                                 <img src={receiptImage} alt="Receipt Attached" style={{ width: '100%', borderRadius: '10px' }} />
                             </div>}
 
-                            <button onClick={handlePrint} className="no-print" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--primary-cyan)', color: 'var(--primary-dark)', border: 'none', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
+                            <button onClick={handlePrint} className="no-print" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--primary-cyan)', color: 'var(--primary-dark)', border: 'none', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
                                 <i className="fas fa-print"></i> Cetak & Simpan Laporan
                             </button>
                         </div>
