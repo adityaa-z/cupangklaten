@@ -76,23 +76,24 @@ export default function KalkulatorModal() {
         if (!reportRef.current) return;
         
         try {
-            // Background process to capture the hidden report
+            // High quality capture for mobile
             const dataUrl = await toPng(reportRef.current, {
                 cacheBust: true,
                 backgroundColor: '#ffffff',
+                pixelRatio: 2, // Double resolution for sharpness
                 style: {
                     display: 'block',
                     position: 'static',
-                    width: '600px' // Optimal width for gallery
+                    width: '600px' 
                 }
             });
             const link = document.createElement('a');
-            link.download = `Cupang-Klaten-Report-${Date.now()}.png`;
+            link.download = `Cupang-Klaten-${Date.now()}.png`;
             link.href = dataUrl;
             link.click();
         } catch (err) {
-            console.error('Error saving image:', err);
-            alert('Gagal menyimpan gambar. Silakan coba gunakan tombol Simpan PDF.');
+            console.error('Save image error:', err);
+            alert('Gagal mengambil gambar. Coba gunakan fitur Simpan PDF.');
         }
     };
 
@@ -385,10 +386,27 @@ export default function KalkulatorModal() {
                     .print-report { display: none; }
                     @media (max-width: 900px) { .calculator-grid { grid-template-columns: 1fr; } .item-row { grid-template-columns: 1fr 1fr !important; } .item-row input:first-child { grid-column: 1 / -1; } }
                     @media print {
-                        @page { size: A4; margin: 0.5cm; }
-                        html, body { height: auto !important; min-height: 0 !important; background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; }
-                        .no-print, header, footer, nav, .fab-container { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
-                        .print-report { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
+                        @page { size: auto; margin: 0.5cm; }
+                        html, body { 
+                            height: auto !important; 
+                            min-height: 0 !important; 
+                            background: white !important; 
+                            color: black !important; 
+                            padding: 0 !important; 
+                            margin: 0 !important; 
+                            overflow: visible !important;
+                            font-size: 12pt;
+                        }
+                        .no-print, header, footer, nav, .fab-container { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
+                        .print-report { 
+                            display: block !important; 
+                            width: 100% !important; 
+                            max-width: 100% !important;
+                            margin: 0 !important; 
+                            padding: 0 !important; 
+                            border: none !important; 
+                        }
+                        table { font-size: 10pt !important; width: 100% !important; }
                         .printable-content { max-width: 100% !important; padding: 0 !important; margin: 0 !important; min-height: 0 !important; }
                         .calculator-grid, .summary-section { display: none !important; }
                     }
