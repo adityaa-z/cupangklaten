@@ -336,8 +336,6 @@ export default function KalkulatorModal() {
                     }
                 `}</style>
             </div>
-            <div className="no-print"><Footer /></div>
-            <div className="no-print"><FAB /></div>
         </>
     );
 }
