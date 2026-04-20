@@ -41,14 +41,14 @@ export default function Home() {
         
         let selected = [];
         
-        // 1. First, take all pinned products (limit to 6)
-        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 10);
+        // 1. First, take all pinned products (limit to 12)
+        const pinned = readyProducts.filter(p => p.is_pinned).slice(0, 12);
         selected = [...pinned];
 
-        // 2. If less than 6, try to fill with 1 from each category that isn't already selected
-        if (selected.length < 10) {
+        // 2. If less than 12, try to fill with 1 from each category that isn't already selected
+        if (selected.length < 12) {
             categories.forEach(cat => {
-                if (selected.length >= 10) return;
+                if (selected.length >= 12) return;
                 const item = readyProducts.find(p => 
                     p.category.toLowerCase() === cat.toLowerCase() && 
                     !selected.find(s => s.id === p.id)
@@ -57,15 +57,15 @@ export default function Home() {
             });
         }
 
-        // 3. If still less than 6, fill with newest available
-        if (selected.length < 10) {
+        // 3. If still less than 12, fill with newest available
+        if (selected.length < 12) {
             const remaining = readyProducts
                 .filter(p => !selected.find(s => s.id === p.id))
-                .slice(0, 10 - selected.length);
+                .slice(0, 12 - selected.length);
             selected = [...selected, ...remaining];
         }
 
-        setFeaturedProducts(selected.slice(0, 10));
+        setFeaturedProducts(selected.slice(0, 12));
       } catch (err) {
         console.error('Error fetching featured products:', err);
       } finally {
