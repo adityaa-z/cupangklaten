@@ -144,6 +144,11 @@ export default function Home() {
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Produk Unggulan dari cupangklaten.id</p>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
+          
+          <div className="swipe-hint" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-dark)', fontSize: '0.9rem', fontWeight: '600', opacity: '0.8' }}>
+            <i className="fas fa-arrows-alt-h"></i>
+            <span>Geser kanan-kiri untuk melihat koleksi</span>
+          </div>
         </div>
 
         <div className="slider-container">
