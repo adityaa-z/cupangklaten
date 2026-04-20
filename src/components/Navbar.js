@@ -58,7 +58,7 @@ const Navbar = () => {
                         <Link href="/#reviews" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-star"></i> Testimoni
                         </Link>
-                        <Link href="/faq" className="menu-item" onClick={() => setMenuOpen(false)}>
+                        <Link href="/claim-garansi" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-shield-alt"></i> Claim Garansi
                         </Link>
                         <Link href="/faq" className="menu-item" onClick={() => setMenuOpen(false)}>
