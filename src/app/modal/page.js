@@ -114,37 +114,17 @@ export default function KalkulatorModal() {
                                     <div key={item.id} className="item-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.5fr 40px', gap: '0.8rem', alignItems: 'center', background: 'var(--bg-light)', padding: '1rem', borderRadius: '15px', border: '1px solid var(--border-color)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                                             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Nama Biaya</span>
-                                            <input 
-                                                type="text" 
-                                                placeholder="Contoh: Ikan HM"
-                                                value={item.name} 
-                                                onChange={(e) => updateItem(item.id, 'name', e.target.value)} 
-                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
-                                            />
+                                            <input type="text" placeholder="Contoh: Ikan HM" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                                             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Jumlah</span>
-                                            <input 
-                                                type="number" 
-                                                placeholder="Qty"
-                                                value={item.qty} 
-                                                onChange={(e) => updateItem(item.id, 'qty', e.target.value)} 
-                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
-                                            />
+                                            <input type="number" placeholder="Qty" value={item.qty} onChange={(e) => updateItem(item.id, 'qty', e.target.value)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                                             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Harga Satuan</span>
-                                            <input 
-                                                type="number" 
-                                                placeholder="Rp"
-                                                value={item.price} 
-                                                onChange={(e) => updateItem(item.id, 'price', e.target.value)} 
-                                                style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} 
-                                            />
+                                            <input type="number" placeholder="Rp" value={item.price} onChange={(e) => updateItem(item.id, 'price', e.target.value)} style={{ background: 'var(--bg-white)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.7rem', fontSize: '0.9rem', width: '100%', color: 'var(--text-dark)' }} />
                                         </div>
-                                        <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', marginTop: '1rem', cursor: 'pointer' }}>
-                                            <i className="fas fa-trash-alt"></i>
-                                        </button>
+                                        <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', marginTop: '1rem' }}><i className="fas fa-trash-alt"></i></button>
                                     </div>
                                 ))}
                             </div>
@@ -212,7 +192,7 @@ export default function KalkulatorModal() {
                             </div>
 
                             {/* Custom Price Check */}
-                            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="no-print" style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                                 <p style={{ fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '1rem', color: 'var(--primary-cyan)' }}>TES HARGA SENDIRI:</p>
                                 <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1.2rem', borderRadius: '15px' }}>
                                     <label style={{ display: 'block', fontSize: '0.7rem', opacity: 0.8, marginBottom: '0.5rem' }}>Mau jual di harga berapa?</label>
@@ -234,19 +214,10 @@ export default function KalkulatorModal() {
                                                 <span>Harga List Shopee:</span>
                                                 <span style={{ color: 'var(--primary-cyan)' }}>{formatRupiah(parseFloat(customPrice) + (customPrice * (shopeeFee / 100)))}</span>
                                             </div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.8 }}>
-                                                <span>Kelipatan Untung:</span>
-                                                <span>{(customPrice / (modalPerFish || 1)).toFixed(1)}x Lipat</span>
-                                            </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
-
-                            {receiptImage && <div className="print-only" style={{ marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
-                                <p style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>Lampiran Nota Pembelian:</p>
-                                <img src={receiptImage} alt="Receipt Attached" style={{ width: '100%', borderRadius: '10px' }} />
-                            </div>}
 
                             <button onClick={handlePrint} className="no-print" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--primary-cyan)', color: 'var(--primary-dark)', border: 'none', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
                                 <i className="fas fa-print"></i> Cetak & Simpan Laporan
@@ -255,18 +226,105 @@ export default function KalkulatorModal() {
                     </div>
                 </div>
 
+                {/* DEDICATED PRINT REPORT VIEW */}
+                <div className="print-report">
+                    <div style={{ borderBottom: '4px solid var(--primary-cyan)', paddingBottom: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                            <h2 style={{ color: 'var(--primary-dark)', marginBottom: '0.2rem' }}>CUPANG KLATEN</h2>
+                            <p style={{ fontSize: '0.8rem', color: '#666' }}>Laporan Analisis Bisnis Internal</p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                        </div>
+                    </div>
+
+                    <h3 style={{ marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Rincian Biaya Modal</h3>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2rem' }}>
+                        <thead>
+                            <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
+                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Item</th>
+                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Qty</th>
+                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0' }}>Harga/Unit</th>
+                                <th style={{ padding: '12px', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {items.map(item => (
+                                <tr key={item.id}>
+                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{item.name || '-'}</td>
+                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{item.qty || 0}</td>
+                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0' }}>{formatRupiah(item.price || 0)}</td>
+                                    <td style={{ padding: '12px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{formatRupiah((item.qty || 0) * (item.price || 0))}</td>
+                                </tr>
+                            ))}
+                            <tr style={{ fontWeight: 'bold', background: '#f1f5f9' }}>
+                                <td colSpan="3" style={{ padding: '12px', textAlign: 'right' }}>TOTAL MODAL KESELURUHAN (BATCH)</td>
+                                <td style={{ padding: '12px', textAlign: 'right' }}>{formatRupiah(totalModal)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+                        <div style={{ border: '2px solid #e2e8f0', padding: '1.5rem', borderRadius: '15px' }}>
+                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Ringkasan Unit</h4>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                <span>Jumlah Ikan:</span>
+                                <span style={{ fontWeight: 'bold' }}>{numFish} Ekor</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                <span>Modal per Ekor:</span>
+                                <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)' }}>{formatRupiah(modalPerFish)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span>Pajak Shopee diatur:</span>
+                                <span style={{ fontWeight: 'bold' }}>{shopeeFee}%</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Rekomendasi Harga Jual</h4>
+                            <div style={{ display: 'grid', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
+                                    <span>Target 2x (Min):</span>
+                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(2))}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
+                                    <span>Target 3x (Ideal):</span>
+                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(3))}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', borderBottom: '1px dashed #ccc' }}>
+                                    <span>Target 5x (Sultan):</span>
+                                    <span style={{ fontWeight: 'bold' }}>{formatRupiah(calculateTarget(5))}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {receiptImage && (
+                        <div style={{ marginTop: '2rem' }}>
+                            <h4 style={{ marginBottom: '1rem', color: '#64748b' }}>Lampiran Bukti Nota</h4>
+                            <img src={receiptImage} alt="Bukti Nota" style={{ width: '100%', maxWidth: '500px', border: '1px solid #ddd', borderRadius: '10px' }} />
+                        </div>
+                    )}
+
+                    <div style={{ marginTop: '4rem', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '1rem', fontSize: '0.7rem', color: '#999' }}>
+                        Laporan ini dihasilkan secara otomatis oleh Sistem Manajemen Cupang Klaten.
+                    </div>
+                </div>
+
                 <style jsx>{`
                     .calculator-grid { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; }
+                    .print-report { display: none; }
                     @media (max-width: 900px) { .calculator-grid { grid-template-columns: 1fr; } .item-row { grid-template-columns: 1fr 1fr !important; } .item-row input:first-child { grid-column: 1 / -1; } }
                     @media print {
+                        @page { margin: 1cm; }
                         body { background: white !important; color: black !important; }
                         .no-print { display: none !important; }
-                        .printable-content { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: none !important; }
-                        .result-card { background: white !important; color: black !important; box-shadow: none !important; border: 1px solid #eee !important; padding: 20px !important; }
-                        h1, h2, h3, h4, p { color: black !important; }
-                        .print-only { display: block !important; }
+                        .print-report { display: block !important; }
+                        .printable-content { max-width: 100% !important; padding: 0 !important; }
+                        .calculator-grid { display: none !important; }
+                        .summary-section { display: none !important; }
                     }
-                    .print-only { display: none; }
                 `}</style>
             </div>
             <div className="no-print"><Footer /></div>
