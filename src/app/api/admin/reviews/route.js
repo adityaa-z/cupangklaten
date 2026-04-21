@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isValidSession } from '@/lib/auth';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-function isAuthenticated(request) {
-    const session = request.cookies.get('admin_session');
-    return session && session.value === 'true';
-}
-
-export async function GET() {
+export async function GET(request) {
+    if (!isValidSession(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const { data, error } = await supabase
         .from('reviews')
         .select('*')
@@ -22,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    if (!isAuthenticated(request)) {
+    if (!isValidSession(request)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -49,7 +48,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-    if (!isAuthenticated(request)) {
+    if (!isValidSession(request)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

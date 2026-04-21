@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isValidSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,14 +13,9 @@ function getSupabase() {
     });
 }
 
-function isAuthenticated(request) {
-    const session = request.cookies.get('admin_session');
-    return session && session.value === 'true';
-}
-
 export async function GET(request) {
     try {
-        if (!isAuthenticated(request)) {
+        if (!isValidSession(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -44,7 +40,7 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        if (!isAuthenticated(request)) {
+        if (!isValidSession(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -84,7 +80,7 @@ export async function POST(request) {
 
 export async function DELETE(request) {
     try {
-        if (!isAuthenticated(request)) {
+        if (!isValidSession(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

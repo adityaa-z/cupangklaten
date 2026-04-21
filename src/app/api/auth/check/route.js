@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
+import { isValidSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
     try {
-        const sessionCookie = request.cookies.get('admin_session');
-
-        if (sessionCookie && sessionCookie.value === 'true') {
+        if (isValidSession(request)) {
             return NextResponse.json({ isLoggedIn: true });
         }
 
