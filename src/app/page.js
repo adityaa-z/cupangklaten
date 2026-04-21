@@ -49,24 +49,32 @@ export default function Home() {
         // Separate products - include sold out but exclude archived
         const filtered = (data || []).filter(p => !p.is_archived);
         
-        const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
-        
-        const fish = filtered.filter(p => {
-          const cat = p.category?.trim().toLowerCase();
-          return !cat || cat !== 'kebutuhan ikan';
-        });
+        const suppliesKeywords = ['kebutuhan', 'ikan', 'pakan', 'obat', 'alat', 'perlengkapan', 'aksesoris', 'toples', 'aquarium'];
         
         const supplies = filtered.filter(p => {
-          const cat = p.category?.trim().toLowerCase();
-          return cat === 'kebutuhan ikan' || cat === 'perlengkapan' || cat === 'aksesoris';
+          const cat = p.category?.trim().toLowerCase() || '';
+          // Jika kategori mengandung kata kunci pakan/obat/perlengkapan dsb
+          return cat.includes('kebutuhan') || 
+                 cat.includes('pakan') || 
+                 cat.includes('obat') || 
+                 cat.includes('alat') || 
+                 cat.includes('perlengkapan') || 
+                 cat.includes('aksesoris') || 
+                 cat.includes('toples') || 
+                 (cat === 'kebutuhan ikan');
+        });
+        
+        const fish = filtered.filter(p => {
+          const isInSupplies = supplies.some(s => s.id === p.id);
+          return !isInSupplies;
         });
 
         // Prioritize pinned products for the featured sliders
         const sortedFish = [...fish].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
         const sortedSupplies = [...supplies].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
 
-        setFishProducts(sortedFish.slice(0, 15)); 
-        setSuppliesProducts(sortedSupplies.slice(0, 15));
+        setFishProducts(sortedFish.slice(0, 20)); 
+        setSuppliesProducts(sortedSupplies.slice(0, 20));
 
 
       } catch (err) {
