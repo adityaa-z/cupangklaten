@@ -77,6 +77,7 @@ export default function AdminPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoginError(false);
+        setLoading(true);
         try {
             const res = await fetch('/api/login/', {
                 method: 'POST',
@@ -92,6 +93,8 @@ export default function AdminPage() {
             }
         } catch (err) {
             setLoginError(true);
+        } finally {
+            setLoading(false);
         }
     };
 
