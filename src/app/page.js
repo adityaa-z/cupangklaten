@@ -49,18 +49,19 @@ export default function Home() {
         // Separate products - include sold out but exclude archived
         const filtered = (data || []).filter(p => !p.is_archived);
         
-        // Debug log untuk membantu melihat data yang masuk (hanya muncul di konsol saat dev)
+        // Debug log (Hanya muncul di konsol browser - tekan F12)
         if (process.env.NODE_ENV !== 'production') {
-          console.log('DEBUG: Total produk aktif:', filtered.length);
-          console.log('DEBUG: Daftar Kategori unik:', [...new Set(filtered.map(p => p.category))]);
+          console.log('Total Produk di DB:', data?.length);
+          console.log('Total Produk Aktif (Bukan Arsip):', filtered.length);
         }
         
         const supplies = filtered.filter(p => {
-          const cat = (p.category || '').toString().trim().toLowerCase();
-          return cat === 'kebutuhan ikan' || 
-                 cat === 'kebutuhan' || 
-                 cat.includes('perlengkapan') || 
-                 cat.includes('aksesoris');
+          const category = (p.category || '').toString().toLowerCase().trim();
+          // Debugging log khusus untuk kategori (bisa dilihat di Inspect > Console)
+          if (process.env.NODE_ENV !== 'production' && category !== '') {
+             console.log(`Checking Product: ${p.code}, Category: "${category}"`);
+          }
+          return category === 'kebutuhan ikan' || category === 'kebutuhan' || category.includes('perlengkapan');
         });
         
         const fish = filtered.filter(p => !supplies.some(s => s.id === p.id));
@@ -69,8 +70,8 @@ export default function Home() {
         const sortedFish = [...fish].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
         const sortedSupplies = [...supplies].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
 
-        setFishProducts(sortedFish.slice(0, 20)); 
-        setSuppliesProducts(sortedSupplies.slice(0, 20));
+        setFishProducts(sortedFish.slice(0, 50)); 
+        setSuppliesProducts(sortedSupplies.slice(0, 50));
 
 
       } catch (err) {
