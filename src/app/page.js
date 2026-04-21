@@ -49,25 +49,21 @@ export default function Home() {
         // Separate products - include sold out but exclude archived
         const filtered = (data || []).filter(p => !p.is_archived);
         
-        const suppliesKeywords = ['kebutuhan', 'ikan', 'pakan', 'obat', 'alat', 'perlengkapan', 'aksesoris', 'toples', 'aquarium'];
+        // Debug log untuk membantu melihat data yang masuk (hanya muncul di konsol saat dev)
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('DEBUG: Total produk aktif:', filtered.length);
+          console.log('DEBUG: Daftar Kategori unik:', [...new Set(filtered.map(p => p.category))]);
+        }
         
         const supplies = filtered.filter(p => {
-          const cat = p.category?.trim().toLowerCase() || '';
-          // Jika kategori mengandung kata kunci pakan/obat/perlengkapan dsb
-          return cat.includes('kebutuhan') || 
-                 cat.includes('pakan') || 
-                 cat.includes('obat') || 
-                 cat.includes('alat') || 
+          const cat = (p.category || '').toString().trim().toLowerCase();
+          return cat === 'kebutuhan ikan' || 
+                 cat === 'kebutuhan' || 
                  cat.includes('perlengkapan') || 
-                 cat.includes('aksesoris') || 
-                 cat.includes('toples') || 
-                 (cat === 'kebutuhan ikan');
+                 cat.includes('aksesoris');
         });
         
-        const fish = filtered.filter(p => {
-          const isInSupplies = supplies.some(s => s.id === p.id);
-          return !isInSupplies;
-        });
+        const fish = filtered.filter(p => !supplies.some(s => s.id === p.id));
 
         // Prioritize pinned products for the featured sliders
         const sortedFish = [...fish].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
