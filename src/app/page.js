@@ -49,15 +49,24 @@ export default function Home() {
         // Separate products - include sold out but exclude archived
         const filtered = (data || []).filter(p => !p.is_archived);
         
-        const fish = filtered.filter(p => p.category?.toLowerCase() !== 'kebutuhan ikan');
-        const supplies = filtered.filter(p => p.category?.toLowerCase() === 'kebutuhan ikan');
+        const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
+        
+        const fish = filtered.filter(p => {
+          const cat = p.category?.trim().toLowerCase();
+          return !cat || cat !== 'kebutuhan ikan';
+        });
+        
+        const supplies = filtered.filter(p => {
+          const cat = p.category?.trim().toLowerCase();
+          return cat === 'kebutuhan ikan' || cat === 'perlengkapan' || cat === 'aksesoris';
+        });
 
         // Prioritize pinned products for the featured sliders
         const sortedFish = [...fish].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
         const sortedSupplies = [...supplies].sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
 
-        setFishProducts(sortedFish.slice(0, 10)); 
-        setSuppliesProducts(sortedSupplies.slice(0, 10));
+        setFishProducts(sortedFish.slice(0, 15)); 
+        setSuppliesProducts(sortedSupplies.slice(0, 15));
 
 
       } catch (err) {
