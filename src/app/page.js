@@ -46,24 +46,21 @@ export default function Home() {
 
         if (error) throw error;
 
-        // Separate products - include sold out but exclude archived
-        const filtered = (data || []).filter(p => !p.is_archived);
+        // Separate products - include everything
+        const filtered = (data || []);
         
-        // Debug log (Hanya muncul di konsol browser - tekan F12)
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('Total Produk di DB:', data?.length);
-          console.log('Total Produk Aktif (Bukan Arsip):', filtered.length);
-        }
-        
+        // 1. Ambil Perlengkapan (Kebutuhan Ikan)
         const supplies = filtered.filter(p => {
-          const category = (p.category || '').toString().toLowerCase().trim();
-          // Debugging log khusus untuk kategori (bisa dilihat di Inspect > Console)
-          if (process.env.NODE_ENV !== 'production' && category !== '') {
-             console.log(`Checking Product: ${p.code}, Category: "${category}"`);
-          }
-          return category === 'kebutuhan ikan' || category === 'kebutuhan' || category.includes('perlengkapan');
+          const cat = (p.category || '').toString().toLowerCase().trim();
+          return cat.includes('kebutuhan') || 
+                 cat.includes('pakan') || 
+                 cat.includes('obat') || 
+                 cat.includes('alat') || 
+                 cat.includes('aksesoris') ||
+                 cat.includes('perlengkapan');
         });
         
+        // 2. Sisanya adalah Ikan
         const fish = filtered.filter(p => !supplies.some(s => s.id === p.id));
 
         // Prioritize pinned products for the featured sliders
