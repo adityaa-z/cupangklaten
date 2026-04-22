@@ -19,10 +19,12 @@ export default function Home() {
   // Refs for sliders
   const fishSliderRef = React.useRef(null);
   const suppliesSliderRef = React.useRef(null);
+  const reviewsSliderRef = React.useRef(null);
 
   // Scroll states
   const [scrollFish, setScrollFish] = useState({ left: false, right: true });
   const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
+  const [scrollReviews, setScrollReviews] = useState({ left: false, right: true });
 
 
 
@@ -94,24 +96,29 @@ export default function Home() {
   useEffect(() => {
     const fSlider = fishSliderRef.current;
     const sSlider = suppliesSliderRef.current;
+    const rSlider = reviewsSliderRef.current;
     
     const onFishScroll = () => handleScroll(fishSliderRef, setScrollFish);
     const onSuppScroll = () => handleScroll(suppliesSliderRef, setScrollSupp);
+    const onReviewsScroll = () => handleScroll(reviewsSliderRef, setScrollReviews);
 
     if (fSlider) fSlider.addEventListener('scroll', onFishScroll);
     if (sSlider) sSlider.addEventListener('scroll', onSuppScroll);
+    if (rSlider) rSlider.addEventListener('scroll', onReviewsScroll);
     
     // Initial checks
     setTimeout(() => {
       onFishScroll();
       onSuppScroll();
+      onReviewsScroll();
     }, 500);
 
     return () => {
       if (fSlider) fSlider.removeEventListener('scroll', onFishScroll);
       if (sSlider) sSlider.removeEventListener('scroll', onSuppScroll);
+      if (rSlider) rSlider.removeEventListener('scroll', onReviewsScroll);
     };
-  }, [loading, fishProducts, suppliesProducts]);
+  }, [loading, fishProducts, suppliesProducts, reviews]);
 
   const scroll = (ref, direction) => {
     if (ref.current) {
@@ -271,36 +278,44 @@ export default function Home() {
               <h2 className="section-title">Kata Pelanggan cupangklaten.id</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Ulasan asli dari Google Maps</p>
               
-              <div className="reviews-grid">
-                  {reviews.length > 0 ? reviews.map(r => (
-                      <div key={r.id} className="review-card">
-                          <i className="fab fa-google google-icon"></i>
-                          <div className="review-header">
-                              <div className="review-avatar">
-                                  {r.img ? (
-                                      <img src={r.img} alt={r.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                                  ) : (
-                                      r.avatar_char || r.name.charAt(0).toUpperCase()
-                                  )}
-                              </div>
-                              <div className="review-info">
-                                  <h4>{r.name}</h4>
-                              </div>
-                          </div>
-                          <div className="review-stars">
-                              {[...Array(r.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
-                              <span className="verify-badge-container">
-                                  <i className="fas fa-check-circle verify-badge"></i>
-                                  <span className="tooltip">berhasil terverifikasi bahwa sumber asli dari Google</span>
-                              </span>
-                          </div>
-                          <p className="review-content">{r.content}</p>
-                      </div>
-                  )) : (
-                      <div style={{ width: '100%', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                          <p>Belum ada ulasan. Tambahkan ulasan pertama Anda di Admin Panel!</p>
-                      </div>
-                  )}
+              <div className="slider-container">
+                <button className="slider-nav-btn prev" onClick={() => scroll(reviewsSliderRef, 'left')} disabled={!scrollReviews.left} aria-label="Previous review">
+                    <i className="fas fa-chevron-left"></i>
+                </button>
+                <div className="reviews-grid" ref={reviewsSliderRef}>
+                    {reviews.length > 0 ? reviews.map(r => (
+                        <div key={r.id} className="review-card">
+                            <i className="fab fa-google google-icon"></i>
+                            <div className="review-header">
+                                <div className="review-avatar">
+                                    {r.img ? (
+                                        <img src={r.img} alt={r.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    ) : (
+                                        r.avatar_char || r.name.charAt(0).toUpperCase()
+                                    )}
+                                </div>
+                                <div className="review-info">
+                                    <h4>{r.name}</h4>
+                                </div>
+                            </div>
+                            <div className="review-stars">
+                                {[...Array(r.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
+                                <span className="verify-badge-container">
+                                    <i className="fas fa-check-circle verify-badge"></i>
+                                    <span className="tooltip">berhasil terverifikasi bahwa sumber asli dari Google</span>
+                                </span>
+                            </div>
+                            <p className="review-content">{r.content}</p>
+                        </div>
+                    )) : (
+                        <div style={{ width: '100%', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                            <p>Belum ada ulasan. Tambahkan ulasan pertama Anda di Admin Panel!</p>
+                        </div>
+                    )}
+                </div>
+                <button className="slider-nav-btn next" onClick={() => scroll(reviewsSliderRef, 'right')} disabled={!scrollReviews.right} aria-label="Next review">
+                    <i className="fas fa-chevron-right"></i>
+                </button>
               </div>
           </div>
       </section>
