@@ -88,7 +88,7 @@ const ProductCard = ({ product }) => {
                                 )}
                                 
                                 <div className="lightbox-img-wrapper">
-                                    <img src={images[currentImgIndex]} alt={`Product ${currentImgIndex}`} />
+                                    <img key={currentImgIndex} src={images[currentImgIndex]} alt={`Product ${currentImgIndex}`} />
                                     <div className="lightbox-counter">{currentImgIndex + 1} / {images.length}</div>
                                 </div>
 
