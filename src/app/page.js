@@ -6,7 +6,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
-import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,23 +29,25 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchReviews() {
-      if (!supabase) return;
-      const { data } = await supabase.from('reviews').select('*').order('id', { ascending: false });
-      if (data) setReviews(data);
+      try {
+        const res = await fetch('/api/reviews/');
+        if (res.ok) {
+          const data = await res.json();
+          setReviews(data);
+        }
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+      }
     }
     fetchReviews();
   }, []);
 
   useEffect(() => {
     async function fetchFeatured() {
-      if (!supabase) return;
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
+        const res = await fetch('/api/products/');
+        if (!res.ok) throw new Error('Failed to fetch products');
+        const data = await res.json();
 
         // Separate products - include everything
         const filtered = (data || []);

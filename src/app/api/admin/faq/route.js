@@ -1,17 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { query, execute } from '@/lib/db';
 import { isValidSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
-
-function getSupabase() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) return null;
-    return createClient(url, key, {
-        auth: { persistSession: false }
-    });
-}
 
 export async function GET(request) {
     try {
@@ -19,19 +10,8 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const supabase = getSupabase();
-        if (!supabase) {
-            return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur di Environment Variables' }, { status: 500 });
-        }
-
-        const { data, error } = await supabase.from('faqs').select('*').order('created_at', { ascending: true });
-
-        if (error) {
-            console.error('Supabase error:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
-        }
-
-        return NextResponse.json(data || []);
+        const rows = await query('SELECT * FROM faqs ORDER BY created_at ASC');
+        return NextResponse.json(rows);
     } catch (err) {
         console.error('API FAQ GET Error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -44,25 +24,22 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const supabase = getSupabase();
-        if (!supabase) {
-            return NextResponse.json({ error: 'Service key belum diatur' }, { status: 500 });
-        }
-
         const body = await request.json();
         const { id, question, answer } = body;
 
-        const data = { question, answer };
-
-        let result;
         if (id) {
-            result = await supabase.from('faqs').update(data).eq('id', id);
+            await execute(
+                'UPDATE faqs SET question = ?, answer = ? WHERE id = ?',
+                [question, answer, id]
+            );
         } else {
-            result = await supabase.from('faqs').insert([data]);
+            await execute(
+                'INSERT INTO faqs (question, answer) VALUES (?, ?)',
+                [question, answer]
+            );
         }
 
-        if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
-        return NextResponse.json({ success: true, data: result.data });
+        return NextResponse.json({ success: true });
     } catch (err) {
         console.error('API FAQ POST Error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -75,18 +52,12 @@ export async function DELETE(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const supabase = getSupabase();
-        if (!supabase) {
-            return NextResponse.json({ error: 'Service key belum diatur' }, { status: 500 });
-        }
-
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
-        const { error } = await supabase.from('faqs').delete().eq('id', id);
-        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        await execute('DELETE FROM faqs WHERE id = ?', [id]);
         return NextResponse.json({ success: true });
     } catch (err) {
         console.error('API FAQ DELETE Error:', err);

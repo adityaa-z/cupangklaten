@@ -1,14 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+// Supabase has been replaced by MySQL.
+// This file is kept as a stub to prevent import errors during migration.
+// All database operations now go through @/lib/db.js
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-
-export const supabase = (SUPABASE_URL && SUPABASE_KEY) 
-    ? createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: false }
-    }) 
-    : null;
-
-if (!supabase) {
-    console.error('Supabase client failed to initialize. Check your .env.local for NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY.');
-}
+export const supabase = null;

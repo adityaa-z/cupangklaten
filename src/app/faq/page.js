@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
-import { supabase } from '@/lib/supabase';
 
 export default function FAQPage() {
     const [faqs, setFaqs] = useState([]);
@@ -12,14 +11,10 @@ export default function FAQPage() {
 
     useEffect(() => {
         async function fetchFaqs() {
-            if (!supabase) return;
             try {
-                const { data, error } = await supabase
-                    .from('faqs')
-                    .select('*')
-                    .order('created_at', { ascending: true });
-
-                if (error) throw error;
+                const res = await fetch('/api/faqs/');
+                if (!res.ok) throw new Error('Failed to fetch FAQs');
+                const data = await res.json();
                 setFaqs(data || []);
             } catch (err) {
                 console.error('Error fetching FAQs:', err);

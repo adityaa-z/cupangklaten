@@ -6,7 +6,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
-import { supabase } from '@/lib/supabase';
 
 const StokContent = () => {
     const searchParams = useSearchParams();
@@ -15,17 +14,13 @@ const StokContent = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentCategory, setCurrentCategory] = useState('all');
-    //d
+
     useEffect(() => {
         async function fetchAllProducts() {
-            if (!supabase) return;
             try {
-                const { data, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
+                const res = await fetch('/api/products/');
+                if (!res.ok) throw new Error('Failed to fetch products');
+                const data = await res.json();
                 setProducts(data || []);
             } catch (err) {
                 console.error('Error fetching products:', err);
