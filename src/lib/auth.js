@@ -29,8 +29,8 @@ export function isValidSession(request) {
 export function setSession(response) {
     response.cookies.set(SESSION_COOKIE_NAME, getSecret(), {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: false, // Ubah ke false agar bisa login via HTTP (IP)
+        sameSite: 'lax', // Ubah ke lax untuk kompatibilitas lebih baik
         maxAge: 60 * 60 * 2, // 2 Hours
         path: '/',
     });
@@ -39,8 +39,8 @@ export function setSession(response) {
 export function clearSession(response) {
     response.cookies.set(SESSION_COOKIE_NAME, '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: false,
+        sameSite: 'lax',
         maxAge: 0,
         path: '/',
     });

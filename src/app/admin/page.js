@@ -196,7 +196,7 @@ export default function AdminPage() {
             }));
         } catch (err) {
             console.error('Upload error:', err);
-            alert('Gagal mengupload gambar. Pastikan Bucket "produk" sudah ada di Supabase dan diatur ke Public.');
+            alert('Gagal mengupload gambar. Silakan coba lagi.');
         } finally {
             setUploadingField(null);
             e.target.value = ''; // Reset input
