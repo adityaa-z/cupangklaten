@@ -22,15 +22,15 @@ export async function POST(request) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-        // Save to public/uploads/produk/ directory
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'produk');
+        // Save to uploads/produk/ directory (outside public)
+        const uploadDir = path.join(process.cwd(), 'uploads', 'produk');
         await mkdir(uploadDir, { recursive: true });
 
         const filePath = path.join(uploadDir, fileName);
         await writeFile(filePath, buffer);
 
-        // Return the public URL path
-        const publicUrl = `/uploads/produk/${fileName}`;
+        // Return the API URL path
+        const publicUrl = `/api/uploads/produk/${fileName}`;
 
         return NextResponse.json({ url: publicUrl });
     } catch (err) {
