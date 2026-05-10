@@ -13,13 +13,17 @@ export async function GET(request) {
                (SELECT MAX(amount) FROM bids WHERE auction_id = a.id) as max_bid
         FROM auctions a ORDER BY a.created_at DESC
     `);
-    return NextResponse.json(auctions);
+    const mappedAuctions = auctions.map(a => ({
+        ...a,
+        is_video: !!a.is_video
+    }));
+    return NextResponse.json(mappedAuctions);
 }
 
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { id, title, description, image_url, start_price, min_bid_increment, start_time, end_time, status, action } = body;
+        const { id, title, description, image_url, image2_url, image3_url, image4_url, is_video, start_price, min_bid_increment, start_time, end_time, status, action } = body;
 
         if (action === 'mark_paid') {
             await query("UPDATE auctions SET payment_status = 'paid' WHERE id = ?", [id]);
@@ -29,14 +33,14 @@ export async function POST(request) {
         if (id) {
             // Update
             await query(
-                'UPDATE auctions SET title=?, description=?, image_url=?, start_price=?, min_bid_increment=?, start_time=?, end_time=?, status=? WHERE id=?',
-                [title, description, image_url, start_price, min_bid_increment, start_time, end_time, status, id]
+                'UPDATE auctions SET title=?, description=?, image_url=?, image2_url=?, image3_url=?, image4_url=?, is_video=?, start_price=?, min_bid_increment=?, start_time=?, end_time=?, status=? WHERE id=?',
+                [title, description, image_url, image2_url || null, image3_url || null, image4_url || null, is_video ? 1 : 0, start_price, min_bid_increment, start_time, end_time, status, id]
             );
         } else {
             // Insert
             await query(
-                'INSERT INTO auctions (title, description, image_url, start_price, min_bid_increment, start_time, end_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [title, description, image_url, start_price, min_bid_increment, start_time, end_time, status || 'draft']
+                'INSERT INTO auctions (title, description, image_url, image2_url, image3_url, image4_url, is_video, start_price, min_bid_increment, start_time, end_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [title, description, image_url, image2_url || null, image3_url || null, image4_url || null, is_video ? 1 : 0, start_price, min_bid_increment, start_time, end_time, status || 'draft']
             );
         }
         return NextResponse.json({ success: true });

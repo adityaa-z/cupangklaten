@@ -155,11 +155,33 @@ export default function LelangRoomPage({ params }) {
                     {/* Kiri: Media & Info */}
                     <div>
                         <div style={{ background: '#1e293b', borderRadius: '16px', overflow: 'hidden', border: '1px solid #334155' }}>
-                            {auction.image_url?.includes('.mp4') ? (
-                                <video src={auction.image_url} autoPlay loop muted playsInline style={{ width: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <img src={auction.image_url || '/logo.png'} alt={auction.title} style={{ width: '100%', objectFit: 'cover' }} />
-                            )}
+                            <div style={{ position: 'relative' }}>
+                                {/* Main Media */}
+                                <div style={{ width: '100%', aspectRatio: '1/1', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {auction.is_video ? (
+                                        <video src={auction.image_url} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        <img src={auction.image_url || '/logo.png'} alt={auction.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    )}
+                                </div>
+                                
+                                {/* Thumbnails */}
+                                {(auction.image2_url || auction.image3_url || auction.image4_url) && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', padding: '1rem', background: '#0f172a' }}>
+                                        {[auction.image_url, auction.image2_url, auction.image3_url, auction.image4_url]
+                                            .filter(Boolean)
+                                            .map((img, idx) => (
+                                                <div key={idx} style={{ aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '2px solid transparent', cursor: 'pointer' }}>
+                                                    {idx === 0 && auction.is_video ? (
+                                                        <video src={img} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    ) : (
+                                                        <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
+                            </div>
                             <div style={{ padding: '1.5rem' }}>
                                 <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#f8fafc' }}>{auction.title}</h1>
                                 <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5' }}>{auction.description || 'Tidak ada deskripsi tambahan.'}</p>

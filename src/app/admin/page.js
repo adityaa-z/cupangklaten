@@ -36,7 +36,7 @@ export default function AdminPage() {
         code: '', category: '', variant: '', gender: 'Jantan',
         age: '', size: 'M', stock: 1, price: 0, shopee: '',
         img: '', img2: '', img3: '', img4: '', is_video: false,
-        title: '', description: '', image_url: '', start_price: 0, min_bid_increment: 0, start_time: '', end_time: '', status: 'draft'
+        title: '', description: '', image_url: '', image2_url: '', image3_url: '', image4_url: '', start_price: 0, min_bid_increment: 0, start_time: '', end_time: '', status: 'draft'
     });
 
     useEffect(() => {
@@ -694,14 +694,52 @@ export default function AdminPage() {
                         <div className="modal-body">
                             {modalType === 'auction' ? (
                                 <form onSubmit={saveProduct}>
-                                    <div className="form-group">
-                                        <label>Foto/Video Ikan (URL atau Upload)</label>
-                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                            <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                {uploadingField === 'image_url' ? <div className="spinner"></div> : formData.image_url ? <img src={formData.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-camera" style={{ color: '#94a3b8' }}></i>}
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                                        {[
+                                            { label: 'Gambar Utama (Wajib)', field: 'image_url', isPrimary: true },
+                                            { label: 'Gambar 2', field: 'image2_url' },
+                                            { label: 'Gambar 3', field: 'image3_url' },
+                                            { label: 'Gambar 4', field: 'image4_url' }
+                                        ].map((slot, index) => (
+                                            <div key={slot.field} className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '0' }}>
+                                                <label style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', fontWeight: '700' }}>{slot.label}</label>
+                                                
+                                                {/* Preview Box */}
+                                                <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '8px', overflow: 'hidden', margin: '0.5rem 0', border: '2px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                                    {uploadingField === slot.field ? (
+                                                        <div className="spinner"></div>
+                                                    ) : formData[slot.field] ? (
+                                                        <>
+                                                            {(slot.isPrimary && formData.is_video) ? (
+                                                                <video src={formData[slot.field]} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            ) : (
+                                                                <img src={formData[slot.field]} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            )}
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setFormData({ ...formData, [slot.field]: '', is_video: slot.isPrimary ? false : formData.is_video })}
+                                                                style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', zIndex: 10 }}
+                                                            >
+                                                                <i className="fas fa-times"></i>
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                                                            <i className="fas fa-cloud-upload-alt" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}></i>
+                                                            <div style={{ fontSize: '0.7rem' }}>Klik Upload</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <input
+                                                    type="file"
+                                                    disabled={uploadingField !== null}
+                                                    accept={slot.isPrimary ? "image/*, video/mp4, video/webm" : "image/*"}
+                                                    onChange={(e) => handleFileUpload(e, slot.field, slot.isPrimary)}
+                                                    style={{ fontSize: '0.7rem', width: '100%' }}
+                                                />
                                             </div>
-                                            <input type="file" accept="image/*, video/mp4, video/webm" onChange={(e) => handleFileUpload(e, 'image_url', true)} />
-                                        </div>
+                                        ))}
                                     </div>
                                     <div className="form-group">
                                         <label>Judul Lelang</label>

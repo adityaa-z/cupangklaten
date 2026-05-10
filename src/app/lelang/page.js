@@ -138,7 +138,7 @@ export default function LelangPage() {
                                     <span className={`status-badge ${isUpcoming ? 'status-upcoming' : 'status-active'}`}>
                                         {isUpcoming ? 'Akan Datang' : 'Live Bidding'}
                                     </span>
-                                    {auction.image_url?.includes('.mp4') ? (
+                                    {auction.is_video ? (
                                         <video src={auction.image_url} autoPlay loop muted playsInline />
                                     ) : (
                                         <img src={auction.image_url || '/logo.png'} alt={auction.title} />
