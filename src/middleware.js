@@ -1,18 +1,19 @@
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from 'next/server';
-import { isValidSession } from './lib/auth';
 
-export function middleware(request) {
-    const { pathname } = request.nextUrl;
-
-    // Protect /api/admin/*
-    if (pathname.startsWith('/api/admin')) {
-        if (!isValidSession(request)) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-    }
-
+export default withAuth(
+  function middleware(req) {
     return NextResponse.next();
-}
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => {
+        // Hanya izinkan zidanp13794@gmail.com untuk mengakses rute admin
+        return token?.email === 'zidanp13794@gmail.com';
+      },
+    },
+  }
+);
 
 export const config = {
     matcher: ['/admin/:path*', '/api/admin/:path*'],

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useSession, signOut } from 'next-auth/react';
 
 const Navbar = () => {
+    const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [theme, setTheme] = useState('light');
 
@@ -49,6 +50,9 @@ const Navbar = () => {
                     </button>
                     
                     <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
+                        <Link href="/lelang" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-gavel"></i> Area Lelang
+                        </Link>
                         <Link href="/stok" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-fish"></i> Semua Stok
                         </Link>
@@ -64,6 +68,28 @@ const Navbar = () => {
                         <Link href="/faq" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-question-circle"></i> FAQ
                         </Link>
+                        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' }} />
+                        {status === 'loading' ? (
+                            <div className="menu-item" style={{ color: 'var(--text-muted)' }}><i className="fas fa-spinner fa-spin"></i> Memuat...</div>
+                        ) : session ? (
+                            <>
+                                <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
+                                    <i className="fas fa-user-circle"></i> Halo, {session.user.name?.split(' ')[0] || 'Member'}
+                                </Link>
+                                <div className="menu-item" onClick={() => { setMenuOpen(false); signOut(); }} style={{ color: '#ef4444', cursor: 'pointer' }}>
+                                    <i className="fas fa-sign-out-alt"></i> Logout
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/login" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
+                                    <i className="fas fa-sign-in-alt"></i> Login
+                                </Link>
+                                <Link href="/register" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: '#10b981', fontWeight: 'bold' }}>
+                                    <i className="fas fa-user-plus"></i> Daftar Member
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,0 +1,235 @@
+.lelang-container {
+    min-height: 100vh;
+    background: #0f172a;
+    color: white;
+    padding-bottom: 5rem;
+}
+
+.lelang-header {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #334155;
+    position: relative;
+    overflow: hidden;
+}
+
+.lelang-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lelang-header p {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.auth-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+.auth-warning i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #ef4444;
+}
+
+.auth-warning h3 {
+    margin-bottom: 0.5rem;
+}
+
+.auth-warning p {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.lelang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.lelang-card {
+    background: #1e293b;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #334155;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.lelang-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border-color: #38bdf8;
+}
+
+.lelang-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #000;
+}
+
+.lelang-media img, .lelang-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+.status-active {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.status-upcoming {
+    background: #f59e0b;
+    color: white;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.countdown-box {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(5px);
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #38bdf8;
+    font-variant-numeric: tabular-nums;
+}
+
+.time-label {
+    font-size: 0.6rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lelang-info {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.lelang-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #f8fafc;
+    line-height: 1.4;
+}
+
+.price-box {
+    background: #0f172a;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.price-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #10b981;
+}
+
+.btn-bid {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: auto;
+}
+
+.btn-bid.active {
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    color: white;
+}
+
+.btn-bid.active:hover {
+    background: linear-gradient(to right, #2563eb, #7c3aed);
+    transform: translateY(-2px);
+}
+
+.btn-bid.upcoming {
+    background: #334155;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .lelang-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -61,8 +61,60 @@ CREATE TABLE IF NOT EXISTS faqs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Tabel: users
+-- ============================================
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL UNIQUE,
+    password VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    google_id VARCHAR(200) DEFAULT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    role ENUM('member', 'admin') DEFAULT 'member',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Tabel: auctions
+-- ============================================
+CREATE TABLE IF NOT EXISTS auctions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    image_url TEXT DEFAULT NULL,
+    start_price DECIMAL(15, 2) NOT NULL,
+    min_bid_increment DECIMAL(15, 2) NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    status ENUM('draft', 'active', 'ended') DEFAULT 'draft',
+    winner_id INT DEFAULT NULL,
+    winning_bid DECIMAL(15, 2) DEFAULT NULL,
+    payment_status ENUM('waiting_confirmation', 'confirmed', 'paid') DEFAULT 'waiting_confirmation',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Tabel: bids
+-- ============================================
+CREATE TABLE IF NOT EXISTS bids (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    auction_id INT NOT NULL,
+    user_id INT NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Buat user database (opsional, ganti password)
 -- ============================================
 -- CREATE USER 'cupang_user'@'localhost' IDENTIFIED BY 'GANTI_PASSWORD_DISINI';
 -- GRANT ALL PRIVILEGES ON cupang_klaten.* TO 'cupang_user'@'localhost';
 -- FLUSH PRIVILEGES;
+

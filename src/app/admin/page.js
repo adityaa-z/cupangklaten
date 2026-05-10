@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { signOut } from 'next-auth/react';
 import './admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,8 @@ export default function AdminPage() {
     const [products, setProducts] = useState([]);
     const [faqs, setFaqs] = useState([]);
     const [reviews, setReviews] = useState([]);
+    const [members, setMembers] = useState([]);
+    const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Auth State
@@ -32,75 +35,63 @@ export default function AdminPage() {
     const [formData, setFormData] = useState({
         code: '', category: '', variant: '', gender: 'Jantan',
         age: '', size: 'M', stock: 1, price: 0, shopee: '',
-        img: '', img2: '', img3: '', img4: '', is_video: false
+        img: '', img2: '', img3: '', img4: '', is_video: false,
+        title: '', description: '', image_url: '', start_price: 0, min_bid_increment: 0, start_time: '', end_time: '', status: 'draft'
     });
 
     useEffect(() => {
         setIsMounted(true);
-        checkSession();
+        fetchData();
     }, []);
-
-    const checkSession = async () => {
-        setAuthLoading(true);
-        try {
-            const res = await fetch('/api/auth/check/');
-            const data = await res.json();
-            if (data.isLoggedIn) {
-                setIsLoggedIn(true);
-                fetchData();
-            }
-        } catch (err) {
-            console.error('Session check failed:', err);
-        } finally {
-            setAuthLoading(false);
-        }
-    };
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [pRes, fRes, rRes] = await Promise.all([
+            const [pRes, fRes, rRes, mRes, aRes] = await Promise.all([
                 fetch('/api/admin/products/'),
                 fetch('/api/admin/faq/'),
-                fetch('/api/admin/reviews/')
+                fetch('/api/admin/reviews/'),
+                fetch('/api/admin/members/'),
+                fetch('/api/admin/auctions/')
             ]);
 
             if (pRes.ok) setProducts(await pRes.json());
             if (fRes.ok) setFaqs(await fRes.json());
             if (rRes.ok) setReviews(await rRes.json());
+            if (mRes.ok) setMembers(await mRes.json());
+            if (aRes.ok) setAuctions(await aRes.json());
         } catch (err) {
             console.error('Unexpected error fetching data:', err);
         }
         setLoading(false);
     };
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setLoginError(false);
-        setLoading(true);
-        try {
-            const res = await fetch('/api/login/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (res.ok) {
-                setIsLoggedIn(true);
-                fetchData();
-            } else {
-                setLoginError(true);
-            }
-        } catch (err) {
-            setLoginError(true);
-        } finally {
-            setLoading(false);
-        }
+    const handleLogout = async () => {
+        signOut({ callbackUrl: '/' });
     };
 
-    const handleLogout = async () => {
-        await fetch('/api/logout/', { method: 'POST' });
-        setIsLoggedIn(false);
+    // Member Functions
+    const updateMemberStatus = async (id, status, phone, name) => {
+        if (!confirm(`Yakin ingin mengubah status akun ini menjadi ${status}?`)) return;
+        
+        const res = await fetch('/api/admin/members/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status })
+        });
+        
+        if (res.status === 401) return handleLogout();
+        if (res.ok) {
+            fetchData();
+            if (status === 'approved' && phone) {
+                // Format phone number to WA format (start with 62)
+                let waNumber = phone.replace(/\D/g, '');
+                if (waNumber.startsWith('0')) waNumber = '62' + waNumber.substring(1);
+                
+                const waLink = `https://wa.me/${waNumber}?text=Halo%20${name},%0AAkun%20Cupang%20Klaten%20Anda%20telah%20DISETUJUI!%0ASekarang%20Anda%20bisa%20login%20dan%20mengikuti%20lelang%20di%20website%20kami.%0A%0ASelamat%20bergabung!`;
+                window.open(waLink, '_blank');
+            }
+        }
     };
 
     // Product Functions
@@ -228,6 +219,12 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
             });
+        } else if (modalType === 'auction') {
+            res = await fetch('/api/admin/auctions/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+            });
         }
 
         if (res && res.status === 401) return handleLogout();
@@ -260,57 +257,19 @@ export default function AdminPage() {
         if (res.ok) fetchData();
     };
 
-    if (!isMounted || authLoading) {
+    const deleteAuction = async (id) => {
+        if (!confirm('Hapus item lelang ini?')) return;
+        const res = await fetch(`/api/admin/auctions/?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
+    };
+
+    if (!isMounted) {
         return (
             <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <div className="spinner" style={{ marginBottom: '1rem' }}></div>
-                    <p style={{ color: 'var(--text-muted)' }}>Memeriksa Sesi...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!isLoggedIn) {
-        return (
-            <div className="login-container">
-                <div className="login-box">
-                    <img src="/logo.png" alt="Logo" style={{ height: '50px', marginBottom: '1rem', borderRadius: '8px' }} />
-                    <h1>Admin Access</h1>
-                    <form onSubmit={handleLogin}>
-                        <div className="form-group">
-                            <label>Username</label>
-                            <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
-                        </div>
-                        <div className="form-group" style={{ position: 'relative' }}>
-                            <label>Password</label>
-                            <input 
-                                type={showPassword ? "text" : "password"} 
-                                value={password} 
-                                onChange={e => setPassword(e.target.value)} 
-                                required 
-                            />
-                            <button 
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                style={{ 
-                                    position: 'absolute', 
-                                    right: '10px', 
-                                    top: '35px', 
-                                    background: 'none', 
-                                    border: 'none', 
-                                    color: 'var(--text-muted)', 
-                                    cursor: 'pointer' 
-                                }}
-                            >
-                                <i className={`fas fa-eye${showPassword ? '-slash' : ''}`}></i>
-                            </button>
-                        </div>
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? 'Logging in...' : 'Login'}
-                        </button>
-                        {loginError && <p style={{ color: 'red', marginTop: '1rem' }}>Username atau password salah!</p>}
-                    </form>
+                    <p style={{ color: 'var(--text-muted)' }}>Memuat...</p>
                 </div>
             </div>
         );
@@ -324,9 +283,9 @@ export default function AdminPage() {
                     HQ Panel
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Pesanan', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
+                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
                             {tab}
                         </div>
                     ))}
@@ -411,6 +370,177 @@ export default function AdminPage() {
                                                 <td className="action-btns" data-label="Aksi">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData(p); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'Lelang' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls">
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ title: '', description: '', image_url: '', start_price: 100000, min_bid_increment: 10000, start_time: '', end_time: '', status: 'draft' }); setModalType('auction'); setIsModalOpen(true); }}>
+                                    <i className="fas fa-plus"></i> Buat Lelang
+                                </button>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Media</th>
+                                            <th>Judul</th>
+                                            <th>OB & Kelipatan</th>
+                                            <th>Jadwal</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {auctions.map(a => {
+                                            const now = new Date();
+                                            const end = new Date(a.end_time);
+                                            const isEnded = now > end || a.status === 'ended';
+                                            return (
+                                                <tr key={a.id}>
+                                                    <td className="td-img" data-label="Media">
+                                                        {a.image_url ? <img src={a.image_url} alt="" /> : <div style={{width:'50px', height:'50px', background:'#eee', borderRadius:'8px'}}/>}
+                                                    </td>
+                                                    <td data-label="Judul" style={{fontWeight: 'bold', color: 'var(--primary-dark)'}}>{a.title}</td>
+                                                    <td data-label="OB & Kelipatan">
+                                                        <div>OB: <span style={{color: '#10b981', fontWeight: 'bold'}}>Rp {a.start_price.toLocaleString()}</span></div>
+                                                        <div style={{fontSize: '0.8rem', color: '#718096'}}>Kel: Rp {a.min_bid_increment.toLocaleString()}</div>
+                                                    </td>
+                                                    <td data-label="Jadwal" style={{fontSize: '0.85rem'}}>
+                                                        <div>Mulai: {new Date(a.start_time).toLocaleString('id-ID')}</div>
+                                                        <div>Tutup: {new Date(a.end_time).toLocaleString('id-ID')}</div>
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        <span style={{
+                                                            padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold',
+                                                            backgroundColor: isEnded ? '#fee2e2' : a.status === 'active' ? '#dcfce7' : '#f1f5f9',
+                                                            color: isEnded ? '#991b1b' : a.status === 'active' ? '#166534' : '#475569'
+                                                        }}>
+                                                            {isEnded ? 'ENDED' : a.status.toUpperCase()}
+                                                        </span>
+                                                        {isEnded && a.winner_name && a.payment_status !== 'paid' && (
+                                                            <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', background: '#f8fafc', padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                                                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '0.85rem' }}>🏆 {a.winner_name}</div>
+                                                                <div style={{ color: '#64748b' }}>Rp {Number(a.max_bid).toLocaleString('id-ID')}</div>
+                                                                <div style={{ display: 'flex', gap: '0.3rem', marginTop: '0.3rem', flexWrap: 'wrap' }}>
+                                                                    <a href={`https://wa.me/${a.winner_phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" style={{ color: '#25D366', textDecoration: 'none', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                                        <i className="fab fa-whatsapp"></i> Hubungi
+                                                                    </a>
+                                                                    <span style={{ color: '#cbd5e1' }}>|</span>
+                                                                    <button onClick={async () => {
+                                                                        if (!confirm('Tandai lelang ini sudah dibayar LUNAS oleh pemenang?')) return;
+                                                                        const res = await fetch('/api/admin/auctions/', {
+                                                                            method: 'POST',
+                                                                            headers: {'Content-Type': 'application/json'},
+                                                                            body: JSON.stringify({ id: a.id, action: 'mark_paid' })
+                                                                        });
+                                                                        if (res.ok) fetchData();
+                                                                    }} style={{ background: 'none', border: 'none', color: '#3b82f6', fontWeight: 'bold', cursor: 'pointer', padding: 0 }}>
+                                                                        <i className="fas fa-check-double"></i> Tandai Lunas
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {isEnded && a.payment_status === 'paid' && (
+                                                            <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', background: '#ecfdf5', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', color: '#059669', fontWeight: 'bold', textAlign: 'center' }}>
+                                                                <i className="fas fa-check-circle"></i> LUNAS TERBAYAR
+                                                                <div style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#10b981' }}>{a.winner_name}</div>
+                                                            </div>
+                                                        )}
+                                                        {isEnded && !a.winner_name && (
+                                                            <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#94a3b8' }}>Tidak ada pemenang</div>
+                                                        )}
+                                                    </td>
+                                                    <td className="action-btns" data-label="Aksi">
+                                                        <button className="btn-icon" onClick={() => { 
+                                                            const sd = new Date(a.start_time);
+                                                            const ed = new Date(a.end_time);
+                                                            // Format to datetime-local YYYY-MM-DDThh:mm
+                                                            const sdStr = new Date(sd.getTime() - (sd.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                                                            const edStr = new Date(ed.getTime() - (ed.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                                                            
+                                                            setEditingItem(a); 
+                                                            setFormData({...a, start_time: sdStr, end_time: edStr}); 
+                                                            setModalType('auction'); 
+                                                            setIsModalOpen(true); 
+                                                        }}><i className="fas fa-edit"></i></button>
+                                                        <button className="btn-icon delete" onClick={() => deleteAuction(a.id)}><i className="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'Member' && (
+                        <div className="tab-view">
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nama & Email</th>
+                                            <th>WhatsApp</th>
+                                            <th>Alamat</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {members.map(m => (
+                                            <tr key={m.id}>
+                                                <td data-label="Nama & Email">
+                                                    <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{m.name}</div>
+                                                    <div style={{ fontSize: '0.85rem', color: '#718096' }}>{m.email}</div>
+                                                </td>
+                                                <td data-label="WhatsApp">
+                                                    <a href={`https://wa.me/${m.phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" style={{ color: '#25D366', fontWeight: 'bold', textDecoration: 'none' }}>
+                                                        <i className="fab fa-whatsapp"></i> {m.phone || '-'}
+                                                    </a>
+                                                </td>
+                                                <td data-label="Alamat" style={{ fontSize: '0.85rem', maxWidth: '200px' }}>{m.address || '-'}</td>
+                                                <td data-label="Status">
+                                                    <span style={{ 
+                                                        padding: '0.3rem 0.8rem', 
+                                                        borderRadius: '20px', 
+                                                        fontSize: '0.8rem', 
+                                                        fontWeight: 'bold',
+                                                        backgroundColor: m.status === 'approved' ? '#dcfce7' : m.status === 'rejected' ? '#fee2e2' : '#fef9c3',
+                                                        color: m.status === 'approved' ? '#166534' : m.status === 'rejected' ? '#991b1b' : '#854d0e'
+                                                    }}>
+                                                        {m.status.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td data-label="Aksi" style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    {m.status === 'pending' && (
+                                                        <>
+                                                            <button className="btn" onClick={() => updateMemberStatus(m.id, 'approved', m.phone, m.name)} style={{ padding: '0.5rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '5px' }}>
+                                                                <i className="fas fa-check"></i> Setujui
+                                                            </button>
+                                                            <button className="btn" onClick={() => updateMemberStatus(m.id, 'rejected')} style={{ padding: '0.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '5px' }}>
+                                                                <i className="fas fa-times"></i> Tolak
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {m.status === 'approved' && (
+                                                        <button className="btn" onClick={() => updateMemberStatus(m.id, 'rejected')} style={{ padding: '0.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '5px' }}>
+                                                            Blokir
+                                                        </button>
+                                                    )}
+                                                    {m.status === 'rejected' && (
+                                                        <button className="btn" onClick={() => updateMemberStatus(m.id, 'approved', m.phone, m.name)} style={{ padding: '0.5rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '5px' }}>
+                                                            Pulihkan
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
@@ -558,11 +688,60 @@ export default function AdminPage() {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : 'Ulasan'}</h3>
+                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : 'Ulasan'}</h3>
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            {modalType === 'product' ? (
+                            {modalType === 'auction' ? (
+                                <form onSubmit={saveProduct}>
+                                    <div className="form-group">
+                                        <label>Foto/Video Ikan (URL atau Upload)</label>
+                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                            <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {uploadingField === 'image_url' ? <div className="spinner"></div> : formData.image_url ? <img src={formData.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-camera" style={{ color: '#94a3b8' }}></i>}
+                                            </div>
+                                            <input type="file" accept="image/*,video/*" onChange={(e) => handleFileUpload(e, 'image_url', true)} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Judul Lelang</label>
+                                        <input type="text" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Contoh: Plakat Blue Rim Super Grade" required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Deskripsi (Opsional)</label>
+                                        <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Deskripsi ikan..." style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '80px' }}></textarea>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Open Bid (Rp)</label>
+                                            <input type="number" value={formData.start_price} onChange={e => setFormData({ ...formData, start_price: parseInt(e.target.value) || 0 })} required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Kelipatan Bid (Rp)</label>
+                                            <input type="number" value={formData.min_bid_increment} onChange={e => setFormData({ ...formData, min_bid_increment: parseInt(e.target.value) || 0 })} required />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Waktu Mulai</label>
+                                            <input type="datetime-local" value={formData.start_time} onChange={e => setFormData({ ...formData, start_time: e.target.value })} required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Waktu Berakhir</label>
+                                            <input type="datetime-local" value={formData.end_time} onChange={e => setFormData({ ...formData, end_time: e.target.value })} required />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Status</label>
+                                        <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
+                                            <option value="draft">Draft (Belum Tampil)</option>
+                                            <option value="active">Active (Sedang Lelang)</option>
+                                            <option value="ended">Ended (Sudah Berakhir)</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary">Simpan Lelang</button>
+                                </form>
+                            ) : modalType === 'product' ? (
                                 <form onSubmit={saveProduct}>
                                     {/* Media Pickers Grid */}
                                     <div className="media-grid-admin">
