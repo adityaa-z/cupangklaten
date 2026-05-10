@@ -159,8 +159,8 @@ export default function AdminPage() {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file maksimal 2 MB!');
+        if (file.size > 20 * 1024 * 1024) {
+            alert('Ukuran file maksimal 20 MB!');
             e.target.value = '';
             return;
         }
