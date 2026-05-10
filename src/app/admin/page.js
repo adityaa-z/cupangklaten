@@ -178,7 +178,7 @@ export default function AdminPage() {
             if (!res.ok) throw new Error('Gagal upload ke storage');
 
             const { url } = await res.json();
-            const isVid = isPrimary && file.type.startsWith('video/');
+            const isVid = isPrimary && file.type?.startsWith('video/');
             
             setFormData(prev => ({ 
                 ...prev, 
@@ -700,7 +700,7 @@ export default function AdminPage() {
                                             <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 {uploadingField === 'image_url' ? <div className="spinner"></div> : formData.image_url ? <img src={formData.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-camera" style={{ color: '#94a3b8' }}></i>}
                                             </div>
-                                            <input type="file" accept="image/*,video/*" onChange={(e) => handleFileUpload(e, 'image_url', true)} />
+                                            <input type="file" accept="image/*, video/mp4, video/webm" onChange={(e) => handleFileUpload(e, 'image_url', true)} />
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -784,7 +784,7 @@ export default function AdminPage() {
                                                 <input
                                                     type="file"
                                                     disabled={uploadingField !== null}
-                                                    accept={slot.isPrimary ? "image/*,video/*" : "image/*"}
+                                                    accept={slot.isPrimary ? "image/*, video/mp4, video/webm" : "image/*"}
                                                     onChange={(e) => handleFileUpload(e, slot.field, slot.isPrimary)}
                                                     style={{ fontSize: '0.7rem', width: '100%' }}
                                                 />

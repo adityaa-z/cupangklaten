@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { isValidSession } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
@@ -7,10 +6,6 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
     try {
-        if (!isValidSession(request)) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
         const formData = await request.formData();
         const file = formData.get('file');
 
