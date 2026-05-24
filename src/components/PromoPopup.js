@@ -3,29 +3,28 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export default function PromoPopup({ isActive, generalPromos = [] }) {
+export default function PromoPopup({ isActive, generalPromos = [], limitRemaining = 0 }) {
     const [show, setShow] = useState(false);
     
     const hasGeneralPromo = generalPromos && generalPromos.length > 0;
-    const hasVoucherPromo = isActive === 'true';
+    // Voucher Promo aktif HANYA jika status aktif DAN sisa kuota masih ada (> 0)
+    const hasVoucherPromo = isActive === 'true' && limitRemaining > 0;
 
     useEffect(() => {
         if (hasGeneralPromo || hasVoucherPromo) {
-            const popupKey = 'promo_popup_seen_' + (hasGeneralPromo ? generalPromos[0].id : 'voucher');
-            const hasSeen = sessionStorage.getItem(popupKey);
-            if (!hasSeen) {
-                const timer = setTimeout(() => {
-                    setShow(true);
-                }, 1500);
-                return () => clearTimeout(timer);
-            }
+            // "muncul terus ketika ada dan aktif" - tidak menggunakan sessionStorage agar selalu tampil di halaman utama
+            const timer = setTimeout(() => {
+                setShow(true);
+            }, 1500);
+            return () => clearTimeout(timer);
+        } else {
+            // "ketika tidak ada dan di nonaktif maka pop upnya ga muncul" - dan "limit habis pop up otomatis hilang"
+            setShow(false);
         }
     }, [hasGeneralPromo, hasVoucherPromo]);
 
     const handleClose = () => {
         setShow(false);
-        const popupKey = 'promo_popup_seen_' + (generalPromos && generalPromos.length > 0 ? generalPromos[0].id : 'voucher');
-        sessionStorage.setItem(popupKey, 'true');
     };
 
     if (!show) return null;
@@ -65,6 +64,9 @@ export default function PromoPopup({ isActive, generalPromos = [] }) {
                             <p style={descStyle}>
                                 Khusus untuk Anda yang memberikan rating <strong>Bintang 5</strong> di Google Maps kami.
                             </p>
+                            <div style={{ fontSize: '0.9rem', color: '#f59e0b', marginBottom: '1.5rem', fontWeight: 'bold' }}>
+                                <i className="fas fa-fire"></i> Sisa Kuota Hari Ini: {limitRemaining} Voucher
+                            </div>
                             <Link 
                                 href="/claim-voucher" 
                                 style={ctaStyle}
@@ -144,7 +146,7 @@ const titleStyle = {
 const descStyle = {
     color: '#cbd5e1',
     fontSize: '1.05rem',
-    marginBottom: '2rem',
+    marginBottom: '1rem',
     lineHeight: '1.5',
 };
 

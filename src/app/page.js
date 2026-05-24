@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import PromoPopup from '@/components/PromoPopup';
-import { getPromoSettings, getActiveGeneralPromos } from '@/app/actions/promo';
+import { getPromoSettings, getActiveGeneralPromos, getPromoStats } from '@/app/actions/promo';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +20,7 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [promoActive, setPromoActive] = useState('false');
+  const [promoLimitRemaining, setPromoLimitRemaining] = useState(0);
   const [generalPromos, setGeneralPromos] = useState([]);
 
   // User Review States
@@ -136,6 +137,8 @@ export default function Home() {
         setPromoActive(settings.PROMO_ACTIVE);
         const activePromos = await getActiveGeneralPromos();
         setGeneralPromos(activePromos);
+        const stats = await getPromoStats();
+        setPromoLimitRemaining(stats.remainingLimit);
       } catch (err) {
         console.error('Error fetching promo settings', err);
       }
