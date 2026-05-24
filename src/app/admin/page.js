@@ -869,21 +869,13 @@ export default function AdminPage() {
                                                     </div>
                                                 </div>
                                                 <div style={{ marginBottom: '2rem' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                                        <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Bukti Screenshot</div>
-                                                        {scannedClaim.image_path && (
-                                                            <button 
-                                                                onClick={handleDeleteClaimImage} 
-                                                                style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', padding: '0.3rem 0.7rem', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                                                            >
-                                                                <i className="fas fa-trash"></i> Hapus Foto
-                                                            </button>
-                                                        )}
-                                                    </div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem' }}>Bukti Screenshot</div>
                                                     {scannedClaim.image_path ? (
                                                         <img src={scannedClaim.image_path} alt="Bukti" style={{ width: '100%', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
                                                     ) : (
-                                                        <div style={{ padding: '2rem', background: '#f3f4f6', textAlign: 'center', color: '#9ca3af', borderRadius: '8px' }}><i className="fas fa-image" style={{ marginRight: '0.5rem' }}></i>Foto sudah dihapus atau tidak ada</div>
+                                                        <div style={{ padding: '2rem', background: '#f3f4f6', textAlign: 'center', color: '#9ca3af', borderRadius: '8px' }}>
+                                                            <i className="fas fa-image" style={{ marginRight: '0.5rem' }}></i>Foto dihapus otomatis setelah diproses
+                                                        </div>
                                                     )}
                                                 </div>
                                                 {scannedClaim.status === 'pending' && (

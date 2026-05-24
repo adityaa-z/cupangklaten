@@ -1,0 +1,2 @@
+-- Jalankan di MySQL VPS
+ALTER TABLE promo_claims MODIFY COLUMN image_path VARCHAR(500) NULL DEFAULT NULL;
