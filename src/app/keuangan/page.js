@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import FAB from '@/components/FAB';
 import './keuangan.css';
 
 export const dynamic = 'force-dynamic';
@@ -250,21 +253,23 @@ export default function KeuanganPage() {
     }
 
     return (
-        <div className="finance-body">
-            <div className="finance-container">
-                {/* Header */}
-                <header className="finance-header">
-                    <div className="finance-logo-group">
-                        <img src="/logo.png" alt="Cupang Klaten Logo" className="finance-logo" />
-                        <div>
-                            <h1 className="finance-title">Z-IFC MODUL KEUANGAN</h1>
-                            <p className="finance-subtitle">Sistem Terintegrasi Cupang Klaten</p>
+        <>
+            <Navbar />
+            <div className="finance-body">
+                <div className="finance-container">
+                    {/* Header */}
+                    <div className="finance-header">
+                        <div className="finance-logo-group">
+                            <i className="fas fa-coins" style={{ fontSize: '2rem', color: '#D4AF37' }}></i>
+                            <div>
+                                <h1 className="finance-title">Z-IFC MODUL KEUANGAN</h1>
+                                <p className="finance-subtitle">Sistem Terintegrasi Cupang Klaten</p>
+                            </div>
                         </div>
+                        <Link href="/admin" className="btn-home">
+                            <i className="fas fa-arrow-left"></i> Dashboard Admin
+                        </Link>
                     </div>
-                    <Link href="/admin" className="btn-home">
-                        <i className="fas fa-arrow-left"></i> Dashboard Admin
-                    </Link>
-                </header>
 
                 {/* Dashboard Stats */}
                 <section className="finance-stats-grid">
@@ -777,6 +782,9 @@ export default function KeuanganPage() {
                     {toast.message}
                 </div>
             )}
-        </div>
+            </div>
+            <Footer />
+            <FAB />
+        </>
     );
 }
