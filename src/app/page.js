@@ -7,17 +7,20 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const [fishProducts, setFishProducts] = useState([]);
+  const [auctions, setAuctions] = useState([]);
   const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // User Review States
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [userRating, setUserRating] = useState(5);
@@ -32,11 +35,13 @@ export default function Home() {
   const fishSliderRef = React.useRef(null);
   const suppliesSliderRef = React.useRef(null);
   const reviewsSliderRef = React.useRef(null);
+  const auctionsSliderRef = React.useRef(null);
 
   // Scroll states
   const [scrollFish, setScrollFish] = useState({ left: false, right: true });
   const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
   const [scrollReviews, setScrollReviews] = useState({ left: false, right: true });
+  const [scrollAuctions, setScrollAuctions] = useState({ left: false, right: true });
 
 
 
@@ -133,7 +138,21 @@ export default function Home() {
   };
 
   useEffect(() => {
-    async function fetchFeatured() {
+        async function fetchAuctions() {
+      try {
+        const res = await fetch('/api/auctions/');
+        if (res.ok) {
+          const data = await res.json();
+          // Filter only active auctions
+          setAuctions(data.filter(a => a.status === 'active'));
+        }
+      } catch (err) {
+        console.error('Error fetching auctions:', err);
+      }
+    }
+    fetchAuctions();
+
+async function fetchFeatured() {
       try {
         const res = await fetch('/api/products/');
         if (!res.ok) throw new Error('Failed to fetch products');
@@ -192,22 +211,27 @@ export default function Home() {
     const onFishScroll = () => handleScroll(fishSliderRef, setScrollFish);
     const onSuppScroll = () => handleScroll(suppliesSliderRef, setScrollSupp);
     const onReviewsScroll = () => handleScroll(reviewsSliderRef, setScrollReviews);
+    const onAuctionsScroll = () => handleScroll(auctionsSliderRef, setScrollAuctions);
 
     if (fSlider) fSlider.addEventListener('scroll', onFishScroll);
     if (sSlider) sSlider.addEventListener('scroll', onSuppScroll);
     if (rSlider) rSlider.addEventListener('scroll', onReviewsScroll);
+    const aSlider = auctionsSliderRef.current;
+    if (aSlider) aSlider.addEventListener('scroll', onAuctionsScroll);
     
     // Initial checks
     setTimeout(() => {
       onFishScroll();
       onSuppScroll();
       onReviewsScroll();
+      onAuctionsScroll();
     }, 500);
 
     return () => {
       if (fSlider) fSlider.removeEventListener('scroll', onFishScroll);
       if (sSlider) sSlider.removeEventListener('scroll', onSuppScroll);
       if (rSlider) rSlider.removeEventListener('scroll', onReviewsScroll);
+      if (aSlider) aSlider.removeEventListener('scroll', onAuctionsScroll);
     };
   }, [loading, fishProducts, suppliesProducts, reviews]);
 
@@ -330,6 +354,87 @@ export default function Home() {
             Lihat Semua Produk
             <i className="fas fa-arrow-right"></i>
           </Link>
+        </div>
+      </section>
+
+      {/* Lelang Ikan Section */}
+      <section className="products-section" id="lelang-home" style={{ paddingBottom: '4rem', paddingTop: '4rem', background: 'var(--bg-dark)' }}>
+        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: '#fff' }}>
+            Lelang <span style={{ background: 'linear-gradient(to right, #facc15, #ca8a04)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Pilihan</span>
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>Menangkan ikan cupang kontes dengan penawaran terbaik</p>
+          <div style={{ width: '60px', height: '4px', background: '#facc15', borderRadius: '10px', marginTop: '1rem' }}></div>
+        </div>
+
+        <div className="slider-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <button className="slider-nav-btn prev" onClick={() => scroll(auctionsSliderRef, 'left')} disabled={!scrollAuctions.left} aria-label="Previous auction">
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          
+          <div className="product-slider" ref={auctionsSliderRef}>
+            {loading ? (
+              [...Array(3)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div></div>)
+            ) : auctions.length > 0 ? (
+              auctions.map(auction => (
+                <div key={auction.id} style={{ 
+                    minWidth: '280px', maxWidth: '300px', background: '#1e293b', borderRadius: '20px', 
+                    overflow: 'hidden', border: '1px solid #334155', display: 'flex', flexDirection: 'column',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+                }}>
+                    <div style={{ position: 'relative', width: '100%', height: '220px', background: '#0f172a' }}>
+                        <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: 'white', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', zIndex: 1, boxShadow: '0 2px 10px rgba(239, 68, 68, 0.5)' }}>
+                            <i className="fas fa-circle" style={{ fontSize: '0.5rem', verticalAlign: 'middle', marginRight: '4px', animation: 'pulse 1.5s infinite' }}></i> Live Bidding
+                        </span>
+                        {auction.is_video ? (
+                            <video src={auction.image_url} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            <img src={auction.image_url || '/logo.png'} alt={auction.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        )}
+                    </div>
+                    <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '1rem', fontWeight: '700', lineHeight: 1.3 }}>{auction.title}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', padding: '0.8rem', background: '#0f172a', borderRadius: '12px' }}>
+                            <div>
+                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.2rem' }}>Open Bid</div>
+                                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '1rem' }}>Rp {auction.start_price.toLocaleString('id-ID')}</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.2rem' }}>Kelipatan</div>
+                                <div style={{ color: '#38bdf8', fontWeight: 'bold', fontSize: '0.9rem' }}>Rp {auction.min_bid_increment.toLocaleString('id-ID')}</div>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => {
+                                if (!session) {
+                                    router.push('/login');
+                                } else {
+                                    router.push('/lelang/' + auction.id);
+                                }
+                            }}
+                            style={{ 
+                                width: '100%', padding: '0.8rem', marginTop: 'auto', background: 'linear-gradient(135deg, #facc15, #ca8a04)', 
+                                color: '#000', border: 'none', borderRadius: '50px', fontWeight: '700', cursor: 'pointer',
+                                transition: 'transform 0.2s', boxShadow: '0 4px 15px rgba(250, 204, 21, 0.3)'
+                            }}
+                            onMouseOver={e => e.target.style.transform = 'translateY(-2px)'}
+                            onMouseOut={e => e.target.style.transform = 'translateY(0)'}
+                        >
+                            Ikut Lelang
+                        </button>
+                    </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', width: '100%', padding: '3rem', color: '#94a3b8' }}>
+                <i className="fas fa-gavel" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}></i>
+                <p style={{ fontSize: '1.2rem' }}>Belum ada ikan yang di lelang.</p>
+              </div>
+            )}
+          </div>
+          <button className="slider-nav-btn next" onClick={() => scroll(auctionsSliderRef, 'right')} disabled={!scrollAuctions.right} aria-label="Next auction">
+            <i className="fas fa-chevron-right"></i>
+          </button>
         </div>
       </section>
 
