@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import PromoPopup from '@/components/PromoPopup';
-import { getPromoSettings, getActiveGeneralPromos, getPromoStats } from '@/app/actions/promo';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -133,12 +132,13 @@ export default function Home() {
 
     async function fetchPromoSettings() {
       try {
-        const settings = await getPromoSettings();
-        setPromoActive(settings.PROMO_ACTIVE);
-        const activePromos = await getActiveGeneralPromos();
-        setGeneralPromos(activePromos);
-        const stats = await getPromoStats();
-        setPromoLimitRemaining(stats.remainingLimit);
+        const res = await fetch('/api/promo/');
+        if (res.ok) {
+          const data = await res.json();
+          setPromoActive(data.promoActive);
+          setGeneralPromos(data.generalPromos || []);
+          setPromoLimitRemaining(data.limitRemaining || 0);
+        }
       } catch (err) {
         console.error('Error fetching promo settings', err);
       }
@@ -244,7 +244,7 @@ async function fetchFeatured() {
   return (
     <>
       <Navbar />
-      <PromoPopup isActive={promoActive} />
+      <PromoPopup isActive={promoActive} generalPromos={generalPromos} limitRemaining={promoLimitRemaining} />
       
       {/* Hero Section */}
       <section className="hero">
