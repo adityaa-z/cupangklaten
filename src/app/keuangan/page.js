@@ -25,6 +25,7 @@ export default function KeuanganPage() {
     
     // Tab State: 'transaksi' or 'inventaris'
     const [activeTab, setActiveTab] = useState('transaksi');
+    const [chartFilter, setChartFilter] = useState('minggu'); // hari, minggu, bulan, tahun
 
     // Form States
     const [formData, setFormData] = useState({
@@ -260,6 +261,52 @@ export default function KeuanganPage() {
             setActionLoading(false);
         }
     };
+
+    // Chart Data Processing
+    const processChartData = () => {
+        if (!transactions || transactions.length === 0) return [];
+        
+        const now = new Date();
+        now.setHours(23, 59, 59, 999);
+        
+        const filtered = transactions.filter(t => {
+            const tDate = new Date(t.tanggal);
+            const diffTime = now.getTime() - tDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (chartFilter === 'hari') return diffDays <= 1;
+            if (chartFilter === 'minggu') return diffDays <= 7;
+            if (chartFilter === 'bulan') return diffDays <= 30;
+            if (chartFilter === 'tahun') return diffDays <= 365;
+            return true;
+        });
+
+        const grouped = {};
+        filtered.forEach(t => {
+            let dateKey = '';
+            const tDate = new Date(t.tanggal);
+            if (chartFilter === 'tahun') {
+                dateKey = tDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+            } else {
+                dateKey = tDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            }
+            
+            // Generate a grouping key that is consistent for sorting if year/month
+            const sortKey = chartFilter === 'tahun' 
+                ? tDate.getFullYear() * 100 + tDate.getMonth() 
+                : tDate.getTime();
+
+            if (!grouped[dateKey]) {
+                grouped[dateKey] = { name: dateKey, sortKey: sortKey, pemasukan: 0, pengeluaran: 0 };
+            }
+            if (t.jenis === 'masuk') grouped[dateKey].pemasukan += Number(t.nominal);
+            if (t.jenis === 'keluar') grouped[dateKey].pengeluaran += Number(t.nominal);
+        });
+
+        return Object.values(grouped).sort((a, b) => a.sortKey - b.sortKey);
+    };
+    
+    const chartData = processChartData();
 
     const handleTransactionSubmit = async (e) => {
         e.preventDefault();
@@ -823,6 +870,67 @@ export default function KeuanganPage() {
                                         </div>
                                     );
                                 })()}
+                                {/* CHART SECTION */}
+                                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <h4 style={{ fontSize: '1rem', color: '#D4AF37', margin: 0 }}>Grafik Arus Kas</h4>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            {['hari', 'minggu', 'bulan', 'tahun'].map(f => (
+                                                <button 
+                                                    key={f}
+                                                    onClick={() => setChartFilter(f)}
+                                                    style={{
+                                                        background: chartFilter === f ? 'rgba(212,175,55,0.2)' : 'transparent',
+                                                        border: `1px solid ${chartFilter === f ? '#D4AF37' : '#475569'}`,
+                                                        color: chartFilter === f ? '#D4AF37' : '#94a3b8',
+                                                        padding: '0.3rem 0.8rem',
+                                                        borderRadius: '20px',
+                                                        fontSize: '0.75rem',
+                                                        cursor: 'pointer',
+                                                        textTransform: 'capitalize'
+                                                    }}
+                                                >
+                                                    1 {f}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ width: '100%', height: 300 }}>
+                                        {chartData.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                                    <defs>
+                                                        <linearGradient id="colorMasuk" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                                        </linearGradient>
+                                                        <linearGradient id="colorKeluar" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
+                                                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                                                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                                                    <Tooltip 
+                                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                                        itemStyle={{ fontSize: '0.85rem' }}
+                                                        labelStyle={{ color: '#D4AF37', marginBottom: '0.5rem' }}
+                                                        formatter={(value) => ['Rp ' + value.toLocaleString('id-ID'), '']}
+                                                    />
+                                                    <Area type="monotone" dataKey="pemasukan" name="Pemasukan" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" />
+                                                    <Area type="monotone" dataKey="pengeluaran" name="Pengeluaran" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#64748b' }}>
+                                                Tidak ada data untuk periode ini.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <div className="table-responsive">
                                     <table className="finance-table">
                                         <thead>
