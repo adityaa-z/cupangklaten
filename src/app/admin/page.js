@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { 
+    getPromoSettings, updatePromoSettings, getClaimByCode, processAndCleanUpClaim,
+    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo
+} from '@/app/actions/promo';
+
 import './admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +36,23 @@ export default function AdminPage() {
     const [editingItem, setEditingItem] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const [uploadingField, setUploadingField] = useState(null);
+
+    // Promo Tab States
+    const [promoActiveTab, setPromoActiveTab] = useState('voucher');
+    const [promoActive, setPromoActive] = useState(false);
+    const [dailyLimit, setDailyLimit] = useState(10);
+    const [isSavingSettings, setIsSavingSettings] = useState(false);
+    const [scannerActive, setScannerActive] = useState(false);
+    const [scannedClaim, setScannedClaim] = useState(null);
+    const [isProcessingClaim, setIsProcessingClaim] = useState(false);
+    const [scanMessage, setScanMessage] = useState('');
+    const [generalPromos, setGeneralPromos] = useState([]);
+    const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
+    const [promoFormData, setPromoFormData] = useState({
+        title: '', description: '', targetCategory: '5k', 
+        priceOrDiscount: '', startDate: '', endDate: ''
+    });
+
 
     // Form States (Product)
     const [formData, setFormData] = useState({
@@ -64,8 +87,81 @@ export default function AdminPage() {
             console.error('Unexpected error fetching data:', err);
         }
         setLoading(false);
+
+    const fetchPromoData = async () => {
+        try {
+            const settings = await getPromoSettings();
+            setPromoActive(settings.PROMO_ACTIVE === 'true');
+            setDailyLimit(parseInt(settings.PROMO_DAILY_LIMIT, 10));
+            const pData = await getAllGeneralPromos();
+            setGeneralPromos(pData);
+        } catch (err) { console.error('Promo fetch error:', err); }
+    };
+    fetchPromoData();
+    
     };
 
+    
+    // Promo Logic
+    const handleSaveSettings = async () => {
+        setIsSavingSettings(true);
+        await updatePromoSettings(promoActive, dailyLimit);
+        alert('Pengaturan Voucher berhasil disimpan!');
+        setIsSavingSettings(false);
+    };
+
+    useEffect(() => {
+        if (activeTab === 'Promo' && promoActiveTab === 'voucher' && scannerActive) {
+            const scanner = new Html5QrcodeScanner('reader', { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+            scanner.render((decodedText) => {
+                scanner.clear();
+                setScannerActive(false);
+                handleScannedCode(decodedText);
+            }, () => {});
+            return () => { scanner.clear().catch(e => console.error(e)); };
+        }
+    }, [scannerActive, activeTab, promoActiveTab]);
+
+    const handleScannedCode = async (code) => {
+        setScanMessage('Memeriksa kode...');
+        const claim = await getClaimByCode(code);
+        if (claim) { setScannedClaim(claim); setScanMessage(''); } 
+        else { setScanMessage('Kode tidak valid.'); }
+    };
+
+    const handleProcessClaim = async (action) => {
+        setIsProcessingClaim(true);
+        const res = await processAndCleanUpClaim(scannedClaim.claim_code, action);
+        if (res.success) { alert(`Voucher berhasil di-${action}`); setScannedClaim(null); } 
+        else { alert(`Gagal: ${res.error}`); }
+        setIsProcessingClaim(false);
+    };
+
+    const handleCreatePromo = async (e) => {
+        e.preventDefault();
+        setIsSubmittingPromo(true);
+        const res = await createGeneralPromo(promoFormData);
+        if (res.success) {
+            alert('Promo berhasil dibuat!');
+            setPromoFormData({title: '', description: '', targetCategory: '5k', priceOrDiscount: '', startDate: '', endDate: ''});
+            const pData = await getAllGeneralPromos();
+            setGeneralPromos(pData);
+        } else { alert('Gagal membuat promo'); }
+        setIsSubmittingPromo(false);
+    };
+
+    const handleTogglePromoStatus = async (id, currentStatus) => {
+        await toggleGeneralPromoStatus(id, !currentStatus);
+        const pData = await getAllGeneralPromos(); setGeneralPromos(pData);
+    };
+
+    const handleDeleteGeneralPromo = async (id) => {
+        if (confirm('Yakin hapus?')) {
+            await deleteGeneralPromo(id);
+            const pData = await getAllGeneralPromos(); setGeneralPromos(pData);
+        }
+    };
+    
     const handleLogout = async () => {
         signOut({ callbackUrl: '/' });
     };
