@@ -117,11 +117,10 @@ export async function processAndCleanUpClaim(code, action) {
             await execute('UPDATE fish_stock SET remaining_stock = remaining_stock - 1 WHERE id = ?', [stock.id]);
 
             // Catat transaksi
-            const txId = generateId();
             await execute(`
-                INSERT INTO transactions (id, type, amount, cogs, profit, description, fish_id)
-                VALUES (?, 'masuk', 0, 2000, -2000, ?, ?)
-            `, [txId, `Claim Voucher Google Maps (${claim.maps_name})`, stock.id]);
+                INSERT INTO transactions (tanggal, category_id, fish_stock_id, nominal, hpp_total, keterangan)
+                VALUES (CURDATE(), 1, ?, 0, 2000, ?)
+            `, [stock.id, `Claim Voucher Google Maps (${claim.maps_name})`]);
 
             await execute('UPDATE promo_claims SET status = "claimed" WHERE claim_code = ?', [code]);
         } else {
@@ -203,4 +202,9 @@ export async function deleteGeneralPromo(id) {
         console.error('deleteGeneralPromo error:', e);
         return { success: false, error: 'Gagal menghapus promo' };
     }
+}
+
+export async function getAllClaims() {
+    const rows = await query('SELECT * FROM promo_claims ORDER BY created_at DESC');
+    return rows;
 }

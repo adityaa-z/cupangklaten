@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { 
     getPromoSettings, updatePromoSettings, getClaimByCode, processAndCleanUpClaim,
-    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo
+    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo, getAllClaims
 } from '@/app/actions/promo';
 
 import './admin.css';
@@ -48,6 +48,7 @@ export default function AdminPage() {
     const [scanMessage, setScanMessage] = useState('');
     const [manualCode, setManualCode] = useState('');
     const [generalPromos, setGeneralPromos] = useState([]);
+    const [allClaims, setAllClaims] = useState([]);
     const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
     const [promoFormData, setPromoFormData] = useState({
         title: '', description: '', targetCategory: '5k', 
@@ -95,6 +96,8 @@ export default function AdminPage() {
             setPromoActive(settings.PROMO_ACTIVE === 'true');
             setDailyLimit(parseInt(settings.PROMO_DAILY_LIMIT, 10));
             const pData = await getAllGeneralPromos();
+            const cData = await getAllClaims();
+            setAllClaims(cData);
             setGeneralPromos(pData);
         } catch (err) { console.error('Promo fetch error:', err); }
     };
@@ -141,7 +144,7 @@ export default function AdminPage() {
     const handleProcessClaim = async (action) => {
         setIsProcessingClaim(true);
         const res = await processAndCleanUpClaim(scannedClaim.claim_code, action);
-        if (res.success) { alert(`Voucher berhasil di-${action}`); setScannedClaim(null); } 
+        if (res.success) { alert(`Voucher berhasil di-${action}`); setScannedClaim(null); const cData = await getAllClaims(); setAllClaims(cData); } 
         else { alert(`Gagal: ${res.error}`); }
         setIsProcessingClaim(false);
     };
@@ -835,7 +838,51 @@ export default function AdminPage() {
                                             </div>
                                         </div>
                                     )}
+
                                 </div>
+                                <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', marginTop: '2rem' }}>
+                                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-list-alt"></i> Daftar Klaim Voucher</h3>
+                                    <div className="table-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Kode & Tanggal</th>
+                                                    <th>Pelanggan</th>
+                                                    <th>Status</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {allClaims.length === 0 ? (
+                                                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Belum ada klaim voucher</td></tr>
+                                                ) : allClaims.map(c => (
+                                                    <tr key={c.id}>
+                                                        <td>
+                                                            <div style={{ fontWeight: 'bold' }}>{c.claim_code}</div>
+                                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(c.created_at).toLocaleDateString('id-ID')}</div>
+                                                        </td>
+                                                        <td>
+                                                            <div style={{ fontWeight: 'bold' }}>{c.maps_name}</div>
+                                                            <div style={{ fontSize: '0.8rem', color: '#10b981' }}><i className="fab fa-whatsapp"></i> {c.whatsapp_number}</div>
+                                                        </td>
+                                                        <td>
+                                                            <span style={{ padding: '0.3rem 0.8rem', borderRadius: '50px', border: 'none', fontSize: '0.8rem', fontWeight: 'bold', background: c.status === 'pending' ? '#fef3c7' : (c.status === 'claimed' ? '#d1fae5' : '#fee2e2'), color: c.status === 'pending' ? '#d97706' : (c.status === 'claimed' ? '#059669' : '#dc2626') }}>
+                                                                {c.status.toUpperCase()}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button onClick={() => setScannedClaim(c)} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', background: '#3b82f6' }}>
+                                                                <i className="fas fa-eye"></i> Detail
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             )}
 
                             {promoActiveTab === 'general' && (
