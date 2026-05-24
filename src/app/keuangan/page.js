@@ -751,6 +751,36 @@ export default function KeuanganPage() {
                                 <h3 className="panel-title" style={{ border: 'none', marginBottom: '1rem', paddingBottom: 0 }}>
                                     <i className="fas fa-history"></i> Riwayat Arus Kas Toko
                                 </h3>
+                                
+                                {(() => {
+                                    const totalPemasukan = transactions.filter(t => t.jenis === 'masuk').reduce((acc, t) => acc + Number(t.nominal), 0);
+                                    const totalPengeluaran = transactions.filter(t => t.jenis === 'keluar').reduce((acc, t) => acc + Number(t.nominal), 0);
+                                    const totalHPP = transactions.filter(t => t.jenis === 'masuk').reduce((acc, t) => acc + Number(t.hpp_total || 0), 0);
+                                    const labaKotor = totalPemasukan - totalHPP;
+                                    const totalBiayaOperasional = transactions.filter(t => t.jenis === 'keluar' && Number(t.category_id) !== 2).reduce((acc, t) => acc + Number(t.nominal), 0);
+                                    const labaBersih = labaKotor - totalBiayaOperasional;
+
+                                    return (
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Total Pemasukan</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#10b981' }}>Rp {totalPemasukan.toLocaleString('id-ID')}</div>
+                                            </div>
+                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Total Pengeluaran</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#ef4444' }}>Rp {totalPengeluaran.toLocaleString('id-ID')}</div>
+                                            </div>
+                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Laba Kotor</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#3b82f6' }}>Rp {labaKotor.toLocaleString('id-ID')}</div>
+                                            </div>
+                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Laba Bersih</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#D4AF37' }}>Rp {labaBersih.toLocaleString('id-ID')}</div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                                 <div className="table-responsive">
                                     <table className="finance-table">
                                         <thead>
