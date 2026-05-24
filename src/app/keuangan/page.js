@@ -875,6 +875,14 @@ export default function KeuanganPage() {
                                                                     </span>
                                                                 ) : '-'}
                                                             </td>
+                                                            <td style={{ whiteSpace: 'nowrap' }}>
+                                                                <button onClick={() => handleEditTransaction(t)} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', marginRight: '0.8rem' }} title="Edit Transaksi">
+                                                                    <i className="fas fa-edit"></i>
+                                                                </button>
+                                                                <button onClick={() => handleDeleteTransaction(t.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }} title="Hapus Transaksi">
+                                                                    <i className="fas fa-trash"></i>
+                                                                </button>
+                                                            </td>
                                                         </tr>
                                                     );
                                                 })
