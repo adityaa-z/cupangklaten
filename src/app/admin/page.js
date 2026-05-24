@@ -722,6 +722,205 @@ export default function AdminPage() {
                         </div>
                     )}
 
+                    
+                    {activeTab === 'Promo' && (
+                        <div className="tab-view">
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '1rem' }}>
+                                <button onClick={() => setPromoActiveTab('voucher')} style={{ padding: '0.8rem 1.5rem', background: promoActiveTab === 'voucher' ? 'var(--primary-cyan)' : 'transparent', color: promoActiveTab === 'voucher' ? 'white' : 'var(--text-muted)', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.3s' }}>
+                                    <i className="fas fa-ticket-alt"></i> Voucher Maps
+                                </button>
+                                <button onClick={() => setPromoActiveTab('general')} style={{ padding: '0.8rem 1.5rem', background: promoActiveTab === 'general' ? '#D4AF37' : 'transparent', color: promoActiveTab === 'general' ? 'white' : 'var(--text-muted)', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.3s' }}>
+                                    <i className="fas fa-bullhorn"></i> Promo Umum
+                                </button>
+                            </div>
+
+                            {promoActiveTab === 'voucher' && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
+                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-cog"></i> Pengaturan Voucher</h3>
+                                        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-light)', padding: '1rem', borderRadius: '8px' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold', color: 'var(--text-dark)' }}>Status Promo Maps</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Popup di halaman utama</div>
+                                            </div>
+                                            <label style={{ position: 'relative', display: 'inline-block', width: '60px', height: '34px' }}>
+                                                <input type="checkbox" checked={promoActive} onChange={(e) => setPromoActive(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                                                <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: promoActive ? '#10b981' : '#cbd5e1', transition: '.4s', borderRadius: '34px' }}>
+                                                    <span style={{ position: 'absolute', content: '""', height: '26px', width: '26px', left: promoActive ? '30px' : '4px', bottom: '4px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Limit Harian</label>
+                                            <input type="number" value={dailyLimit} onChange={(e) => setDailyLimit(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                        </div>
+                                        <button onClick={handleSaveSettings} disabled={isSavingSettings} style={{ width: '100%', padding: '1rem', background: 'var(--primary-dark)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                            {isSavingSettings ? 'Menyimpan...' : 'Simpan Pengaturan'}
+                                        </button>
+                                    </div>
+
+                                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
+                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-qrcode"></i> Scan QR Code Pelanggan</h3>
+                                        {!scannerActive ? (
+                                            <button onClick={() => setScannerActive(true)} style={{ width: '100%', padding: '3rem', border: '2px dashed var(--primary-cyan)', background: 'rgba(0, 188, 212, 0.05)', borderRadius: '12px', color: 'var(--primary-cyan)', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                <i className="fas fa-camera" style={{ fontSize: '2rem', display: 'block', marginBottom: '1rem' }}></i>
+                                                Mulai Scan Kamera
+                                            </button>
+                                        ) : (
+                                            <div>
+                                                <div id="reader" style={{ width: '100%', borderRadius: '12px', overflow: 'hidden' }}></div>
+                                                <button onClick={() => setScannerActive(false)} style={{ width: '100%', padding: '1rem', marginTop: '1rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                    Batalkan Scan
+                                                </button>
+                                            </div>
+                                        )}
+                                        {scanMessage && <div style={{ marginTop: '1rem', padding: '1rem', background: '#fee2e2', color: '#b91c1c', borderRadius: '8px', textAlign: 'center' }}>{scanMessage}</div>}
+
+                                        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Cek Kode Manual</label>
+                                            <form onSubmit={handleManualCodeSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <input 
+                                                    type="text" 
+                                                    value={manualCode} 
+                                                    onChange={e => setManualCode(e.target.value.toUpperCase())} 
+                                                    placeholder="Contoh: VOUCHER-XXXXXX" 
+                                                    style={{ flex: 1, padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', textTransform: 'uppercase' }} 
+                                                />
+                                                <button type="submit" style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-dark)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                    Cek
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    {scannedClaim && (
+                                        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <div style={{ background: 'white', width: '90%', maxWidth: '500px', borderRadius: '16px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.5rem', color: '#111827', margin: 0 }}>Detail Klaim Voucher</h3>
+                                                    <button onClick={() => setScannedClaim(null)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                                                </div>
+                                                <div style={{ marginBottom: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Nama Maps</div>
+                                                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#111827' }}>{scannedClaim.maps_name}</div>
+                                                </div>
+                                                <div style={{ marginBottom: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>WhatsApp</div>
+                                                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#111827' }}>{scannedClaim.whatsapp_number}</div>
+                                                </div>
+                                                <div style={{ marginBottom: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Status</div>
+                                                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '4px', background: scannedClaim.status === 'pending' ? '#fef3c7' : (scannedClaim.status === 'claimed' ? '#d1fae5' : '#fee2e2'), color: scannedClaim.status === 'pending' ? '#92400e' : (scannedClaim.status === 'claimed' ? '#065f46' : '#991b1b') }}>
+                                                        {scannedClaim.status.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div style={{ marginBottom: '2rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem' }}>Bukti Screenshot</div>
+                                                    {scannedClaim.image_path ? (
+                                                        <img src={scannedClaim.image_path} alt="Bukti" style={{ width: '100%', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
+                                                    ) : (
+                                                        <div style={{ padding: '2rem', background: '#f3f4f6', textAlign: 'center', color: '#9ca3af', borderRadius: '8px' }}>File tidak ada</div>
+                                                    )}
+                                                </div>
+                                                {scannedClaim.status === 'pending' && (
+                                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                                        <button onClick={() => handleProcessClaim('approve')} disabled={isProcessingClaim} style={{ flex: 1, padding: '1rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                            <i className="fas fa-check"></i> Approve
+                                                        </button>
+                                                        <button onClick={() => handleProcessClaim('reject')} disabled={isProcessingClaim} style={{ flex: 1, padding: '1rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                            <i className="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {promoActiveTab === 'general' && (
+                                <div>
+                                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', marginBottom: '2rem' }}>
+                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-plus-circle"></i> Buat Promo Umum</h3>
+                                        <form onSubmit={handleCreatePromo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Judul Promo</label>
+                                                <input required type="text" value={promoFormData.title} onChange={e=>setPromoFormData({...promoFormData, title: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Kategori Target</label>
+                                                <input required type="text" value={promoFormData.targetCategory} onChange={e=>setPromoFormData({...promoFormData, targetCategory: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                            </div>
+                                            <div style={{ gridColumn: 'span 2' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Deskripsi Singkat</label>
+                                                <textarea required value={promoFormData.description} onChange={e=>setPromoFormData({...promoFormData, description: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '80px' }} />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Harga / Diskon</label>
+                                                <input required type="text" value={promoFormData.priceOrDiscount} onChange={e=>setPromoFormData({...promoFormData, priceOrDiscount: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Mulai</label>
+                                                    <input required type="datetime-local" value={promoFormData.startDate} onChange={e=>setPromoFormData({...promoFormData, startDate: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Berakhir</label>
+                                                    <input required type="datetime-local" value={promoFormData.endDate} onChange={e=>setPromoFormData({...promoFormData, endDate: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                                                </div>
+                                            </div>
+                                            <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end' }}>
+                                                <button type="submit" disabled={isSubmittingPromo} style={{ padding: '1rem 3rem', background: '#D4AF37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                                    {isSubmittingPromo ? 'Menyimpan...' : 'Terbitkan Promo'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
+                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-list"></i> Daftar Promo</h3>
+                                        <div className="table-container">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Judul</th>
+                                                        <th>Masa Berlaku</th>
+                                                        <th>Status</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {generalPromos.length === 0 ? (
+                                                        <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Belum ada promo.</td></tr>
+                                                    ) : generalPromos.map(promo => (
+                                                        <tr key={promo.id}>
+                                                            <td>
+                                                                <div style={{ fontWeight: 'bold' }}>{promo.title}</div>
+                                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{promo.price_or_discount}</div>
+                                                            </td>
+                                                            <td style={{ fontSize: '0.9rem' }}>
+                                                                {new Date(promo.start_date).toLocaleDateString('id-ID')} s/d {new Date(promo.end_date).toLocaleDateString('id-ID')}
+                                                            </td>
+                                                            <td>
+                                                                <button onClick={() => handleTogglePromoStatus(promo.id, promo.is_active)} style={{ padding: '0.3rem 0.8rem', borderRadius: '50px', border: 'none', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', background: promo.is_active ? '#d1fae5' : '#f1f5f9', color: promo.is_active ? '#059669' : '#64748b' }}>
+                                                                    {promo.is_active ? 'AKTIF' : 'NONAKTIF'}
+                                                                </button>
+                                                            </td>
+                                                            <td>
+                                                                <button onClick={() => handleDeleteGeneralPromo(promo.id)} className="btn-icon delete"><i className="fas fa-trash"></i></button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+
                     {activeTab === 'FAQ' && (
                         <div className="tab-view">
                             <div className="dashboard-controls">
