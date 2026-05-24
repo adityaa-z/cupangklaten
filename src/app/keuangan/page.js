@@ -88,6 +88,16 @@ export default function KeuanganPage() {
         }
     }, [purchaseData.harga_beli_per_ekor, purchaseData.stok_sisa, formData.category_id]);
 
+    // Auto-calculate nominal when cart changes, but allow manual override
+    useEffect(() => {
+        if (Number(formData.category_id) === 1 || Number(formData.category_id) === 2) {
+            const total = cart.reduce((acc, item) => acc + Number(item.nominal), 0);
+            if (total > 0) {
+                setFormData(prev => ({ ...prev, nominal: total }));
+            }
+        }
+    }, [cart, formData.category_id]);
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -197,9 +207,25 @@ export default function KeuanganPage() {
 
         try {
             const isBatch = Number(formData.category_id) === 1 || Number(formData.category_id) === 2;
-            if (isBatch && cart.length === 0) {
-                setActionLoading(false);
-                return alert("Keranjang transaksi kosong. Tambahkan item ke daftar terlebih dahulu.");
+            let currentCart = [...cart];
+            
+            if (isBatch && currentCart.length === 0) {
+                if (Number(formData.category_id) === 1) {
+                    if (saleData.fish && saleData.qty && saleData.nominal) {
+                        currentCart.push({ ...saleData });
+                    } else {
+                        setActionLoading(false);
+                        return alert("Pilih ikan dan lengkapi data penjualan, atau klik Tambah ke Keranjang.");
+                    }
+                } else if (Number(formData.category_id) === 2) {
+                    if (purchaseData.kode_ikan && purchaseData.nama_tipe && purchaseData.harga_beli_per_ekor && purchaseData.stok_sisa) {
+                        const itemNominal = Number(purchaseData.harga_beli_per_ekor) * Number(purchaseData.stok_sisa);
+                        currentCart.push({ ...purchaseData, nominal: itemNominal });
+                    } else {
+                        setActionLoading(false);
+                        return alert("Lengkapi semua data ikan grosir terlebih dahulu.");
+                    }
+                }
             }
 
             const payload = {
@@ -209,16 +235,30 @@ export default function KeuanganPage() {
             };
 
             if (isBatch) {
-                payload.items = cart.map(item => {
+                let totalCartNominal = currentCart.reduce((acc, item) => acc + Number(item.nominal), 0);
+                let manualNominal = Number(formData.nominal);
+                
+                // If user didn't type anything in nominal, fallback to totalCartNominal
+                if (!manualNominal && manualNominal !== 0) {
+                    manualNominal = totalCartNominal;
+                }
+                
+                let diff = manualNominal - totalCartNominal;
+
+                payload.items = currentCart.map((item, index) => {
+                    let finalItemNominal = Number(item.nominal);
+                    if (index === 0) {
+                        finalItemNominal += diff; // Adjust first item so total matches manual nominal
+                    }
                     if (Number(formData.category_id) === 1) {
-                        return { fish_stock_id: item.fish.id, qty: Number(item.qty), nominal: Number(item.nominal) };
+                        return { fish_stock_id: item.fish.id, qty: Number(item.qty), nominal: finalItemNominal };
                     } else {
                         return {
                             purchase_data: {
                                 kode_ikan: item.kode_ikan, nama_tipe: item.nama_tipe, grade: item.grade,
                                 harga_beli_per_ekor: Number(item.harga_beli_per_ekor), stok_sisa: Number(item.stok_sisa), lokasi: item.lokasi
                             },
-                            nominal: Number(item.nominal)
+                            nominal: finalItemNominal
                         };
                     }
                 });
@@ -631,15 +671,14 @@ export default function KeuanganPage() {
                                     type="number" 
                                     name="nominal" 
                                     placeholder="Nominal rupiah..."
-                                    value={(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) ? cart.reduce((acc, item) => acc + Number(item.nominal), 0) : formData.nominal} 
+                                    value={formData.nominal} 
                                     onChange={handleFormChange} 
                                     className="form-control"
-                                    required={(Number(formData.category_id) !== 1 && Number(formData.category_id) !== 2)} 
-                                    disabled={Number(formData.category_id) === 1 || Number(formData.category_id) === 2} 
+                                    required 
                                 />
                                 {(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) && (
                                     <small style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.2rem', display: 'block' }}>
-                                        * Dikalkulasi otomatis dari keranjang.
+                                        * Anda bisa mengubah total nominal ini jika ada diskon/penyesuaian.
                                     </small>
                                 )}
                             </div>
