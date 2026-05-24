@@ -46,6 +46,7 @@ export default function AdminPage() {
     const [scannedClaim, setScannedClaim] = useState(null);
     const [isProcessingClaim, setIsProcessingClaim] = useState(false);
     const [scanMessage, setScanMessage] = useState('');
+    const [manualCode, setManualCode] = useState('');
     const [generalPromos, setGeneralPromos] = useState([]);
     const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
     const [promoFormData, setPromoFormData] = useState({
@@ -121,6 +122,14 @@ export default function AdminPage() {
             return () => { scanner.clear().catch(e => console.error(e)); };
         }
     }, [scannerActive, activeTab, promoActiveTab]);
+
+    const handleManualCodeSubmit = async (e) => {
+        e.preventDefault();
+        if (manualCode) {
+            handleScannedCode(manualCode);
+            setManualCode('');
+        }
+    };
 
     const handleScannedCode = async (code) => {
         setScanMessage('Memeriksa kode...');
