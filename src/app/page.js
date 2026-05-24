@@ -357,12 +357,12 @@ async function fetchFeatured() {
       </section>
 
       {/* Lelang Ikan Section */}
-      <section className="products-section" id="lelang-home" style={{ paddingBottom: '4rem', paddingTop: '4rem', background: 'var(--bg-dark)' }}>
+      <section className="products-section" id="lelang-home" style={{ paddingBottom: '4rem', paddingTop: '4rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: '#fff' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
             Lelang <span style={{ background: 'linear-gradient(to right, #facc15, #ca8a04)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Pilihan</span>
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>Menangkan ikan cupang kontes dengan penawaran terbaik</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Menangkan ikan cupang kontes dengan penawaran terbaik</p>
           <div style={{ width: '60px', height: '4px', background: '#facc15', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
@@ -425,7 +425,7 @@ async function fetchFeatured() {
                 </div>
               ))
             ) : (
-              <div style={{ textAlign: 'center', width: '100%', padding: '3rem', color: '#94a3b8' }}>
+              <div style={{ textAlign: 'center', width: '100%', padding: '3rem', color: 'var(--text-muted)' }}>
                 <i className="fas fa-gavel" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}></i>
                 <p style={{ fontSize: '1.2rem' }}>Belum ada ikan yang di lelang.</p>
               </div>
