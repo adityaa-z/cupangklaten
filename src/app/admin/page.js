@@ -156,14 +156,23 @@ export default function AdminPage() {
     const handleDeleteClaimImage = async () => {
         if (!scannedClaim || !scannedClaim.image_path) return;
         if (!confirm('Hapus foto/screenshot ini dari server? Tindakan ini tidak bisa dibatalkan.')) return;
-        const res = await deleteClaimImage(scannedClaim.claim_code);
-        if (res.success) {
-            setScannedClaim({ ...scannedClaim, image_path: null });
-            const cData = await getAllClaims();
-            setAllClaims(cData);
-            alert('Foto berhasil dihapus dari server.');
-        } else {
-            alert(`Gagal: ${res.error}`);
+        try {
+            const res = await fetch('/api/admin/delete-image/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ claimCode: scannedClaim.claim_code })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setScannedClaim({ ...scannedClaim, image_path: null });
+                const cData = await getAllClaims();
+                setAllClaims(cData);
+                alert('Foto berhasil dihapus dari server.');
+            } else {
+                alert(`Gagal: ${data.error}`);
+            }
+        } catch (e) {
+            alert('Terjadi kesalahan jaringan.');
         }
     };
 
