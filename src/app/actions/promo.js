@@ -173,20 +173,35 @@ export async function createGeneralPromo(data) {
 }
 
 export async function getActiveGeneralPromos() {
-    return await query(`
+    const rows = await query(`
         SELECT * FROM general_promos 
-        WHERE is_active = true AND end_date >= NOW()
+        WHERE is_active = 1 AND end_date >= NOW()
         ORDER BY start_date ASC
     `);
+    return rows.map(r => ({
+        ...r,
+        start_date: r.start_date ? r.start_date.toISOString() : null,
+        end_date: r.end_date ? r.end_date.toISOString() : null,
+        created_at: r.created_at ? r.created_at.toISOString() : null,
+        is_active: true
+    }));
 }
 
 export async function getAllGeneralPromos() {
-    return await query('SELECT * FROM general_promos ORDER BY created_at DESC');
+    const rows = await query('SELECT * FROM general_promos ORDER BY created_at DESC');
+    return rows.map(r => ({
+        ...r,
+        start_date: r.start_date ? r.start_date.toISOString() : null,
+        end_date: r.end_date ? r.end_date.toISOString() : null,
+        created_at: r.created_at ? r.created_at.toISOString() : null,
+        is_active: !!(r.is_active === 1 || (r.is_active && r.is_active[0] === 1) || r.is_active === true)
+    }));
 }
 
 export async function toggleGeneralPromoStatus(id, isActive) {
     try {
-        await execute('UPDATE general_promos SET is_active = ? WHERE id = ?', [isActive, id]);
+        const val = isActive ? 1 : 0;
+        await execute('UPDATE general_promos SET is_active = ? WHERE id = ?', [val, id]);
         return { success: true };
     } catch (e) {
         console.error('toggleGeneralPromoStatus error:', e);

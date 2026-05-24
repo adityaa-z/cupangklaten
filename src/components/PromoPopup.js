@@ -11,7 +11,8 @@ export default function PromoPopup({ isActive, generalPromos = [] }) {
 
     useEffect(() => {
         if (hasGeneralPromo || hasVoucherPromo) {
-            const hasSeen = sessionStorage.getItem('promo_popup_seen');
+            const popupKey = 'promo_popup_seen_' + (hasGeneralPromo ? generalPromos[0].id : 'voucher');
+            const hasSeen = sessionStorage.getItem(popupKey);
             if (!hasSeen) {
                 const timer = setTimeout(() => {
                     setShow(true);
@@ -23,7 +24,8 @@ export default function PromoPopup({ isActive, generalPromos = [] }) {
 
     const handleClose = () => {
         setShow(false);
-        sessionStorage.setItem('promo_popup_seen', 'true');
+        const popupKey = 'promo_popup_seen_' + (generalPromos && generalPromos.length > 0 ? generalPromos[0].id : 'voucher');
+        sessionStorage.setItem(popupKey, 'true');
     };
 
     if (!show) return null;
