@@ -412,9 +412,9 @@ export default function AdminPage() {
                     HQ Panel
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
+                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
                             {tab}
                         </div>
                     ))}
