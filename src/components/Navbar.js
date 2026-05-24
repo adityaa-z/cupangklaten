@@ -76,6 +76,16 @@ const Navbar = () => {
                                 <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
                                     <i className="fas fa-user-circle"></i> Halo, {session.user.name?.split(' ')[0] || 'Member'}
                                 </Link>
+                                {session.user?.email === 'zidanp13794@gmail.com' && (
+                                    <>
+                                        <Link href="/keuangan" className="menu-item" onClick={() => setMenuOpen(false)}>
+                                            <i className="fas fa-wallet" style={{ color: '#D4AF37' }}></i> Menu Keuangan
+                                        </Link>
+                                        <Link href="/admin" className="menu-item" onClick={() => setMenuOpen(false)}>
+                                            <i className="fas fa-user-shield" style={{ color: '#3b82f6' }}></i> Admin Panel
+                                        </Link>
+                                    </>
+                                )}
                                 <div className="menu-item" onClick={() => { setMenuOpen(false); signOut(); }} style={{ color: '#ef4444', cursor: 'pointer' }}>
                                     <i className="fas fa-sign-out-alt"></i> Logout
                                 </div>
