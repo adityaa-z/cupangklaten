@@ -8,14 +8,12 @@ export default function JantanVsBetinaPage() {
         <>
             <Navbar />
             <div style={{ padding: '4rem 2rem', maxWidth: '800px', margin: '0 auto' }}>
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center', color: 'var(--text-dark)' }}>
-                    Jantan vs <span style={{ color: 'var(--secondary-coral)' }}>Betina</span>
-                </h1>
+                <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center' }}>Jantan vs <span style={{ color: 'var(--secondary-coral)' }}>Betina</span></h1>
                 <div style={{ background: 'var(--bg-white)', padding: '2rem', borderRadius: '15px', boxShadow: 'var(--card-shadow)' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                         <div>
                             <h3 style={{ color: 'var(--primary-dark)', marginBottom: '1rem' }}>Cupang Jantan</h3>
-                            <ul style={{ paddingLeft: '1.2rem', color: 'var(--text-dark)' }}>
+                            <ul style={{ paddingLeft: '1.2rem' }}>
                                 <li>Sirip lebih panjang dan lebar.</li>
                                 <li>Warna lebih cerah dan tajam.</li>
                                 <li>Agresivitas tinggi (suka membusungkan insang).</li>
@@ -24,7 +22,7 @@ export default function JantanVsBetinaPage() {
                         </div>
                         <div>
                             <h3 style={{ color: 'var(--secondary-coral)', marginBottom: '1rem' }}>Cupang Betina</h3>
-                            <ul style={{ paddingLeft: '1.2rem', color: 'var(--text-dark)' }}>
+                            <ul style={{ paddingLeft: '1.2rem' }}>
                                 <li>Sirip cenderung pendek.</li>
                                 <li>Warna lebih kusam (kecuali varian tertentu).</li>
                                 <li>Terdapat titik putih (telur) di bagian perut.</li>

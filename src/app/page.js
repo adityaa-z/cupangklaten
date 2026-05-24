@@ -11,11 +11,19 @@ import { useSession } from 'next-auth/react';
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
-  const { data: session } = useSession();
   const [fishProducts, setFishProducts] = useState([]);
   const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // User Review States
+  const { data: session, status } = useSession();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [userRating, setUserRating] = useState(5);
+  const [userComment, setUserComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Refs for sliders
   const fishSliderRef = React.useRef(null);
@@ -26,13 +34,6 @@ export default function Home() {
   const [scrollFish, setScrollFish] = useState({ left: false, right: true });
   const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
   const [scrollReviews, setScrollReviews] = useState({ left: false, right: true });
-
-  // Review form state
-  const [reviewForm, setReviewForm] = useState({ rating: 5, content: '' });
-  const [reviewHoverRating, setReviewHoverRating] = useState(0);
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [reviewError, setReviewError] = useState('');
 
 
 
@@ -50,6 +51,57 @@ export default function Home() {
     }
     fetchReviews();
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      async function checkMyReview() {
+        try {
+          const res = await fetch('/api/reviews/my-review/');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.hasReview) {
+              setHasSubmitted(true);
+            }
+          }
+        } catch (err) {
+          console.error('Error checking my review:', err);
+        }
+      }
+      checkMyReview();
+    } else {
+      setHasSubmitted(false);
+    }
+  }, [session]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setSubmittingReview(true);
+    setSubmitError('');
+
+    try {
+      const res = await fetch('/api/reviews/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: userRating, content: userComment })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal mengirimkan ulasan');
+      }
+
+      setHasSubmitted(true);
+      setShowReviewModal(false);
+      setUserComment('');
+      setUserRating(5);
+      
+      alert('Ulasan Anda berhasil dikirim dan menunggu persetujuan admin!');
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -142,30 +194,6 @@ export default function Home() {
   };
 
 
-
-  const submitReview = async (e) => {
-    e.preventDefault();
-    if (!session) return;
-    setReviewSubmitting(true);
-    setReviewError('');
-    try {
-      const res = await fetch('/api/reviews/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating: reviewForm.rating, content: reviewForm.content })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setReviewSubmitted(true);
-      } else {
-        setReviewError(data.error || 'Terjadi kesalahan.');
-      }
-    } catch {
-      setReviewError('Gagal mengirim ulasan. Coba lagi.');
-    } finally {
-      setReviewSubmitting(false);
-    }
-  };
 
   return (
     <>
@@ -352,142 +380,165 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Review Submit Form */}
-              <div style={{ marginTop: '4rem', maxWidth: '600px', margin: '4rem auto 0' }}>
-                <div style={{
-                  background: 'var(--bg-white)',
-                  borderRadius: '24px',
-                  padding: '2.5rem',
-                  border: '1px solid var(--border-color)',
-                  boxShadow: 'var(--card-shadow)'
-                }}>
-                  <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>
-                      ✍️ Bagikan Pengalaman Anda
-                    </h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                      Ceritakan pengalaman berbelanja di Cupang Klaten
-                    </p>
-                  </div>
-
-                  {!session ? (
-                    <div style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--bg-light)', borderRadius: '16px' }}>
-                      <i className="fas fa-lock" style={{ fontSize: '2rem', color: 'var(--primary-cyan)', marginBottom: '1rem', display: 'block' }}></i>
-                      <p style={{ color: 'var(--text-muted)', marginBottom: '1.2rem' }}>Login terlebih dahulu untuk memberikan ulasan</p>
-                      <Link href="/login" style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                        padding: '0.8rem 2rem', borderRadius: '50px',
-                        background: 'linear-gradient(135deg, var(--primary-dark), var(--primary-cyan))',
-                        color: 'white', fontWeight: '700', textDecoration: 'none',
-                        boxShadow: '0 8px 20px rgba(0,188,212,0.3)'
-                      }}>
-                        <i className="fas fa-sign-in-alt"></i> Login Sekarang
-                      </Link>
-                    </div>
-                  ) : reviewSubmitted ? (
-                    <div style={{ textAlign: 'center', padding: '2rem' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-                      <h4 style={{ color: 'var(--text-dark)', marginBottom: '0.5rem', fontWeight: '700' }}>Terima Kasih!</h4>
-                      <p style={{ color: 'var(--text-muted)' }}>Ulasan Anda sedang menunggu persetujuan admin dan akan segera ditampilkan.</p>
-                    </div>
+              {/* Tulis Ulasan / Rating Section */}
+              <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+                  {status === 'loading' ? (
+                      <div style={{ color: 'var(--text-muted)' }}>Memuat status...</div>
+                  ) : session ? (
+                      hasSubmitted ? (
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '0.8rem 1.8rem', borderRadius: '50px', fontWeight: '700', fontSize: '0.95rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                              <i className="fas fa-check-circle"></i> Anda telah mengirimkan ulasan untuk website ini. Terima kasih!
+                          </div>
+                      ) : (
+                          <button 
+                              onClick={() => {
+                                  setUserRating(5);
+                                  setUserComment('');
+                                  setSubmitError('');
+                                  setShowReviewModal(true);
+                              }} 
+                              className="filter-btn active"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 2.2rem', fontSize: '1rem', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'white', background: 'var(--primary-cyan)', boxShadow: '0 8px 20px rgba(0, 188, 212, 0.3)', transition: 'var(--transition-smooth)' }}
+                          >
+                              <i className="fas fa-pen-nib"></i> Tulis Ulasan Anda
+                          </button>
+                      )
                   ) : (
-                    <form onSubmit={submitReview}>
-                      {reviewError && (
-                        <div style={{
-                          background: '#fef2f2', border: '1px solid #fecaca',
-                          borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem',
-                          color: '#dc2626', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem'
-                        }}>
-                          <i className="fas fa-exclamation-circle"></i> {reviewError}
-                        </div>
-                      )}
-
-                      {/* Star Rating */}
-                      <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', fontWeight: '700', color: 'var(--text-dark)', marginBottom: '0.8rem', fontSize: '0.95rem' }}>
-                          Rating Anda
-                        </label>
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                              key={star}
-                              type="button"
-                              id={`star-${star}`}
-                              onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
-                              onMouseEnter={() => setReviewHoverRating(star)}
-                              onMouseLeave={() => setReviewHoverRating(0)}
-                              style={{
-                                background: 'none', border: 'none', cursor: 'pointer',
-                                fontSize: '2.2rem', padding: '0.2rem',
-                                color: star <= (reviewHoverRating || reviewForm.rating) ? '#facc15' : 'var(--border-color)',
-                                transition: 'transform 0.1s, color 0.2s',
-                                transform: star <= (reviewHoverRating || reviewForm.rating) ? 'scale(1.2)' : 'scale(1)'
-                              }}
-                              aria-label={`${star} bintang`}
-                            >
-                              ★
-                            </button>
-                          ))}
-                        </div>
-                        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.3rem' }}>
-                          {['', 'Sangat Buruk', 'Buruk', 'Cukup', 'Bagus', 'Sangat Bagus'][reviewForm.rating]} ({reviewForm.rating}/5)
-                        </p>
+                      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: '500' }}>Sudah membeli ikan di Cupang Klaten? Yuk login untuk memberikan rating!</p>
+                          <Link 
+                              href="/login" 
+                              className="filter-btn active" 
+                              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 2.2rem', fontSize: '1rem', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'white', background: 'var(--primary-cyan)', boxShadow: '0 8px 20px rgba(0, 188, 212, 0.3)' }}
+                          >
+                              <i className="fas fa-sign-in-alt"></i> Login untuk Mengisi Rating
+                          </Link>
                       </div>
-
-                      {/* Comment */}
-                      <div style={{ marginBottom: '1.5rem' }}>
-                        <label htmlFor="review-content" style={{ display: 'block', fontWeight: '700', color: 'var(--text-dark)', marginBottom: '0.6rem', fontSize: '0.95rem' }}>
-                          Komentar
-                        </label>
-                        <textarea
-                          id="review-content"
-                          value={reviewForm.content}
-                          onChange={(e) => setReviewForm(prev => ({ ...prev, content: e.target.value }))}
-                          placeholder="Ceritakan pengalaman Anda... (min. 10 karakter)"
-                          required
-                          minLength={10}
-                          rows={4}
-                          style={{
-                            width: '100%', padding: '1rem', borderRadius: '14px',
-                            border: '2px solid var(--border-color)',
-                            background: 'var(--bg-light)',
-                            color: 'var(--text-dark)',
-                            fontSize: '0.95rem', resize: 'vertical', outline: 'none',
-                            transition: 'border-color 0.2s',
-                            fontFamily: 'inherit'
-                          }}
-                          onFocus={(e) => e.target.style.borderColor = 'var(--primary-cyan)'}
-                          onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
-                        />
-                      </div>
-
-                      <button
-                        id="submit-review-btn"
-                        type="submit"
-                        disabled={reviewSubmitting}
-                        style={{
-                          width: '100%', padding: '1rem',
-                          background: reviewSubmitting
-                            ? 'var(--border-color)'
-                            : 'linear-gradient(135deg, var(--primary-dark), var(--primary-cyan))',
-                          color: 'white', border: 'none', borderRadius: '14px',
-                          fontWeight: '800', fontSize: '1rem', cursor: reviewSubmitting ? 'not-allowed' : 'pointer',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                          boxShadow: reviewSubmitting ? 'none' : '0 8px 20px rgba(0,188,212,0.3)',
-                          transition: 'all 0.3s'
-                        }}
-                      >
-                        {reviewSubmitting ? (
-                          <><i className="fas fa-spinner fa-spin"></i> Mengirim...</>
-                        ) : (
-                          <><i className="fas fa-paper-plane"></i> Kirim Ulasan</>
-                        )}
-                      </button>
-                    </form>
                   )}
-                </div>
               </div>
           </div>
+
+          {/* Modal Kirim Ulasan */}
+          {showReviewModal && (
+              <div className="review-submit-modal-overlay" style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  backdropFilter: 'blur(8px)',
+                  zIndex: 9999,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+              }}>
+                  <div className="review-submit-modal-content" style={{
+                      background: 'var(--bg-white)',
+                      padding: '2.5rem 2rem',
+                      borderRadius: '24px',
+                      maxWidth: '500px',
+                      width: '100%',
+                      boxShadow: 'var(--card-shadow)',
+                      border: '1px solid var(--border-color)',
+                      position: 'relative',
+                      textAlign: 'left'
+                  }}>
+                      <button 
+                          onClick={() => setShowReviewModal(false)}
+                          style={{
+                              position: 'absolute',
+                              top: '1.5rem',
+                              right: '1.5rem',
+                              background: 'none',
+                              border: 'none',
+                              fontSize: '1.5rem',
+                              color: 'var(--text-muted)',
+                              cursor: 'pointer'
+                          }}
+                          aria-label="Tutup"
+                      >
+                          &times;
+                      </button>
+                      <h3 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>Berikan Ulasan Anda</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Bagikan pengalaman Anda membeli ikan cupang di Cupang Klaten.</p>
+                      
+                      <form onSubmit={handleReviewSubmit}>
+                          <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                              <label style={{ display: 'block', fontWeight: '700', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-dark)' }}>Rating Bintang</label>
+                              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', fontSize: '2.2rem' }}>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                      <i 
+                                          key={star} 
+                                          className={`${userRating >= star ? 'fas' : 'far'} fa-star`}
+                                          onClick={() => setUserRating(star)}
+                                          style={{ color: '#facc15', cursor: 'pointer', transition: 'transform 0.1s ease' }}
+                                      ></i>
+                                  ))}
+                              </div>
+                          </div>
+                          
+                          <div style={{ marginBottom: '1.5rem' }}>
+                              <label style={{ display: 'block', fontWeight: '700', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-dark)' }}>Ulasan Anda</label>
+                              <textarea 
+                                  required
+                                  value={userComment}
+                                  onChange={(e) => setUserComment(e.target.value)}
+                                  placeholder="Tulis komentar ulasan Anda disini (min. 5 karakter)..."
+                                  style={{
+                                      width: '100%',
+                                      padding: '1rem',
+                                      borderRadius: '12px',
+                                      border: '1px solid var(--border-color)',
+                                      minHeight: '120px',
+                                      background: 'var(--bg-light)',
+                                      color: 'var(--text-dark)',
+                                      fontSize: '0.95rem',
+                                      resize: 'vertical',
+                                      outline: 'none',
+                                      transition: 'border-color 0.2s'
+                                  }}
+                              ></textarea>
+                          </div>
+                          
+                          {submitError && (
+                              <div style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1.2rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                  <i className="fas fa-exclamation-circle"></i> {submitError}
+                              </div>
+                          )}
+                          
+                          <button 
+                              type="submit" 
+                              disabled={submittingReview}
+                              style={{
+                                  width: '100%',
+                                  padding: '1rem',
+                                  background: 'var(--primary-cyan)',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '12px',
+                                  fontWeight: '700',
+                                  fontSize: '1.05rem',
+                                  cursor: 'pointer',
+                                  transition: 'var(--transition-smooth)',
+                                  boxShadow: '0 4px 12px rgba(0, 188, 212, 0.2)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '0.5rem'
+                              }}
+                          >
+                              {submittingReview ? (
+                                  <>
+                                      <i className="fas fa-spinner fa-spin"></i> Mengirim...
+                                  </>
+                              ) : 'Kirim Ulasan'}
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          )}
       </section>
 
       <Footer />

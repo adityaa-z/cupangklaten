@@ -47,7 +47,11 @@ CREATE TABLE IF NOT EXISTS reviews (
     content TEXT DEFAULT NULL,
     img TEXT DEFAULT NULL,
     avatar_char VARCHAR(5) DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    user_id INT DEFAULT NULL,
+    status ENUM('pending', 'approved') DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================

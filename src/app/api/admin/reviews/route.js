@@ -10,10 +10,7 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Tampilkan semua ulasan: pending dulu, lalu published, urutkan by id desc
-        const rows = await query(
-            "SELECT * FROM reviews ORDER BY CASE WHEN status = 'pending' THEN 0 ELSE 1 END, id DESC"
-        );
+        const rows = await query('SELECT * FROM reviews ORDER BY id DESC');
         return NextResponse.json(rows);
     } catch (err) {
         console.error('API Reviews GET Error:', err);
@@ -29,27 +26,19 @@ export async function POST(request) {
 
         const body = await request.json();
         const { id, name, rating, content, img, status } = body;
-
-        // Kalau cuma approve (publish), hanya update status
-        if (id && body.action === 'approve') {
-            await execute("UPDATE reviews SET status = 'published' WHERE id = ?", [id]);
-            return NextResponse.json({ success: true });
-        }
-
-        const avatar_char = (name || '?').charAt(0).toUpperCase();
-        const reviewStatus = status || 'published'; // Admin tambah manual = langsung published
+        const avatar_char = name.charAt(0).toUpperCase();
 
         if (id) {
             // Update
             await execute(
                 'UPDATE reviews SET name = ?, rating = ?, content = ?, img = ?, avatar_char = ?, status = ? WHERE id = ?',
-                [name, rating, content, img || null, avatar_char, reviewStatus, id]
+                [name, rating, content, img || null, avatar_char, status || 'approved', id]
             );
         } else {
-            // Insert baru oleh admin (langsung published)
+            // Insert
             await execute(
                 'INSERT INTO reviews (name, rating, content, img, avatar_char, status) VALUES (?, ?, ?, ?, ?, ?)',
-                [name, rating, content, img || null, avatar_char, reviewStatus]
+                [name, rating, content, img || null, avatar_char, status || 'approved']
             );
         }
 

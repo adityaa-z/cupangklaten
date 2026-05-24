@@ -11,7 +11,7 @@ git push origin main
 ```
 
 ## Tahap 2: Tarik Kode di VPS
-Login ke VPS melalui SSH (contoh: `ssh root@IP_VPS`), lalu masuk ke direktori website:
+Login ke VPS melalui SSH (contoh: `ssh root@103.191.63.126`), lalu masuk ke direktori website:
 ```bash
 cd /var/www/cupangklaten
 git pull origin main
