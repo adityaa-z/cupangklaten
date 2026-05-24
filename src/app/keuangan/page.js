@@ -169,14 +169,32 @@ export default function KeuanganPage() {
         setCart(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleDeleteStock = async (id) => {
-        if (!confirm("Yakin ingin menghapus data stok ikan ini? (Biasa digunakan jika ikan mati/tidak valid)")) return;
+    const handleDeleteStock = async (id, maxQty) => {
+        const qtyStr = prompt(`Berapa banyak ikan yang mati? (Maksimal ${maxQty})\nKetik 'ALL' jika ingin menghapus seluruh data ikan ini.`);
+        if (!qtyStr) return;
+        
+        let qtyToDeduct = 0;
+        let isDeleteAll = false;
+
+        if (qtyStr.toUpperCase() === 'ALL') {
+            isDeleteAll = true;
+        } else {
+            qtyToDeduct = parseInt(qtyStr, 10);
+            if (isNaN(qtyToDeduct) || qtyToDeduct <= 0) return alert("Jumlah tidak valid.");
+            if (qtyToDeduct > maxQty) return alert(`Jumlah melebihi stok yang ada (${maxQty}).`);
+            if (qtyToDeduct === maxQty) isDeleteAll = true;
+        }
+
         setActionLoading(true);
         try {
-            const res = await fetch(`/api/keuangan/stock/${id}`, { method: 'DELETE' });
+            const url = isDeleteAll 
+                ? `/api/keuangan/stock/${id}` 
+                : `/api/keuangan/stock/${id}?reduce=${qtyToDeduct}`;
+            const method = isDeleteAll ? 'DELETE' : 'PATCH';
+            const res = await fetch(url, { method });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            showNotification('Stok ikan berhasil dihapus.');
+            showNotification(isDeleteAll ? 'Data stok ikan berhasil dihapus.' : `Stok ikan berhasil dikurangi ${qtyToDeduct}.`);
             fetchData();
         } catch (err) {
             alert(`Error: ${err.message}`);
@@ -825,7 +843,7 @@ export default function KeuanganPage() {
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
                                                             <button 
-                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
                                                                 style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
                                                                 title="Hapus Ikan (Jika Mati/Invalid)"
                                                             >
@@ -875,7 +893,7 @@ export default function KeuanganPage() {
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
                                                             <button 
-                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
                                                                 style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
                                                                 title="Hapus Ikan (Jika Mati/Invalid)"
                                                             >
@@ -925,7 +943,7 @@ export default function KeuanganPage() {
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
                                                             <button 
-                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
                                                                 style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
                                                                 title="Hapus Ikan (Jika Mati/Invalid)"
                                                             >
