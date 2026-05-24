@@ -120,6 +120,56 @@ CREATE TABLE IF NOT EXISTS bids (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Tabel: categories (Z-IFC)
+-- ============================================
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama_kategori VARCHAR(100) NOT NULL,
+    jenis ENUM('masuk', 'keluar') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed categories
+INSERT INTO categories (id, nama_kategori, jenis) VALUES
+(1, 'Jual Ikan Eceran', 'masuk'),
+(2, 'Pembelian Stok Grosir', 'keluar'),
+(3, 'Pakan & Aksesoris (Masuk)', 'masuk'),
+(4, 'Pakan & Aksesoris (Keluar)', 'keluar'),
+(5, 'Operasional', 'keluar')
+ON DUPLICATE KEY UPDATE nama_kategori=VALUES(nama_kategori), jenis=VALUES(jenis);
+
+-- ============================================
+-- Tabel: fish_stocks (Z-IFC)
+-- ============================================
+CREATE TABLE IF NOT EXISTS fish_stocks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    kode_ikan VARCHAR(50) NOT NULL UNIQUE,
+    nama_tipe VARCHAR(200) NOT NULL,
+    grade VARCHAR(50) NOT NULL,
+    harga_beli_per_ekor DECIMAL(15, 2) NOT NULL,
+    stok_sisa INT DEFAULT 0,
+    lokasi ENUM('Pabrik_Pembesaran', 'Gudang', 'Showroom') DEFAULT 'Pabrik_Pembesaran',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Tabel: transactions (Z-IFC)
+-- ============================================
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tanggal DATE NOT NULL,
+    category_id INT NOT NULL,
+    fish_stock_id INT DEFAULT NULL,
+    nominal DECIMAL(15, 2) NOT NULL,
+    hpp_total DECIMAL(15, 2) DEFAULT 0,
+    keterangan TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    FOREIGN KEY (fish_stock_id) REFERENCES fish_stocks(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Buat user database (opsional, ganti password)
 -- ============================================
 -- CREATE USER 'cupang_user'@'localhost' IDENTIFIED BY 'GANTI_PASSWORD_DISINI';
