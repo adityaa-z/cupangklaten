@@ -738,7 +738,8 @@ export default function AdminPage() {
                             </div>
 
                             {promoActiveTab === 'voucher' && (
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                                <>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                                     <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
                                         <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-cog"></i> Pengaturan Voucher</h3>
                                         <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-light)', padding: '1rem', borderRadius: '8px' }}>
@@ -881,8 +882,7 @@ export default function AdminPage() {
                                         </table>
                                     </div>
                                 </div>
-                            </div>
-
+                                </>
                             )}
 
                             {promoActiveTab === 'general' && (
