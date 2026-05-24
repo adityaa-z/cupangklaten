@@ -219,6 +219,48 @@ export default function KeuanganPage() {
         }
     };
 
+    const handleEditTransaction = async (t) => {
+        const newNominal = prompt("Masukkan Nominal Baru:", t.nominal);
+        if (newNominal === null) return;
+        const newKeterangan = prompt("Masukkan Keterangan Baru:", t.keterangan || "");
+        if (newKeterangan === null) return;
+
+        if (isNaN(newNominal) || Number(newNominal) < 0) return alert("Nominal tidak valid.");
+
+        setActionLoading(true);
+        try {
+            const res = await fetch(`/api/keuangan/transaction/${t.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nominal: Number(newNominal), keterangan: newKeterangan })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            showNotification('Transaksi berhasil diubah.');
+            fetchData();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDeleteTransaction = async (id) => {
+        if (!confirm("Peringatan: Menghapus transaksi ini TIDAK akan mengembalikan stok ikan secara otomatis. Lanjutkan?")) return;
+        setActionLoading(true);
+        try {
+            const res = await fetch(`/api/keuangan/transaction/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            showNotification('Transaksi berhasil dihapus.');
+            fetchData();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handleTransactionSubmit = async (e) => {
         e.preventDefault();
         setActionLoading(true);
@@ -791,6 +833,7 @@ export default function KeuanganPage() {
                                                 <th>Catatan</th>
                                                 <th>Nominal</th>
                                                 <th>Laba Kotor</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -837,7 +880,7 @@ export default function KeuanganPage() {
                                                 })
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="6" style={{ textAlign: 'center', color: '#64748b', padding: '3rem' }}>
+                                                    <td colSpan="7" style={{ textAlign: 'center', color: '#64748b', padding: '3rem' }}>
                                                         <i className="fas fa-info-circle" style={{ fontSize: '1.5rem', marginBottom: '0.5rem', display: 'block' }}></i>
                                                         Belum ada catatan transaksi keuangan.
                                                     </td>
