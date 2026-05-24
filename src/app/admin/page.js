@@ -904,7 +904,7 @@ export default function AdminPage() {
                                 <div>
                                     <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', marginBottom: '2rem' }}>
                                         <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-plus-circle"></i> Buat Promo Umum</h3>
-                                        <form onSubmit={handleCreatePromo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                                        <form onSubmit={handleCreatePromo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                                             <div>
                                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Judul Promo</label>
                                                 <input required type="text" value={promoFormData.title} onChange={e=>setPromoFormData({...promoFormData, title: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
@@ -913,7 +913,7 @@ export default function AdminPage() {
                                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Kategori Target</label>
                                                 <input required type="text" value={promoFormData.targetCategory} onChange={e=>setPromoFormData({...promoFormData, targetCategory: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
                                             </div>
-                                            <div style={{ gridColumn: 'span 2' }}>
+                                            <div style={{ gridColumn: '1 / -1' }}>
                                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-dark)' }}>Deskripsi Singkat</label>
                                                 <textarea required value={promoFormData.description} onChange={e=>setPromoFormData({...promoFormData, description: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '80px' }} />
                                             </div>
@@ -931,7 +931,7 @@ export default function AdminPage() {
                                                     <input required type="datetime-local" value={promoFormData.endDate} onChange={e=>setPromoFormData({...promoFormData, endDate: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
                                                 </div>
                                             </div>
-                                            <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end' }}>
+                                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end' }}>
                                                 <button type="submit" disabled={isSubmittingPromo} style={{ padding: '1rem 3rem', background: '#D4AF37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                                                     {isSubmittingPromo ? 'Menyimpan...' : 'Terbitkan Promo'}
                                                 </button>

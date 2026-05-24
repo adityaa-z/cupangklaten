@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import PromoPopup from '@/components/PromoPopup';
-import { getPromoSettings } from '@/app/actions/promo';
+import { getPromoSettings, getActiveGeneralPromos } from '@/app/actions/promo';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +20,7 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [promoActive, setPromoActive] = useState('false');
+  const [generalPromos, setGeneralPromos] = useState([]);
 
   // User Review States
   const { data: session, status } = useSession();
@@ -47,31 +48,6 @@ export default function Home() {
 
 
 
-  useEffect(() => {
-    // Check Date Eligibility (May 24/25 - May 30) for 2025 or 2026 (active testing year)
-    const now = new Date();
-    const isPromoDateActive = (
-      (now >= new Date('2025-05-24T00:00:00') && now <= new Date('2025-05-30T23:59:59')) ||
-      (now >= new Date('2026-05-24T00:00:00') && now <= new Date('2026-05-30T23:59:59'))
-    );
-
-    if (isPromoDateActive) {
-      const lastSeen = localStorage.getItem('promo_popup_seen');
-      const todayStr = now.toDateString();
-      if (lastSeen !== todayStr) {
-        const timer = setTimeout(() => {
-          setShowPromoPopup(true);
-        }, 1200);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, []);
-
-  const handleClosePromo = () => {
-    setShowPromoPopup(false);
-    const todayStr = new Date().toDateString();
-    localStorage.setItem('promo_popup_seen', todayStr);
-  };
 
   useEffect(() => {
     async function fetchReviews() {
@@ -158,6 +134,8 @@ export default function Home() {
       try {
         const settings = await getPromoSettings();
         setPromoActive(settings.PROMO_ACTIVE);
+        const activePromos = await getActiveGeneralPromos();
+        setGeneralPromos(activePromos);
       } catch (err) {
         console.error('Error fetching promo settings', err);
       }
