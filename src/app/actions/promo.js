@@ -56,14 +56,22 @@ export async function submitClaim(formData) {
             return { success: false, error: 'Kuota promo hari ini sudah habis. Silakan coba besok.' };
         }
 
-        // Check if number already claimed today
-        const userRows = await query(`
-            SELECT COUNT(*) as count FROM promo_claims 
-            WHERE whatsapp_number = ? AND DATE(created_at) = CURDATE()
-        `, [whatsappNumber]);
-        
-        if (userRows[0].count > 0) {
-            return { success: false, error: 'Nomor ini sudah melakukan claim hari ini.' };
+        // Cek: 1 nomor WA hanya boleh klaim 1x seumur hidup
+        const waRows = await query(
+            'SELECT COUNT(*) as count FROM promo_claims WHERE whatsapp_number = ?',
+            [whatsappNumber]
+        );
+        if (waRows[0].count > 0) {
+            return { success: false, error: 'Nomor WhatsApp ini sudah pernah mengklaim voucher sebelumnya. Setiap nomor hanya bisa klaim 1x.' };
+        }
+
+        // Cek: 1 nama Maps hanya boleh klaim 1x seumur hidup
+        const mapsRows = await query(
+            'SELECT COUNT(*) as count FROM promo_claims WHERE LOWER(maps_name) = LOWER(?)',
+            [mapsName]
+        );
+        if (mapsRows[0].count > 0) {
+            return { success: false, error: 'Nama Google Maps ini sudah pernah mengklaim voucher. Setiap akun Maps hanya bisa klaim 1x.' };
         }
 
         // Save File
