@@ -106,21 +106,21 @@ export async function processAndCleanUpClaim(code, action) {
         if (claim.status !== 'pending') return { success: false, error: `Voucher ini sudah ${claim.status}` };
 
         if (action === 'approve') {
-            // Find stock 5k
-            const stocks = await query('SELECT * FROM fish_stock WHERE category = "5k" AND remaining_stock > 0 LIMIT 1');
-            if (stocks.length === 0) {
-                return { success: false, error: 'Stok ikan 5k sedang kosong' };
+            // Potong stok produk (jika ada produk 5k atau serupa)
+            try {
+                const stocks = await query('SELECT * FROM products WHERE (category = "5k" OR price <= 5000) AND stock > 0 LIMIT 1');
+                if (stocks.length > 0) {
+                    await execute('UPDATE products SET stock = stock - 1 WHERE id = ?', [stocks[0].id]);
+                }
+            } catch(err) {
+                console.error("Gagal update stok produk", err);
             }
-            const stock = stocks[0];
 
-            // Potong stok
-            await execute('UPDATE fish_stock SET remaining_stock = remaining_stock - 1 WHERE id = ?', [stock.id]);
-
-            // Catat transaksi
+            // Catat transaksi dengan fish_stock_id null karena gratis
             await execute(`
                 INSERT INTO transactions (tanggal, category_id, fish_stock_id, nominal, hpp_total, keterangan)
-                VALUES (CURDATE(), 1, ?, 0, 2000, ?)
-            `, [stock.id, `Claim Voucher Google Maps (${claim.maps_name})`]);
+                VALUES (CURDATE(), 1, NULL, 0, 2000, ?)
+            `, [`Claim Voucher Google Maps (${claim.maps_name})`]);
 
             await execute('UPDATE promo_claims SET status = "claimed" WHERE claim_code = ?', [code]);
         } else {
@@ -207,4 +207,21 @@ export async function deleteGeneralPromo(id) {
 export async function getAllClaims() {
     const rows = await query('SELECT * FROM promo_claims ORDER BY created_at DESC');
     return rows;
+}
+
+export async function getPromoStats() {
+    const settings = await getPromoSettings();
+    const limit = parseInt(settings.PROMO_DAILY_LIMIT, 10) || 10;
+    
+    const todayRows = await query(`
+        SELECT COUNT(*) as count FROM promo_claims 
+        WHERE DATE(created_at) = CURDATE()
+    `);
+    const claimedToday = todayRows[0].count;
+    
+    return {
+        limit,
+        claimedToday,
+        remainingLimit: Math.max(0, limit - claimedToday)
+    };
 }

@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { 
     getPromoSettings, updatePromoSettings, getClaimByCode, processAndCleanUpClaim,
-    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo, getAllClaims
+    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo, getAllClaims, getPromoStats
 } from '@/app/actions/promo';
 
 import './admin.css';
@@ -49,6 +49,7 @@ export default function AdminPage() {
     const [manualCode, setManualCode] = useState('');
     const [generalPromos, setGeneralPromos] = useState([]);
     const [allClaims, setAllClaims] = useState([]);
+    const [promoStats, setPromoStats] = useState({ limit: 0, claimedToday: 0, remainingLimit: 0 });
     const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
     const [promoFormData, setPromoFormData] = useState({
         title: '', description: '', targetCategory: '5k', 
@@ -98,6 +99,8 @@ export default function AdminPage() {
             const pData = await getAllGeneralPromos();
             const cData = await getAllClaims();
             setAllClaims(cData);
+            const sData = await getPromoStats();
+            setPromoStats(sData);
             setGeneralPromos(pData);
         } catch (err) { console.error('Promo fetch error:', err); }
     };
@@ -739,6 +742,18 @@ export default function AdminPage() {
 
                             {promoActiveTab === 'voucher' && (
                                 <>
+                                    
+                                <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '1.5rem', borderRadius: '16px', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)' }}>
+                                    <div>
+                                        <h3 style={{ margin: 0, fontSize: '1.2rem', opacity: 0.9 }}>Sisa Kuota Voucher Hari Ini</h3>
+                                        <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{promoStats.remainingLimit} <span style={{ fontSize: '1rem', fontWeight: 'normal', opacity: 0.8 }}>/ {promoStats.limit} Voucher</span></div>
+                                    </div>
+                                    <div style={{ background: 'rgba(255,255,255,0.2)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{promoStats.claimedToday}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.9 }}>Terklaim</div>
+                                    </div>
+                                </div>
+
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                                     <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
                                         <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-dark)' }}><i className="fas fa-cog"></i> Pengaturan Voucher</h3>
