@@ -28,8 +28,7 @@ export default function Home() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  // Promo Popup States
-  const [showPromoPopup, setShowPromoPopup] = useState(false);
+  
 
   // Refs for sliders
   const fishSliderRef = React.useRef(null);
@@ -675,31 +674,7 @@ async function fetchFeatured() {
           )}
       </section>
 
-      {/* Promo Popup */}
-      {showPromoPopup && (
-          <div className="promo-overlay" onClick={handleClosePromo}>
-              <div className="promo-modal" onClick={(e) => e.stopPropagation()}>
-                  <button className="promo-close-btn" onClick={handleClosePromo} aria-label="Close promotion">&times;</button>
-                  <span className="promo-tag">Promo Terbatas!</span>
-                  <h3 className="promo-title">PROMO SPESIAL!</h3>
-                  <div className="promo-price-box">
-                      <span className="promo-old-price">Rp 25.000/ekor</span>
-                      <span className="promo-new-price">Rp 20.000 Dapat 2 Ekor Cupang</span>
-                  </div>
-                  <p className="promo-terms">Syarat: <strong>Kunjungi toko kami langsung</strong></p>
-                  <a 
-                      href="https://wa.me/6285700846152?text=Halo%20Admin,%20saya%20tertarik%20dengan%20Promo%20Spesial%202%20Ekor%20Cupang%20Rp%2020.000"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="promo-cta-btn"
-                      onClick={handleClosePromo}
-                  >
-                      <i className="fas fa-store"></i> Kunjungi Toko Sekarang
-                  </a>
-                  <span className="promo-period">Periode: 24 - 30 Mei 2025</span>
-              </div>
-          </div>
-      )}
+      
 
       <Footer />
       <FAB />
