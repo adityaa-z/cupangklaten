@@ -257,6 +257,20 @@ export default function AdminPage() {
         if (res.ok) fetchData();
     };
 
+    const approveReview = async (id) => {
+        const res = await fetch('/api/admin/reviews/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, action: 'approve' })
+        });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) {
+            fetchData();
+            setToast({ show: true, message: 'Ulasan berhasil dipublikasikan!', type: 'success' });
+            setTimeout(() => setToast(t => ({ ...t, show: false })), 3000);
+        }
+    };
+
     const deleteAuction = async (id) => {
         if (!confirm('Hapus item lelang ini?')) return;
         const res = await fetch(`/api/admin/auctions/?id=${id}`, { method: 'DELETE' });
@@ -658,20 +672,40 @@ export default function AdminPage() {
                                             <th>Nama</th>
                                             <th>Rating</th>
                                             <th>Komentar</th>
+                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {reviews.map(r => (
-                                            <tr key={r.id}>
+                                            <tr key={r.id} style={r.status === 'pending' ? { background: 'rgba(251,191,36,0.06)', borderLeft: '3px solid #f59e0b' } : {}}>
                                                 <td className="td-img">
-                                                    {r.img ? <img src={r.img} alt="" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} /> : <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}><i className="fas fa-image"></i></div>}
+                                                    {r.img ? <img src={r.img} alt="" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} /> : <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontWeight: '700', fontSize: '1.2rem' }}>{r.avatar_char || (r.name || '?').charAt(0)}</div>}
                                                 </td>
                                                 <td style={{ fontWeight: '600' }} data-label="Nama">{r.name}</td>
                                                 <td style={{ color: '#facc15' }} data-label="Rating">{'⭐'.repeat(r.rating)}</td>
                                                 <td style={{ fontSize: '0.9rem', maxWidth: '300px' }} data-label="Komentar">{r.content}</td>
-                                                <td className="action-btns" data-label="Aksi">
-                                                    <button className="btn-icon" onClick={() => { setEditingItem(r); setFormData(r); setModalType('review'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
+                                                <td data-label="Status">
+                                                    <span style={{
+                                                        padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '700',
+                                                        backgroundColor: r.status === 'pending' ? '#fef9c3' : '#dcfce7',
+                                                        color: r.status === 'pending' ? '#92400e' : '#166534'
+                                                    }}>
+                                                        {r.status === 'pending' ? '⏳ PENDING' : '✅ PUBLISHED'}
+                                                    </span>
+                                                </td>
+                                                <td className="action-btns" data-label="Aksi" style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                                    {r.status === 'pending' && (
+                                                        <button
+                                                            className="btn"
+                                                            onClick={() => approveReview(r.id)}
+                                                            title="Publish ulasan ini"
+                                                            style={{ padding: '0.4rem 0.8rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                                        >
+                                                            <i className="fas fa-check"></i> Publish
+                                                        </button>
+                                                    )}
+                                                    <button className="btn-icon" onClick={() => { setEditingItem(r); setFormData({ ...r, status: r.status || 'published' }); setModalType('review'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteReview(r.id)}><i className="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
@@ -961,6 +995,13 @@ export default function AdminPage() {
                                             required
                                             style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '100px' }}
                                         ></textarea>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Status</label>
+                                        <select value={formData.status || 'published'} onChange={e => setFormData({ ...formData, status: e.target.value })}>
+                                            <option value="published">✅ Published (Tampil di Publik)</option>
+                                            <option value="pending">⏳ Pending (Menunggu Review)</option>
+                                        </select>
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan Ulasan</button>
                                 </form>
