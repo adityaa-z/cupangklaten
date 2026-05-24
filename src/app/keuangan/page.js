@@ -27,6 +27,7 @@ export default function KeuanganPage() {
     // Tab State: 'transaksi' or 'inventaris'
     const [activeTab, setActiveTab] = useState('transaksi');
     const [chartFilter, setChartFilter] = useState('minggu'); // hari, minggu, bulan, tahun
+    const [showChart, setShowChart] = useState(true);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -874,8 +875,17 @@ export default function KeuanganPage() {
                                 {/* CHART SECTION */}
                                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                        <h4 style={{ fontSize: '1rem', color: '#D4AF37', margin: 0 }}>Grafik Arus Kas</h4>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <h4 style={{ fontSize: '1rem', color: '#D4AF37', margin: 0 }}>Grafik Arus Kas</h4>
+                                            <button 
+                                                onClick={() => setShowChart(!showChart)}
+                                                style={{ background: 'transparent', border: '1px solid #475569', color: '#94a3b8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
+                                                title={showChart ? "Sembunyikan Grafik" : "Tampilkan Grafik"}
+                                            >
+                                                <i className={`fas fa-eye${showChart ? '-slash' : ''}`}></i> {showChart ? 'Sembunyikan' : 'Tampilkan'}
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', opacity: showChart ? 1 : 0.5, pointerEvents: showChart ? 'auto' : 'none' }}>
                                             {['hari', 'minggu', 'bulan', 'tahun'].map(f => (
                                                 <button 
                                                     key={f}
@@ -897,7 +907,8 @@ export default function KeuanganPage() {
                                         </div>
                                     </div>
                                     
-                                    <div style={{ width: '100%', height: 300 }}>
+                                    {showChart && (
+                                        <div style={{ width: '100%', height: 300 }}>
                                         {chartData.length > 0 ? (
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -929,7 +940,8 @@ export default function KeuanganPage() {
                                                 Tidak ada data untuk periode ini.
                                             </div>
                                         )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="table-responsive">
