@@ -5,7 +5,8 @@ import { signOut } from 'next-auth/react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { 
     getPromoSettings, updatePromoSettings, getClaimByCode, processAndCleanUpClaim,
-    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo, getAllClaims, getPromoStats
+    createGeneralPromo, getAllGeneralPromos, toggleGeneralPromoStatus, deleteGeneralPromo, getAllClaims, getPromoStats,
+    deleteClaimImage
 } from '@/app/actions/promo';
 
 import './admin.css';
@@ -150,6 +151,20 @@ export default function AdminPage() {
         if (res.success) { alert(`Voucher berhasil di-${action}`); setScannedClaim(null); const cData = await getAllClaims(); setAllClaims(cData); } 
         else { alert(`Gagal: ${res.error}`); }
         setIsProcessingClaim(false);
+    };
+
+    const handleDeleteClaimImage = async () => {
+        if (!scannedClaim || !scannedClaim.image_path) return;
+        if (!confirm('Hapus foto/screenshot ini dari server? Tindakan ini tidak bisa dibatalkan.')) return;
+        const res = await deleteClaimImage(scannedClaim.claim_code);
+        if (res.success) {
+            setScannedClaim({ ...scannedClaim, image_path: null });
+            const cData = await getAllClaims();
+            setAllClaims(cData);
+            alert('Foto berhasil dihapus dari server.');
+        } else {
+            alert(`Gagal: ${res.error}`);
+        }
     };
 
     const handleCreatePromo = async (e) => {
@@ -833,12 +848,33 @@ export default function AdminPage() {
                                                         {scannedClaim.status.toUpperCase()}
                                                     </span>
                                                 </div>
+                                                <div style={{ marginBottom: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Dibuat</div>
+                                                    <div style={{ fontSize: '1rem', color: '#111827' }}>
+                                                        {scannedClaim.created_at ? new Date(scannedClaim.created_at).toLocaleString('id-ID') : '-'}
+                                                        {scannedClaim.is_expired && (
+                                                            <span style={{ marginLeft: '0.5rem', background: '#fee2e2', color: '#dc2626', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                                                <i className="fas fa-exclamation-triangle"></i> HANGUS (lebih dari 2 hari)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                                 <div style={{ marginBottom: '2rem' }}>
-                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem' }}>Bukti Screenshot</div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                        <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Bukti Screenshot</div>
+                                                        {scannedClaim.image_path && (
+                                                            <button 
+                                                                onClick={handleDeleteClaimImage} 
+                                                                style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', padding: '0.3rem 0.7rem', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                                            >
+                                                                <i className="fas fa-trash"></i> Hapus Foto
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                     {scannedClaim.image_path ? (
                                                         <img src={scannedClaim.image_path} alt="Bukti" style={{ width: '100%', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
                                                     ) : (
-                                                        <div style={{ padding: '2rem', background: '#f3f4f6', textAlign: 'center', color: '#9ca3af', borderRadius: '8px' }}>File tidak ada</div>
+                                                        <div style={{ padding: '2rem', background: '#f3f4f6', textAlign: 'center', color: '#9ca3af', borderRadius: '8px' }}><i className="fas fa-image" style={{ marginRight: '0.5rem' }}></i>Foto sudah dihapus atau tidak ada</div>
                                                     )}
                                                 </div>
                                                 {scannedClaim.status === 'pending' && (

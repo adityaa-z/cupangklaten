@@ -96,13 +96,24 @@ export async function submitClaim(formData) {
 
 export async function getClaimByCode(code) {
     const rows = await query('SELECT * FROM promo_claims WHERE claim_code = ? LIMIT 1', [code]);
-    return rows[0] || null;
+    const claim = rows[0] || null;
+    if (!claim) return null;
+
+    // Cek kedaluwarsa: voucher hangus jika sudah lebih dari 2 hari
+    const createdAt = new Date(claim.created_at);
+    const now = new Date();
+    const diffMs = now - createdAt;
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    claim.is_expired = diffDays > 2;
+    claim.created_at = claim.created_at ? claim.created_at.toISOString() : null;
+    return claim;
 }
 
 export async function processAndCleanUpClaim(code, action) {
     try {
         const claim = await getClaimByCode(code);
         if (!claim) return { success: false, error: 'Voucher tidak ditemukan' };
+        if (claim.is_expired) return { success: false, error: 'Voucher sudah hangus (lebih dari 2 hari)' };
         if (claim.status !== 'pending') return { success: false, error: `Voucher ini sudah ${claim.status}` };
 
         if (action === 'approve') {
@@ -143,6 +154,25 @@ export async function processAndCleanUpClaim(code, action) {
     } catch (e) {
         console.error('processAndCleanUpClaim error:', e);
         return { success: false, error: 'Gagal memproses voucher' };
+    }
+}
+
+export async function deleteClaimImage(claimCode) {
+    try {
+        const rows = await query('SELECT image_path FROM promo_claims WHERE claim_code = ? LIMIT 1', [claimCode]);
+        if (!rows[0] || !rows[0].image_path) return { success: false, error: 'Tidak ada foto untuk dihapus' };
+        
+        const absolutePath = path.join(process.cwd(), 'public', rows[0].image_path);
+        try {
+            await fs.unlink(absolutePath);
+        } catch (e) {
+            // File mungkin sudah dihapus, tetap lanjutkan
+        }
+        await execute('UPDATE promo_claims SET image_path = NULL WHERE claim_code = ?', [claimCode]);
+        return { success: true };
+    } catch (e) {
+        console.error('deleteClaimImage error:', e);
+        return { success: false, error: 'Gagal menghapus foto' };
     }
 }
 
