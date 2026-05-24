@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
+import PromoPopup from '@/components/PromoPopup';
+import { getPromoSettings } from '@/app/actions/promo';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +19,7 @@ export default function Home() {
   const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [promoActive, setPromoActive] = useState('false');
 
   // User Review States
   const { data: session, status } = useSession();
@@ -151,6 +154,16 @@ export default function Home() {
     }
     fetchAuctions();
 
+    async function fetchPromoSettings() {
+      try {
+        const settings = await getPromoSettings();
+        setPromoActive(settings.PROMO_ACTIVE);
+      } catch (err) {
+        console.error('Error fetching promo settings', err);
+      }
+    }
+    fetchPromoSettings();
+
 async function fetchFeatured() {
       try {
         const res = await fetch('/api/products/');
@@ -250,6 +263,7 @@ async function fetchFeatured() {
   return (
     <>
       <Navbar />
+      <PromoPopup isActive={promoActive} />
       
       {/* Hero Section */}
       <section className="hero">
