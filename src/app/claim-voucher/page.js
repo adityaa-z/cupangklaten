@@ -39,8 +39,28 @@ export default function ClaimVoucherPage() {
             <div style={{ background: 'var(--bg-white)', maxWidth: '500px', width: '100%', borderRadius: '20px', boxShadow: 'var(--card-shadow)', padding: '2.5rem', border: '1px solid var(--border-color)' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h1 style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--primary-dark)', marginBottom: '0.5rem' }}>Claim Voucher Promo</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Upload bukti screenshot rating Bintang 5 di Google Maps untuk mendapatkan voucher ikan cupang 5000an.</p>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Dapatkan voucher ikan cupang 5000an gratis dengan memberikan rating Bintang 5 di Google Maps kami!</p>
                 </div>
+
+                {!successCode && (
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-dark)', marginBottom: '1rem' }}><i className="fas fa-info-circle" style={{ color: '#3b82f6', marginRight: '8px' }}></i>Cara Mendapatkan Voucher:</h3>
+                        <ol style={{ paddingLeft: '1.2rem', color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+                            <li style={{ marginBottom: '0.5rem' }}>Klik tombol <strong>Beri Rating Maps</strong> di bawah ini.</li>
+                            <li style={{ marginBottom: '0.5rem' }}>Berikan ulasan positif dan rating <strong>Bintang 5</strong> di Google Maps Cupang Klaten.</li>
+                            <li style={{ marginBottom: '0.5rem' }}><strong>Screenshot</strong> bukti ulasan Anda.</li>
+                            <li>Isi form di bawah dan upload screenshot tersebut.</li>
+                        </ol>
+                        <a 
+                            href="https://maps.app.goo.gl/mkFP6BYoa9MmM4UM8" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.8rem', background: '#ffffff', color: '#1a73e8', border: '1px solid #1a73e8', borderRadius: '8px', fontWeight: 'bold', textDecoration: 'none', transition: 'all 0.2s' }}
+                        >
+                            <i className="fas fa-map-marker-alt"></i> Beri Rating Maps Cupang Klaten
+                        </a>
+                    </div>
+                )}
 
                 {successCode ? (
                     <div style={{ textAlign: 'center' }}>
