@@ -35,6 +35,13 @@ export default function KeuanganPage() {
         fish_stock_id: ''
     });
 
+    const [cart, setCart] = useState([]);
+    const [saleData, setSaleData] = useState({
+        fish: null,
+        qty: 1,
+        nominal: ''
+    });
+
     const [purchaseData, setPurchaseData] = useState({
         kode_ikan: '',
         nama_tipe: '',
@@ -120,14 +127,68 @@ export default function KeuanganPage() {
     };
 
     const handleSelectFish = (fish) => {
-        setFormData(prev => ({
-            ...prev,
-            fish_stock_id: fish.id,
-            // Automatically suggest the standard nominal selling price if applicable
-            // (Here it defaults to empty or user can type it in)
-        }));
+        setSaleData(prev => ({ ...prev, fish, qty: 1, nominal: '' }));
         setFishSearch(`${fish.kode_ikan} - ${fish.nama_tipe} (${fish.grade}) - Stok: ${fish.stok_sisa}`);
         setShowFishDropdown(false);
+    };
+
+    const handleAddToCart = (e) => {
+        if (e) e.preventDefault();
+        if (Number(formData.category_id) === 1) {
+            if (!saleData.fish) return alert("Pilih ikan terlebih dahulu.");
+            if (!saleData.qty || saleData.qty < 1) return alert("Jumlah (Qty) tidak valid.");
+            if (saleData.qty > saleData.fish.stok_sisa) return alert(`Jumlah melebihi stok yang ada (${saleData.fish.stok_sisa}).`);
+            if (!saleData.nominal || saleData.nominal <= 0) return alert("Nominal (Harga Jual) harus diisi.");
+
+            setCart(prev => [...prev, { ...saleData }]);
+            setSaleData({ fish: null, qty: 1, nominal: '' });
+            setFishSearch('');
+        } else if (Number(formData.category_id) === 2) {
+            if (!purchaseData.kode_ikan || !purchaseData.nama_tipe || !purchaseData.harga_beli_per_ekor || !purchaseData.stok_sisa) {
+                return alert("Lengkapi semua data ikan grosir.");
+            }
+            const itemNominal = Number(purchaseData.harga_beli_per_ekor) * Number(purchaseData.stok_sisa);
+            setCart(prev => [...prev, { ...purchaseData, nominal: itemNominal }]);
+            setPurchaseData({
+                kode_ikan: '', nama_tipe: '', grade: 'A', harga_beli_per_ekor: '', stok_sisa: '', lokasi: 'Pabrik_Pembesaran'
+            });
+        }
+    };
+
+    const handleRemoveFromCart = (index) => {
+        setCart(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleDeleteStock = async (id) => {
+        if (!confirm("Yakin ingin menghapus data stok ikan ini? (Biasa digunakan jika ikan mati/tidak valid)")) return;
+        setActionLoading(true);
+        try {
+            const res = await fetch(`/api/keuangan/stock/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            showNotification('Stok ikan berhasil dihapus.');
+            fetchData();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleResetData = async () => {
+        if (!confirm("PERINGATAN: Apakah Anda yakin ingin mereset PEMBUKUAN? Ini akan menghapus SELURUH riwayat transaksi dan SELURUH stok ikan yang ada! Pastikan Anda sudah membackup jika perlu.")) return;
+        setActionLoading(true);
+        try {
+            const res = await fetch('/api/keuangan/reset', { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            showNotification('Pembukuan berhasil direset dari awal.');
+            fetchData();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     const handleTransactionSubmit = async (e) => {
@@ -135,21 +196,35 @@ export default function KeuanganPage() {
         setActionLoading(true);
 
         try {
+            const isBatch = Number(formData.category_id) === 1 || Number(formData.category_id) === 2;
+            if (isBatch && cart.length === 0) {
+                setActionLoading(false);
+                return alert("Keranjang transaksi kosong. Tambahkan item ke daftar terlebih dahulu.");
+            }
+
             const payload = {
                 tanggal: formData.tanggal,
                 category_id: Number(formData.category_id),
-                nominal: Number(formData.nominal),
                 keterangan: formData.keterangan,
-                fish_stock_id: formData.fish_stock_id ? Number(formData.fish_stock_id) : null,
-                purchase_data: Number(formData.category_id) === 2 ? {
-                    kode_ikan: purchaseData.kode_ikan.trim(),
-                    nama_tipe: purchaseData.nama_tipe.trim(),
-                    grade: purchaseData.grade,
-                    harga_beli_per_ekor: Number(purchaseData.harga_beli_per_ekor),
-                    stok_sisa: Number(purchaseData.stok_sisa),
-                    lokasi: purchaseData.lokasi
-                } : null
             };
+
+            if (isBatch) {
+                payload.items = cart.map(item => {
+                    if (Number(formData.category_id) === 1) {
+                        return { fish_stock_id: item.fish.id, qty: Number(item.qty), nominal: Number(item.nominal) };
+                    } else {
+                        return {
+                            purchase_data: {
+                                kode_ikan: item.kode_ikan, nama_tipe: item.nama_tipe, grade: item.grade,
+                                harga_beli_per_ekor: Number(item.harga_beli_per_ekor), stok_sisa: Number(item.stok_sisa), lokasi: item.lokasi
+                            },
+                            nominal: Number(item.nominal)
+                        };
+                    }
+                });
+            } else {
+                payload.nominal = Number(formData.nominal);
+            }
 
             const res = await fetch('/api/keuangan/', {
                 method: 'POST',
@@ -181,6 +256,8 @@ export default function KeuanganPage() {
                 lokasi: 'Pabrik_Pembesaran'
             });
             setFishSearch('');
+            setCart([]);
+            setSaleData({ fish: null, qty: 1, nominal: '' });
             
             // Refresh data
             fetchData();
@@ -266,9 +343,14 @@ export default function KeuanganPage() {
                                 <p className="finance-subtitle">Sistem Terintegrasi Cupang Klaten</p>
                             </div>
                         </div>
-                        <Link href="/admin" className="btn-home">
-                            <i className="fas fa-arrow-left"></i> Dashboard Admin
-                        </Link>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button onClick={handleResetData} className="btn-home" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                                <i className="fas fa-power-off"></i> Reset Pembukuan
+                            </button>
+                            <Link href="/admin" className="btn-home">
+                                <i className="fas fa-arrow-left"></i> Dashboard Admin
+                            </Link>
+                        </div>
                     </div>
 
                 {/* Dashboard Stats */}
@@ -330,56 +412,88 @@ export default function KeuanganPage() {
 
                             {/* Conditional Form: Jual Ikan Eceran (Category 1) */}
                             {Number(formData.category_id) === 1 && (
-                                <div className="form-group" style={{ position: 'relative' }}>
-                                    <label>Pilih Ikan (Inventaris Aktif)</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Cari kode ikan, tipe, atau grade..."
-                                        value={fishSearch}
-                                        onChange={(e) => {
-                                            setFishSearch(e.target.value);
-                                            setShowFishDropdown(true);
-                                        }}
-                                        onFocus={() => setShowFishDropdown(true)}
-                                        className="form-control"
-                                        required
-                                    />
-                                    {showFishDropdown && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '100%',
-                                            left: 0,
-                                            width: '100%',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            background: '#0f172a',
-                                            border: '1px solid rgba(212, 175, 55, 0.3)',
-                                            borderRadius: '8px',
-                                            zIndex: 50,
-                                            boxShadow: '0 10px 15px rgba(0,0,0,0.5)'
-                                        }}>
-                                            {filteredFishStocks.length > 0 ? (
-                                                filteredFishStocks.map(fish => (
-                                                    <div 
-                                                        key={fish.id} 
-                                                        onClick={() => handleSelectFish(fish)}
-                                                        style={{
-                                                            padding: '0.6rem 1rem',
-                                                            cursor: 'pointer',
-                                                            borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                                            fontSize: '0.85rem'
-                                                        }}
-                                                        onMouseEnter={(e) => e.target.style.background = '#1e293b'}
-                                                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                                                    >
-                                                        <strong style={{ color: '#D4AF37' }}>{fish.kode_ikan}</strong> - {fish.nama_tipe} ({fish.grade}) - <span style={{ color: '#10b981' }}>Stok: {fish.stok_sisa}</span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ padding: '0.6rem 1rem', color: '#64748b', fontSize: '0.85rem' }}>Ikan tidak ditemukan / stok habis.</div>
-                                            )}
+                                <div style={{ 
+                                    background: 'rgba(255, 255, 255, 0.02)', 
+                                    padding: '1rem', 
+                                    borderRadius: '12px', 
+                                    border: '1px solid rgba(255, 255, 255, 0.04)',
+                                    marginBottom: '1rem' 
+                                }}>
+                                    <h4 style={{ fontSize: '0.85rem', color: '#D4AF37', fontWeight: '700', marginBottom: '0.8rem' }}>Tambah Ikan ke Keranjang Penjualan</h4>
+                                    <div className="form-group" style={{ position: 'relative' }}>
+                                        <label>Pilih Ikan (Inventaris Aktif)</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Cari kode ikan, tipe, atau grade..."
+                                            value={fishSearch}
+                                            onChange={(e) => {
+                                                setFishSearch(e.target.value);
+                                                setShowFishDropdown(true);
+                                            }}
+                                            onFocus={() => setShowFishDropdown(true)}
+                                            className="form-control"
+                                        />
+                                        {showFishDropdown && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: 0,
+                                                width: '100%',
+                                                maxHeight: '200px',
+                                                overflowY: 'auto',
+                                                background: '#0f172a',
+                                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                                borderRadius: '8px',
+                                                zIndex: 50,
+                                                boxShadow: '0 10px 15px rgba(0,0,0,0.5)'
+                                            }}>
+                                                {filteredFishStocks.length > 0 ? (
+                                                    filteredFishStocks.map(fish => (
+                                                        <div 
+                                                            key={fish.id} 
+                                                            onClick={() => handleSelectFish(fish)}
+                                                            style={{
+                                                                padding: '0.6rem 1rem',
+                                                                cursor: 'pointer',
+                                                                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                                                fontSize: '0.85rem'
+                                                            }}
+                                                            onMouseEnter={(e) => e.target.style.background = '#1e293b'}
+                                                            onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                                                        >
+                                                            <strong style={{ color: '#D4AF37' }}>{fish.kode_ikan}</strong> - {fish.nama_tipe} ({fish.grade}) - <span style={{ color: '#10b981' }}>Stok: {fish.stok_sisa}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div style={{ padding: '0.6rem 1rem', color: '#64748b', fontSize: '0.85rem' }}>Ikan tidak ditemukan / stok habis.</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                                        <div className="form-group">
+                                            <label>Jumlah (Qty)</label>
+                                            <input 
+                                                type="number" 
+                                                value={saleData.qty}
+                                                onChange={(e) => setSaleData(prev => ({...prev, qty: e.target.value}))}
+                                                className="form-control"
+                                            />
                                         </div>
-                                    )}
+                                        <div className="form-group">
+                                            <label>Harga Jual Total (Rp)</label>
+                                            <input 
+                                                type="number" 
+                                                value={saleData.nominal}
+                                                onChange={(e) => setSaleData(prev => ({...prev, nominal: e.target.value}))}
+                                                className="form-control"
+                                                placeholder="Contoh: 50000"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button type="button" onClick={handleAddToCart} className="btn-submit" style={{ padding: '0.5rem', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                        <i className="fas fa-plus"></i> Tambah ke Keranjang
+                                    </button>
                                 </div>
                             )}
 
@@ -403,7 +517,6 @@ export default function KeuanganPage() {
                                             value={purchaseData.kode_ikan}
                                             onChange={handlePurchaseChange}
                                             className="form-control"
-                                            required
                                         />
                                     </div>
                                     
@@ -461,7 +574,6 @@ export default function KeuanganPage() {
                                                 value={purchaseData.harga_beli_per_ekor}
                                                 onChange={handlePurchaseChange}
                                                 className="form-control"
-                                                required
                                             />
                                         </div>
                                         <div className="form-group">
@@ -480,21 +592,54 @@ export default function KeuanganPage() {
                                 </div>
                             )}
 
-                            <div className="form-group">
+                            
+                            {/* CART TABLE */}
+                            {(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) && cart.length > 0 && (
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <h4 style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.5rem' }}>Keranjang Transaksi:</h4>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                        {cart.map((item, idx) => (
+                                            <li key={idx} style={{ 
+                                                background: 'rgba(255,255,255,0.03)', 
+                                                padding: '0.8rem', 
+                                                borderRadius: '8px',
+                                                marginBottom: '0.5rem',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                fontSize: '0.85rem'
+                                            }}>
+                                                <div>
+                                                    <div style={{ color: '#D4AF37', fontWeight: 'bold' }}>
+                                                        {Number(formData.category_id) === 1 ? `${item.fish.kode_ikan} - ${item.fish.nama_tipe}` : `${item.kode_ikan} - ${item.nama_tipe}`}
+                                                    </div>
+                                                    <div style={{ color: '#94a3b8' }}>
+                                                        Qty: {item.qty || item.stok_sisa} | Rp {Number(item.nominal).toLocaleString('id-ID')}
+                                                    </div>
+                                                </div>
+                                                <button type="button" onClick={() => handleRemoveFromCart(idx)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                                                    <i className="fas fa-times"></i>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+<div className="form-group">
                                 <label>Nominal Transaksi (Rp)</label>
                                 <input 
                                     type="number" 
                                     name="nominal" 
                                     placeholder="Nominal rupiah..."
-                                    value={formData.nominal} 
+                                    value={(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) ? cart.reduce((acc, item) => acc + Number(item.nominal), 0) : formData.nominal} 
                                     onChange={handleFormChange} 
                                     className="form-control"
-                                    required 
-                                    disabled={Number(formData.category_id) === 2} // Auto computed for wholesale purchase
+                                    required={(Number(formData.category_id) !== 1 && Number(formData.category_id) !== 2)} 
+                                    disabled={Number(formData.category_id) === 1 || Number(formData.category_id) === 2} 
                                 />
-                                {Number(formData.category_id) === 2 && (
+                                {(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) && (
                                     <small style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.2rem', display: 'block' }}>
-                                        * Dikalkulasi otomatis: Qty × Harga Beli.
+                                        * Dikalkulasi otomatis dari keranjang.
                                     </small>
                                 )}
                             </div>
@@ -636,10 +781,17 @@ export default function KeuanganPage() {
                                                             <span className="fish-code">{fish.kode_ikan}</span>
                                                             <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
                                                         </div>
-                                                        <div className="fish-meta">
+                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                                                             <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
+                                                            <button 
+                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
+                                                                title="Hapus Ikan (Jika Mati/Invalid)"
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
                                                         </div>
                                                         <div className="transfer-group">
                                                             <select 
@@ -679,10 +831,17 @@ export default function KeuanganPage() {
                                                             <span className="fish-code">{fish.kode_ikan}</span>
                                                             <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
                                                         </div>
-                                                        <div className="fish-meta">
+                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                                                             <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
+                                                            <button 
+                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
+                                                                title="Hapus Ikan (Jika Mati/Invalid)"
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
                                                         </div>
                                                         <div className="transfer-group">
                                                             <select 
@@ -722,10 +881,17 @@ export default function KeuanganPage() {
                                                             <span className="fish-code">{fish.kode_ikan}</span>
                                                             <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
                                                         </div>
-                                                        <div className="fish-meta">
+                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                                                             <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
                                                             <span>Grade: <strong>{fish.grade}</strong></span>
                                                             <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
+                                                            <button 
+                                                                onClick={() => handleDeleteStock(fish.id)} 
+                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
+                                                                title="Hapus Ikan (Jika Mati/Invalid)"
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
                                                         </div>
                                                         <div className="transfer-group">
                                                             <select 
