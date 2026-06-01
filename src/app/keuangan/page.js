@@ -57,6 +57,7 @@ export default function KeuanganPage() {
     // Searchable dropdown state for Selling fish
     const [fishSearch, setFishSearch] = useState('');
     const [showFishDropdown, setShowFishDropdown] = useState(false);
+    const [showPurchaseFishDropdown, setShowPurchaseFishDropdown] = useState(false);
 
     // Transfer Location inline state
     const [transferLocations, setTransferLocations] = useState({});
@@ -264,6 +265,29 @@ export default function KeuanganPage() {
         }
     };
 
+    const handleEditSaldoKas = async () => {
+        const newSaldo = prompt("Masukkan Nominal Saldo Kas Utama Baru:", stats.saldo_kas);
+        if (newSaldo === null) return;
+        if (isNaN(newSaldo) || Number(newSaldo) < 0) return alert("Nominal saldo tidak valid.");
+
+        setActionLoading(true);
+        try {
+            const res = await fetch('/api/keuangan/', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_saldo: Number(newSaldo) })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            showNotification('Saldo Kas Utama berhasil diperbarui.');
+            fetchData();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     // Chart Data Processing
     const processChartData = () => {
         if (!transactions || transactions.length === 0) return [];
@@ -272,6 +296,7 @@ export default function KeuanganPage() {
         now.setHours(23, 59, 59, 999);
         
         const filtered = transactions.filter(t => {
+            if (t.nama_kategori === 'Saldo Awal') return false;
             const tDate = new Date(t.tanggal);
             const diffTime = now.getTime() - tDate.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -503,20 +528,41 @@ export default function KeuanganPage() {
                     </div>
 
                 {/* Dashboard Stats */}
-                <section className="finance-stats-grid">
-                    <div className="finance-card">
+                <section className="finance-stats-grid" style={{ gridTemplateColumns: '1fr' }}>
+                    <div className="finance-card" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
                         <span className="card-label">Saldo Kas Utama</span>
-                        <h2 className="card-value green">
-                            Rp {stats.saldo_kas.toLocaleString('id-ID')}
+                        <h2 className="card-value green" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                            <span>Rp {stats.saldo_kas.toLocaleString('id-ID')}</span>
+                            <button 
+                                onClick={handleEditSaldoKas}
+                                style={{ 
+                                    background: 'rgba(16, 185, 129, 0.1)', 
+                                    border: '1px solid rgba(16, 185, 129, 0.3)', 
+                                    color: '#10b981', 
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    padding: '0.4rem 0.8rem',
+                                    borderRadius: '8px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                title="Edit Saldo Kas Utama"
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)';
+                                    e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                                }}
+                            >
+                                <i className="fas fa-edit"></i> Edit Saldo
+                            </button>
                         </h2>
                         <i className="fas fa-wallet card-icon"></i>
-                    </div>
-                    <div className="finance-card">
-                        <span className="card-label">Estimasi Nilai Aset Stok</span>
-                        <h2 className="card-value gold">
-                            Rp {stats.estimasi_aset.toLocaleString('id-ID')}
-                        </h2>
-                        <i className="fas fa-fish card-icon"></i>
                     </div>
                 </section>
 
@@ -657,16 +703,77 @@ export default function KeuanganPage() {
                                 }}>
                                     <h4 style={{ fontSize: '0.85rem', color: '#D4AF37', fontWeight: '700', marginBottom: '0.8rem' }}>Informasi Ikan Grosir</h4>
                                     
-                                    <div className="form-group">
-                                        <label>Kode Ikan (Harus Unik)</label>
+                                    <div className="form-group" style={{ position: 'relative' }}>
+                                        <label>Kode Ikan (Pilih yang sudah ada atau ketik baru)</label>
                                         <input 
                                             type="text" 
                                             name="kode_ikan"
-                                            placeholder="Contoh: CO-999"
+                                            placeholder="Cari/Ketik kode ikan..."
                                             value={purchaseData.kode_ikan}
-                                            onChange={handlePurchaseChange}
+                                            onChange={(e) => {
+                                                handlePurchaseChange(e);
+                                                setShowPurchaseFishDropdown(true);
+                                            }}
+                                            onFocus={() => setShowPurchaseFishDropdown(true)}
+                                            onBlur={() => setTimeout(() => setShowPurchaseFishDropdown(false), 200)}
                                             className="form-control"
+                                            required
+                                            autoComplete="off"
                                         />
+                                        {showPurchaseFishDropdown && purchaseData.kode_ikan && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: 0,
+                                                width: '100%',
+                                                maxHeight: '200px',
+                                                overflowY: 'auto',
+                                                background: '#0f172a',
+                                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                                borderRadius: '8px',
+                                                zIndex: 50,
+                                                boxShadow: '0 10px 15px rgba(0,0,0,0.5)'
+                                            }}>
+                                                {(() => {
+                                                    const matches = fishStocks.filter(fish => 
+                                                        `${fish.kode_ikan} ${fish.nama_tipe} ${fish.grade}`.toLowerCase().includes(purchaseData.kode_ikan.toLowerCase())
+                                                    );
+                                                    return matches.length > 0 ? (
+                                                        matches.map(fish => (
+                                                            <div 
+                                                                key={fish.id} 
+                                                                onMouseDown={() => {
+                                                                    setPurchaseData({
+                                                                        kode_ikan: fish.kode_ikan,
+                                                                        nama_tipe: fish.nama_tipe,
+                                                                        grade: fish.grade,
+                                                                        harga_beli_per_ekor: fish.harga_beli_per_ekor,
+                                                                        stok_sisa: purchaseData.stok_sisa || '',
+                                                                        lokasi: fish.lokasi || 'Pabrik_Pembesaran'
+                                                                    });
+                                                                    setShowPurchaseFishDropdown(false);
+                                                                }}
+                                                                style={{
+                                                                    padding: '0.6rem 1rem',
+                                                                    cursor: 'pointer',
+                                                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                                                    fontSize: '0.85rem',
+                                                                    color: '#cbd5e1'
+                                                                }}
+                                                                onMouseEnter={(e) => e.target.style.background = '#1e293b'}
+                                                                onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                                                            >
+                                                                <strong style={{ color: '#D4AF37' }}>{fish.kode_ikan}</strong> - {fish.nama_tipe} ({fish.grade}) - <span style={{ color: '#10b981' }}>Stok: {fish.stok_sisa}</span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div style={{ padding: '0.6rem 1rem', color: '#64748b', fontSize: '0.85rem' }}>
+                                                            Ketik untuk membuat kode ikan baru.
+                                                        </div>
+                                                    );
+                                                 })()}
+                                            </div>
+                                        )}
                                     </div>
                                     
                                     <div className="form-group">
@@ -844,12 +951,12 @@ export default function KeuanganPage() {
                                 </h3>
                                 
                                 {(() => {
-                                    const totalPemasukan = transactions.filter(t => t.jenis === 'masuk').reduce((acc, t) => acc + Number(t.nominal), 0);
-                                    const totalPengeluaran = transactions.filter(t => t.jenis === 'keluar').reduce((acc, t) => acc + Number(t.nominal), 0);
-                                    const totalHPP = transactions.filter(t => t.jenis === 'masuk').reduce((acc, t) => acc + Number(t.hpp_total || 0), 0);
-                                    const labaKotor = totalPemasukan - totalHPP;
-                                    const totalBiayaOperasional = transactions.filter(t => t.jenis === 'keluar' && Number(t.category_id) !== 2).reduce((acc, t) => acc + Number(t.nominal), 0);
-                                    const labaBersih = labaKotor - totalBiayaOperasional;
+                                     const totalPemasukan = transactions.filter(t => t.jenis === 'masuk' && t.nama_kategori !== 'Saldo Awal').reduce((acc, t) => acc + Number(t.nominal), 0);
+                                     const totalPengeluaran = transactions.filter(t => t.jenis === 'keluar').reduce((acc, t) => acc + Number(t.nominal), 0);
+                                     const totalHPP = transactions.filter(t => t.jenis === 'masuk' && t.nama_kategori !== 'Saldo Awal').reduce((acc, t) => acc + Number(t.hpp_total || 0), 0);
+                                     const labaKotor = totalPemasukan - totalHPP;
+                                     const totalBiayaOperasional = transactions.filter(t => t.jenis === 'keluar' && Number(t.category_id) !== 2).reduce((acc, t) => acc + Number(t.nominal), 0);
+                                     const labaBersih = labaKotor - totalBiayaOperasional;
 
                                     return (
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>

@@ -40,8 +40,7 @@ export async function GET() {
         const [keluarRow] = await query("SELECT SUM(nominal) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE c.jenis = 'keluar'");
         const saldo_kas = Number(masukRow[0]?.total || 0) - Number(keluarRow[0]?.total || 0);
 
-        const [asetRow] = await query("SELECT SUM(stok_sisa * harga_beli_per_ekor) as total FROM fish_stocks");
-        const estimasi_aset = Number(asetRow[0]?.total || 0);
+        const estimasi_aset = 0; // Removed stock asset estimation calculation from backend
 
         return NextResponse.json({
             categories,
@@ -176,6 +175,68 @@ export async function POST(request) {
             }
             connection.release();
         }
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
+export async function PUT(request) {
+    try {
+        if (!(await verifyAdmin())) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { target_saldo } = await request.json();
+        if (target_saldo === undefined || isNaN(target_saldo)) {
+            return NextResponse.json({ error: 'Target saldo tidak valid.' }, { status: 400 });
+        }
+
+        // 1. Ensure "Saldo Awal" category exists
+        const [catRows] = await query("SELECT id FROM categories WHERE nama_kategori = 'Saldo Awal'");
+        let saldoAwalCatId;
+        if (catRows.length === 0) {
+            const insertCat = await query("INSERT INTO categories (nama_kategori, jenis) VALUES ('Saldo Awal', 'masuk')");
+            saldoAwalCatId = insertCat.insertId;
+        } else {
+            saldoAwalCatId = catRows[0].id;
+        }
+
+        // 2. Calculate other pemasukan (excluding Saldo Awal category)
+        const [masukRow] = await query(
+            "SELECT SUM(nominal) as total FROM transactions WHERE category_id != ? AND category_id IN (SELECT id FROM categories WHERE jenis = 'masuk')",
+            [saldoAwalCatId]
+        );
+        const P_other = Number(masukRow[0]?.total || 0);
+
+        // 3. Calculate all pengeluaran
+        const [keluarRow] = await query(
+            "SELECT SUM(nominal) as total FROM transactions WHERE category_id IN (SELECT id FROM categories WHERE jenis = 'keluar')"
+        );
+        const K = Number(keluarRow[0]?.total || 0);
+
+        // 4. Calculate S_awal
+        const S_awal = Number(target_saldo) - P_other + K;
+
+        // 5. Check if Saldo Awal transaction already exists
+        const [transRows] = await query(
+            "SELECT id FROM transactions WHERE category_id = ? ORDER BY id ASC LIMIT 1",
+            [saldoAwalCatId]
+        );
+
+        if (transRows.length > 0) {
+            // Update existing
+            await query("UPDATE transactions SET nominal = ? WHERE id = ?", [S_awal, transRows[0].id]);
+        } else {
+            // Create new
+            const today = new Date().toISOString().split('T')[0];
+            await query(
+                "INSERT INTO transactions (tanggal, category_id, nominal, keterangan) VALUES (?, ?, ?, 'Saldo Awal Sistem')",
+                [today, saldoAwalCatId, S_awal]
+            );
+        }
+
+        return NextResponse.json({ success: true, message: 'Saldo Kas Utama berhasil diperbarui.' });
+    } catch (err) {
+        console.error('API Keuangan PUT Error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
