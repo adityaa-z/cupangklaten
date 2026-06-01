@@ -36,8 +36,8 @@ export async function GET() {
         `);
 
         // 4. Calculate Stats
-        const [masukRow] = await query("SELECT SUM(nominal) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE c.jenis = 'masuk'");
-        const [keluarRow] = await query("SELECT SUM(nominal) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE c.jenis = 'keluar'");
+        const masukRow = await query("SELECT SUM(nominal) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE c.jenis = 'masuk'");
+        const keluarRow = await query("SELECT SUM(nominal) as total FROM transactions t JOIN categories c ON t.category_id = c.id WHERE c.jenis = 'keluar'");
         const saldo_kas = Number(masukRow[0]?.total || 0) - Number(keluarRow[0]?.total || 0);
 
         const estimasi_aset = 0; // Removed stock asset estimation calculation from backend
@@ -191,7 +191,7 @@ export async function PUT(request) {
         }
 
         // 1. Ensure "Saldo Awal" category exists
-        const [catRows] = await query("SELECT id FROM categories WHERE nama_kategori = 'Saldo Awal'");
+        const catRows = await query("SELECT id FROM categories WHERE nama_kategori = 'Saldo Awal'");
         let saldoAwalCatId;
         if (catRows.length === 0) {
             const insertCat = await query("INSERT INTO categories (nama_kategori, jenis) VALUES ('Saldo Awal', 'masuk')");
@@ -201,14 +201,14 @@ export async function PUT(request) {
         }
 
         // 2. Calculate other pemasukan (excluding Saldo Awal category)
-        const [masukRow] = await query(
+        const masukRow = await query(
             "SELECT SUM(nominal) as total FROM transactions WHERE category_id != ? AND category_id IN (SELECT id FROM categories WHERE jenis = 'masuk')",
             [saldoAwalCatId]
         );
         const P_other = Number(masukRow[0]?.total || 0);
 
         // 3. Calculate all pengeluaran
-        const [keluarRow] = await query(
+        const keluarRow = await query(
             "SELECT SUM(nominal) as total FROM transactions WHERE category_id IN (SELECT id FROM categories WHERE jenis = 'keluar')"
         );
         const K = Number(keluarRow[0]?.total || 0);
@@ -217,7 +217,7 @@ export async function PUT(request) {
         const S_awal = Number(target_saldo) - P_other + K;
 
         // 5. Check if Saldo Awal transaction already exists
-        const [transRows] = await query(
+        const transRows = await query(
             "SELECT id FROM transactions WHERE category_id = ? ORDER BY id ASC LIMIT 1",
             [saldoAwalCatId]
         );
