@@ -308,6 +308,23 @@ tbody tr:hover {
     z-index: 2000;
 }
 
+.modal-container {
+    background: var(--white);
+    width: 100%;
+    max-width: 600px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-container .modal-body {
+    overflow-y: auto;
+    flex: 1;
+}
+
 .modal-content {
     background: var(--white);
     width: 100%;
@@ -487,17 +504,29 @@ input:checked + .slider:before {
         display: flex;
         padding: 0;
         width: 100%;
-        justify-content: space-around;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .nav-item {
-        flex: 1;
+        flex: 0 0 auto;
         flex-direction: column;
         gap: 0.2rem;
-        padding: 0.6rem 0;
-        font-size: 0.7rem;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.65rem;
         text-align: center;
         border-right: none;
+        white-space: nowrap;
+        min-width: 56px;
+    }
+
+    .nav-item i {
+        font-size: 1.1rem;
     }
 
     .nav-item:hover, .nav-item.active {
@@ -599,6 +628,19 @@ input:checked + .slider:before {
     .modal-content {
         width: 95%;
         margin: 10px;
+    }
+
+    .modal-container {
+        width: 95% !important;
+        max-width: 95vw !important;
+        max-height: 85vh !important;
+        margin: auto;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .form-row {

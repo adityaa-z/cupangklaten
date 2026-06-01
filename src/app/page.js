@@ -433,10 +433,14 @@ async function fetchFeatured() {
       </section>
 
 
-      {/* Education Section */}
+      {/* Blog Kami Section */}
       <section className="blog-section">
-        <div className="section-header" style={{ maxWidth: '1200px', margin: '0 auto 3rem' }}>
-          <h2 style={{ fontSize: '2rem' }}>Tips & Edukasi</h2>
+        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem', maxWidth: '1200px', margin: '0 auto 3rem' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+            Blog <span style={{ background: 'linear-gradient(to right, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Kami</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Tips perawatan, edukasi, dan info seputar ikan cupang</p>
+          <div style={{ width: '60px', height: '4px', background: '#6366f1', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
         <div className="blog-grid">
           <div className="blog-card" style={{ background: 'var(--bg-light)', padding: '1.5rem', borderRadius: '20px' }}>
@@ -459,6 +463,26 @@ async function fetchFeatured() {
               </Link>
             </div>
           </div>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+          <Link href="/blog" style={{
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.8rem',
+            padding: '1rem 2.5rem',
+            fontSize: '1.1rem',
+            borderRadius: '50px',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            color: 'white',
+            fontWeight: '600',
+            boxShadow: '0 10px 25px rgba(99, 102, 241, 0.3)',
+            transition: 'transform 0.2s, box-shadow 0.2s'
+          }}>
+            <i className="fas fa-newspaper"></i>
+            Lihat Semua Artikel Blog
+            <i className="fas fa-arrow-right"></i>
+          </Link>
         </div>
       </section>
 
