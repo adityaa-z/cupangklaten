@@ -23,6 +23,7 @@ export default function AdminPage() {
     const [reviews, setReviews] = useState([]);
     const [members, setMembers] = useState([]);
     const [auctions, setAuctions] = useState([]);
+    const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Auth State
@@ -74,12 +75,13 @@ export default function AdminPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [pRes, fRes, rRes, mRes, aRes] = await Promise.all([
+            const [pRes, fRes, rRes, mRes, aRes, artRes] = await Promise.all([
                 fetch('/api/admin/products/'),
                 fetch('/api/admin/faq/'),
                 fetch('/api/admin/reviews/'),
                 fetch('/api/admin/members/'),
-                fetch('/api/admin/auctions/')
+                fetch('/api/admin/auctions/'),
+                fetch('/api/admin/articles/')
             ]);
 
             if (pRes.ok) setProducts(await pRes.json());
@@ -87,6 +89,7 @@ export default function AdminPage() {
             if (rRes.ok) setReviews(await rRes.json());
             if (mRes.ok) setMembers(await mRes.json());
             if (aRes.ok) setAuctions(await aRes.json());
+            if (artRes && artRes.ok) setArticles(await artRes.json());
         } catch (err) {
             console.error('Unexpected error fetching data:', err);
         }
@@ -360,6 +363,12 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
             });
+        } else if (modalType === 'article') {
+            res = await fetch('/api/admin/articles/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+            });
         }
 
         if (res && res.status === 401) return handleLogout();
@@ -369,7 +378,7 @@ export default function AdminPage() {
             fetchData();
             setToast({ 
                 show: true, 
-                message: modalType === 'product' ? 'Produk berhasil disimpan!' : 'FAQ berhasil disimpan!', 
+                message: modalType === 'product' ? 'Produk berhasil disimpan!' : modalType === 'faq' ? 'FAQ berhasil disimpan!' : modalType === 'article' ? 'Artikel berhasil disimpan!' : 'Data berhasil disimpan!', 
                 type: 'success' 
             });
             setTimeout(() => setToast({ ...toast, show: false }), 3000);
@@ -423,6 +432,13 @@ export default function AdminPage() {
         if (res.ok) fetchData();
     };
 
+    const deleteArticle = async (id) => {
+        if (!confirm('Hapus artikel ini?')) return;
+        const res = await fetch(`/api/admin/articles/?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
+    };
+
     if (!isMounted) {
         return (
             <div className="admin-body" style={{ minHeight: '100vh', background: 'var(--bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -442,9 +458,9 @@ export default function AdminPage() {
                     HQ Panel
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan'].map(tab => (
+                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : 'star'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
                             {tab}
                         </div>
                     ))}
@@ -1140,18 +1156,173 @@ export default function AdminPage() {
                             </div>
                         </div>
                     )}
+
+                    {activeTab === 'Blog' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls">
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ title: '', slug: '', content: '', thumbnail: '', category: '', meta_title: '', meta_description: '' }); setModalType('article'); setIsModalOpen(true); }}>
+                                    <i className="fas fa-plus"></i> Tambah Artikel
+                                </button>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Thumbnail</th>
+                                            <th>Judul & Slug</th>
+                                            <th>Kategori</th>
+                                            <th>Tanggal</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {articles.map(art => (
+                                            <tr key={art.id}>
+                                                <td className="td-img" data-label="Thumbnail">
+                                                    {art.thumbnail ? <img src={art.thumbnail} alt="" style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} /> : <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}><i className="fas fa-image"></i></div>}
+                                                </td>
+                                                <td data-label="Judul & Slug">
+                                                    <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{art.title}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6366f1', textDecoration: 'none' }}>/blog/{art.slug}</div>
+                                                </td>
+                                                <td data-label="Kategori">
+                                                    <span style={{ 
+                                                        padding: '0.2rem 0.6rem', 
+                                                        borderRadius: '20px', 
+                                                        fontSize: '0.8rem', 
+                                                        fontWeight: 'bold',
+                                                        backgroundColor: '#f1f5f9',
+                                                        color: '#475569'
+                                                    }}>{art.category || 'Umum'}</span>
+                                                </td>
+                                                <td data-label="Tanggal" style={{ fontSize: '0.85rem' }}>
+                                                    {new Date(art.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                </td>
+                                                <td className="action-btns" data-label="Aksi">
+                                                    <button className="btn-icon" onClick={() => { setEditingItem(art); setFormData(art); setModalType('article'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
+                                                    <button className="btn-icon delete" onClick={() => deleteArticle(art.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
 
             {isModalOpen && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal-container" style={{ maxWidth: modalType === 'product' || modalType === 'auction' || modalType === 'article' ? '900px' : '600px' }}>
                         <div className="modal-header">
-                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : 'Ulasan'}</h3>
+                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : modalType === 'article' ? 'Artikel' : 'Ulasan'}</h3>
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            {modalType === 'auction' ? (
+                            {modalType === 'article' ? (
+                                <form onSubmit={saveProduct}>
+                                    <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', fontWeight: '700' }}>Gambar Thumbnail</label>
+                                        <div style={{ width: '100px', height: '100px', background: '#fff', borderRadius: '12px', border: '2px dashed #cbd5e1', overflow: 'hidden', margin: '0.5rem 0', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                            {uploadingField === 'thumbnail' ? (
+                                                <div className="spinner"></div>
+                                            ) : formData.thumbnail ? (
+                                                <>
+                                                    <img src={formData.thumbnail} alt="Thumbnail Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setFormData({ ...formData, thumbnail: '' })}
+                                                        style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', zIndex: 10 }}
+                                                    >
+                                                        <i className="fas fa-times"></i>
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                                                    <i className="fas fa-cloud-upload-alt" style={{ fontSize: '1.5rem', marginBottom: '0.2rem' }}></i>
+                                                    <div style={{ fontSize: '0.65rem' }}>Klik Upload</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'thumbnail', false)} style={{ fontSize: '0.75rem' }} />
+                                        <input type="text" value={formData.thumbnail || ''} onChange={e => setFormData({ ...formData, thumbnail: e.target.value })} placeholder="Atau paste URL gambar..." style={{ fontSize: '0.8rem', marginTop: '0.5rem' }} />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Judul Artikel</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.title} 
+                                            onChange={e => {
+                                                const title = e.target.value;
+                                                const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                                                setFormData({ ...formData, title, slug });
+                                            }} 
+                                            placeholder="Contoh: Cara Merawat Ikan Cupang Hias..." 
+                                            required 
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Slug URL (Unik & SEO friendly)</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.slug} 
+                                            onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '') })} 
+                                            placeholder="contoh-cara-merawat-ikan-cupang" 
+                                            required 
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Kategori Artikel</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.category} 
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })} 
+                                            placeholder="Contoh: Tips, Perawatan, Kontes..." 
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Isi Artikel (Mendukung HTML)</label>
+                                        <textarea 
+                                            value={formData.content} 
+                                            onChange={e => setFormData({ ...formData, content: e.target.value })} 
+                                            placeholder="Tulis artikel lengkap di sini... Anda bisa menggunakan tag HTML seperti <p>, <b>, <img> untuk memformat artikel." 
+                                            required 
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '250px', fontFamily: 'inherit' }}
+                                        />
+                                    </div>
+
+                                    <div className="form-group" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem' }}>
+                                        <h4 style={{ fontSize: '0.9rem', color: 'var(--primary-dark)', marginBottom: '0.8rem' }}><i className="fas fa-search-plus"></i> SEO Settings</h4>
+                                        
+                                        <div className="form-group">
+                                            <label>Meta Title (Opsional)</label>
+                                            <input 
+                                                type="text" 
+                                                value={formData.meta_title} 
+                                                onChange={e => setFormData({ ...formData, meta_title: e.target.value })} 
+                                                placeholder="Judul SEO untuk Google Search..." 
+                                            />
+                                        </div>
+                                        
+                                        <div className="form-group">
+                                            <label>Meta Description (Opsional)</label>
+                                            <textarea 
+                                                value={formData.meta_description} 
+                                                onChange={e => setFormData({ ...formData, meta_description: e.target.value })} 
+                                                placeholder="Deskripsi singkat yang tampil di Google Search (maksimal 160 karakter)..." 
+                                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '60px' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" className="btn btn-primary">Simpan Artikel Blog</button>
+                                </form>
+                            ) : modalType === 'auction' ? (
                                 <form onSubmit={saveProduct}>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                                         {[

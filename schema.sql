@@ -170,6 +170,22 @@ CREATE TABLE IF NOT EXISTS transactions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Tabel: articles (Z-IFC Blog)
+-- ============================================
+CREATE TABLE IF NOT EXISTS articles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    content TEXT NOT NULL,
+    thumbnail TEXT DEFAULT NULL,
+    category VARCHAR(100) DEFAULT NULL,
+    meta_title VARCHAR(255) DEFAULT NULL,
+    meta_description TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Buat user database (opsional, ganti password)
 -- ============================================
 -- CREATE USER 'cupang_user'@'localhost' IDENTIFIED BY 'GANTI_PASSWORD_DISINI';
