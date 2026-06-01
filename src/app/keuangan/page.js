@@ -517,7 +517,7 @@ export default function KeuanganPage() {
                                 <p className="finance-subtitle">Sistem Terintegrasi Cupang Klaten</p>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div className="finance-header-actions">
                             <button onClick={handleResetData} className="btn-home" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                                 <i className="fas fa-power-off"></i> Reset Pembukuan
                             </button>
@@ -1071,39 +1071,39 @@ export default function KeuanganPage() {
                                                     const profit = isIncome && t.hpp_total > 0 ? Number(t.nominal) - Number(t.hpp_total) : null;
                                                     return (
                                                         <tr key={t.id}>
-                                                            <td style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
+                                                            <td data-label="Tanggal" style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
                                                                 {new Date(t.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                             </td>
-                                                            <td>
+                                                            <td data-label="Kategori">
                                                                 <span className={`finance-badge ${t.jenis}`}>
                                                                     {isIncome ? '+' : '-'} {t.nama_kategori}
                                                                 </span>
                                                             </td>
-                                                            <td style={{ fontWeight: '600' }}>
+                                                            <td data-label="Item Ikan" style={{ fontWeight: '600' }}>
                                                                 {t.kode_ikan ? (
                                                                     <span style={{ color: '#D4AF37' }}>
                                                                         {t.kode_ikan} <small style={{ color: '#94a3b8', fontWeight: 'normal' }}>({t.nama_tipe})</small>
                                                                     </span>
                                                                 ) : '-'}
                                                             </td>
-                                                            <td style={{ fontSize: '0.85rem', color: '#94a3b8', maxWidth: '180px' }}>
+                                                            <td data-label="Catatan" style={{ fontSize: '0.85rem', color: '#94a3b8', maxWidth: '180px' }}>
                                                                 {t.keterangan || '-'}
                                                             </td>
-                                                            <td style={{ 
+                                                            <td data-label="Nominal" style={{ 
                                                                 fontWeight: '700', 
                                                                 color: isIncome ? '#10b981' : '#f87171',
                                                                 whiteSpace: 'nowrap'
                                                             }}>
                                                                 {isIncome ? '+' : '-'} Rp {Number(t.nominal).toLocaleString('id-ID')}
                                                             </td>
-                                                            <td style={{ whiteSpace: 'nowrap' }}>
+                                                            <td data-label="Laba Kotor" style={{ whiteSpace: 'nowrap' }}>
                                                                 {profit !== null ? (
                                                                     <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '0.85rem' }}>
                                                                         +Rp {profit.toLocaleString('id-ID')}
                                                                     </span>
                                                                 ) : '-'}
                                                             </td>
-                                                            <td style={{ whiteSpace: 'nowrap' }}>
+                                                            <td data-label="Aksi" style={{ whiteSpace: 'nowrap' }}>
                                                                 <button onClick={() => handleEditTransaction(t)} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', marginRight: '0.8rem' }} title="Edit Transaksi">
                                                                     <i className="fas fa-edit"></i>
                                                                 </button>
