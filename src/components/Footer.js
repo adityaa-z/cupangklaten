@@ -25,14 +25,6 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div className="footer-links">
-                    <h4>Blog Kami</h4>
-                    <ul>
-                        <li><Link href="/blog">Semua Artikel</Link></li>
-                        <li><Link href="/tips-perawatan">Tips Perawatan</Link></li>
-                        <li><Link href="/jantan-vs-betina">Jantan vs Betina</Link></li>
-                    </ul>
-                </div>
-                <div className="footer-links">
                     <h4>Kontak</h4>
                     <a href="https://maps.app.goo.gl/mkFP6BYoa9MmM4UM8" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
