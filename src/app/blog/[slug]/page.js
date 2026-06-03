@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
-    const { slug } = params;
+    const { slug } = await params;
     try {
         const rows = await query('SELECT * FROM articles WHERE slug = ? LIMIT 1', [slug]);
         const article = rows[0];
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogDetailPage({ params }) {
-    const { slug } = params;
+    const { slug } = await params;
     
     let article;
     try {
