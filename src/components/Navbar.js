@@ -36,8 +36,8 @@ const Navbar = () => {
         <header>
             <div className="nav-container">
                 <Link href="/" className="logo">
-                    <img src="/logo.png" alt="cupangklaten.id" />
-                    <span className="logo-text">CUPANGKLATEN.ID</span>
+                    <img src="/logo.png" alt="cupangklaten" />
+                    <span className="logo-text">CUPANGKLATEN</span>
                 </Link>
 
                 <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem' }}>

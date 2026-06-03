@@ -7,10 +7,10 @@ const Footer = () => {
             <div className="footer-content">
                 <div className="footer-brand">
                     <Link href="/" className="logo">
-                        <img src="/logo.png" alt="cupangklaten.id"
+                        <img src="/logo.png" alt="cupangklaten"
                             style={{ filter: 'grayscale(100%) brightness(200%)', height: '40px' }} />
                         <span className="logo-text"
-                            style={{ filter: 'grayscale(100%) brightness(200%)', color: '#94a3b8', marginTop: '1rem' }}>CUPANGKLATEN.ID</span>
+                            style={{ filter: 'grayscale(100%) brightness(200%)', color: '#94a3b8', marginTop: '1rem' }}>CUPANGKLATEN</span>
                     </Link>
                     <p style={{ color: '#94a3b8', marginTop: '1rem' }}>Dedikasi kami adalah menghadirkan keindahan ikan cupang
                         Klaten ke seluruh penjuru Asia dengan kualitas premium.</p>
@@ -36,20 +36,20 @@ const Footer = () => {
                         <i className="fab fa-whatsapp" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
                         +62 857-0084-6152
                     </a>
-                    <a href="https://www.instagram.com/cupangklaten.id?igsh=b284dWl3eGdxdTA5" target="_blank" rel="noopener noreferrer"
+                    <a href="https://www.instagram.com/cupangklaten?igsh=b284dWl3eGdxdTA5" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fab fa-instagram" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        @cupangklaten.id
+                        @cupangklaten
                     </a>
-                    <a href="https://www.tiktok.com/@cupangklaten.id" target="_blank" rel="noopener noreferrer"
+                    <a href="https://www.tiktok.com/@cupangklaten" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginTop: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fab fa-tiktok" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        @cupangklaten.id
+                        @cupangklaten
                     </a>
                 </div>
             </div>
             <div className="copyright">
-                &copy; {new Date().getFullYear()} CupangKlaten.id - All Rights Reserved.
+                &copy; {new Date().getFullYear()} CupangKlaten - All Rights Reserved.
             </div>
         </footer>
     );
