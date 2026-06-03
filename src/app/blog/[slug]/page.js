@@ -60,8 +60,22 @@ export default async function BlogDetailPage({ params }) {
                     
                     {/* Back Button */}
                     <div style={{ marginBottom: '2rem' }}>
-                        <Link href="/blog" className="btn-home" style={{ display: 'inline-flex', width: 'auto' }}>
-                            <i className="fas fa-arrow-left"></i> Kembali ke Blog
+                        <Link href="/blog" style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            textDecoration: 'none',
+                            padding: '0.6rem 1.2rem',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            color: 'var(--text-dark)',
+                            backgroundColor: 'var(--bg-white)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s ease'
+                        }}>
+                            <i className="fas fa-arrow-left" style={{ color: '#00d2ff' }}></i> Kembali ke Blog
                         </Link>
                     </div>
 
