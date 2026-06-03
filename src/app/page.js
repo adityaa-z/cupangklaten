@@ -352,6 +352,7 @@ async function fetchFeatured() {
       </section>
 
       {/* Lelang Ikan Section */}
+      {(loading || auctions.length > 0) && (
       <section className="products-section" id="lelang-home" style={{ paddingBottom: '4rem', paddingTop: '4rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
@@ -369,7 +370,7 @@ async function fetchFeatured() {
           <div className="product-slider" ref={auctionsSliderRef}>
             {loading ? (
               [...Array(3)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div></div>)
-            ) : auctions.length > 0 ? (
+            ) : (
               auctions.map(auction => (
                 <div key={auction.id} style={{ 
                     minWidth: '280px', maxWidth: '300px', background: '#1e293b', borderRadius: '20px', 
@@ -419,11 +420,6 @@ async function fetchFeatured() {
                     </div>
                 </div>
               ))
-            ) : (
-              <div style={{ textAlign: 'center', width: '100%', padding: '3rem', color: 'var(--text-muted)' }}>
-                <i className="fas fa-gavel" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}></i>
-                <p style={{ fontSize: '1.2rem' }}>Belum ada ikan yang di lelang.</p>
-              </div>
             )}
           </div>
           <button className="slider-nav-btn next" onClick={() => scroll(auctionsSliderRef, 'right')} disabled={!scrollAuctions.right} aria-label="Next auction">
@@ -431,6 +427,7 @@ async function fetchFeatured() {
           </button>
         </div>
       </section>
+      )}
 
 
       {/* Education Section */}
