@@ -59,8 +59,8 @@ const Navbar = () => {
                         <Link href="/tips-perawatan" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-book-open"></i> Tips & Edukasi
                         </Link>
-                        <Link href="/blog" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-newspaper"></i> Blog Cupang
+                        <Link href="/artikel" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-newspaper"></i> Artikel Cupang
                         </Link>
                         <Link href="/#reviews" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-star"></i> Testimoni

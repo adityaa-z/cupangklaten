@@ -58,7 +58,7 @@ export default function BlogListingPage() {
                     {/* Header */}
                     <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
                         <h1 className="finance-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem', background: 'linear-gradient(135deg, #00d2ff 0%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                            BLOG CUPANG KLATEN
+                            ARTIKEL CUPANG KLATEN
                         </h1>
                         <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: '600' }}>
                             Tips, Edukasi, & Kabar Terbaru Dunia Cupang Hias
@@ -189,7 +189,7 @@ export default function BlogListingPage() {
                                         </p>
 
                                         <Link 
-                                            href={`/blog/${art.slug}`} 
+                                            href={`/artikel/${art.slug}`} 
                                             className="btn-submit" 
                                             style={{ 
                                                 textDecoration: 'none', 

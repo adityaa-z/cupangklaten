@@ -1183,7 +1183,7 @@ export default function AdminPage() {
                                                 </td>
                                                 <td data-label="Judul & Slug">
                                                     <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{art.title}</div>
-                                                    <div style={{ fontSize: '0.8rem', color: '#6366f1', textDecoration: 'none' }}>/blog/{art.slug}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6366f1', textDecoration: 'none' }}>/artikel/{art.slug}</div>
                                                 </td>
                                                 <td data-label="Kategori">
                                                     <span style={{ 

@@ -17,6 +17,7 @@ export default function Home() {
   const [auctions, setAuctions] = useState([]);
   const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [promoActive, setPromoActive] = useState('false');
   const [promoLimitRemaining, setPromoLimitRemaining] = useState(0);
@@ -39,12 +40,14 @@ export default function Home() {
   const suppliesSliderRef = React.useRef(null);
   const reviewsSliderRef = React.useRef(null);
   const auctionsSliderRef = React.useRef(null);
+  const articlesSliderRef = React.useRef(null);
 
   // Scroll states
   const [scrollFish, setScrollFish] = useState({ left: false, right: true });
   const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
   const [scrollReviews, setScrollReviews] = useState({ left: false, right: true });
   const [scrollAuctions, setScrollAuctions] = useState({ left: false, right: true });
+  const [scrollArticles, setScrollArticles] = useState({ left: false, right: true });
 
 
 
@@ -145,6 +148,19 @@ export default function Home() {
     }
     fetchPromoSettings();
 
+    async function fetchArticles() {
+      try {
+        const res = await fetch('/api/blog/');
+        if (res.ok) {
+          const data = await res.json();
+          setArticles(data.slice(0, 10)); // Top 10 recent
+        }
+      } catch (err) {
+        console.error('Error fetching articles:', err);
+      }
+    }
+    fetchArticles();
+
 async function fetchFeatured() {
       try {
         const res = await fetch('/api/products/');
@@ -205,12 +221,15 @@ async function fetchFeatured() {
     const onSuppScroll = () => handleScroll(suppliesSliderRef, setScrollSupp);
     const onReviewsScroll = () => handleScroll(reviewsSliderRef, setScrollReviews);
     const onAuctionsScroll = () => handleScroll(auctionsSliderRef, setScrollAuctions);
+    const onArticlesScroll = () => handleScroll(articlesSliderRef, setScrollArticles);
 
     if (fSlider) fSlider.addEventListener('scroll', onFishScroll);
     if (sSlider) sSlider.addEventListener('scroll', onSuppScroll);
     if (rSlider) rSlider.addEventListener('scroll', onReviewsScroll);
     const aSlider = auctionsSliderRef.current;
     if (aSlider) aSlider.addEventListener('scroll', onAuctionsScroll);
+    const artSlider = articlesSliderRef.current;
+    if (artSlider) artSlider.addEventListener('scroll', onArticlesScroll);
     
     // Initial checks
     setTimeout(() => {
@@ -218,6 +237,7 @@ async function fetchFeatured() {
       onSuppScroll();
       onReviewsScroll();
       onAuctionsScroll();
+      onArticlesScroll();
     }, 500);
 
     return () => {
@@ -225,8 +245,9 @@ async function fetchFeatured() {
       if (sSlider) sSlider.removeEventListener('scroll', onSuppScroll);
       if (rSlider) rSlider.removeEventListener('scroll', onReviewsScroll);
       if (aSlider) aSlider.removeEventListener('scroll', onAuctionsScroll);
+      if (artSlider) artSlider.removeEventListener('scroll', onArticlesScroll);
     };
-  }, [loading, fishProducts, suppliesProducts, reviews]);
+  }, [loading, fishProducts, suppliesProducts, reviews, articles]);
 
   const scroll = (ref, direction) => {
     if (ref.current) {
@@ -430,32 +451,62 @@ async function fetchFeatured() {
       )}
 
 
-      {/* Education Section */}
-      <section className="blog-section">
-        <div className="section-header" style={{ maxWidth: '1200px', margin: '0 auto 3rem' }}>
-          <h2 style={{ fontSize: '2rem' }}>Tips & Edukasi</h2>
+      {/* Artikel Terbaru Section */}
+      <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+            Artikel <span style={{ background: 'linear-gradient(to right, #00d2ff, #007bff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaru</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Tips, Edukasi & Kabar Dunia Cupang</p>
+          <div style={{ width: '60px', height: '4px', background: '#00d2ff', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
-        <div className="blog-grid">
-          <div className="blog-card" style={{ background: 'var(--bg-light)', padding: '1.5rem', borderRadius: '20px' }}>
-            <img src="/pk-001.png" alt="Tips Perawatan" />
-            <div>
-              <h3>Tips Perawatan Ikan</h3>
-              <p>Cara menjaga kualitas air dan pakan terbaik untuk warna ikan cupang.</p>
-              <Link href="/tips-perawatan" style={{ color: 'var(--primary-dark)', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
-                Baca Selengkapnya →
-              </Link>
-            </div>
+
+        <div className="slider-container">
+          <button className="slider-nav-btn prev" onClick={() => scroll(articlesSliderRef, 'left')} disabled={!scrollArticles.left} aria-label="Previous article">
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          
+          <div className="product-slider" ref={articlesSliderRef}>
+            {loading ? (
+              [...Array(3)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div></div>)
+            ) : articles.length > 0 ? (
+              articles.map(art => (
+                <article key={art.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="product-img-container">
+                    {art.thumbnail ? (
+                        <img src={art.thumbnail} alt={art.title} />
+                    ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', background: '#0f172a' }}>
+                            <i className="fas fa-image" style={{ fontSize: '3rem' }}></i>
+                        </div>
+                    )}
+                    {art.category && <div className="product-badge" style={{ background: 'linear-gradient(135deg, #00d2ff 0%, #007bff 100%)' }}>{art.category}</div>}
+                  </div>
+                  <div className="product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.2rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                        <i className="fas fa-calendar-alt"></i> {new Date(art.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </div>
+                    <span className="product-code" style={{ fontSize: '1.05rem', color: 'var(--text-dark)', marginBottom: '1rem', flex: 1 }}>{art.title}</span>
+                    <Link href={`/artikel/${art.slug}`} className="buy-btn" style={{ background: 'linear-gradient(135deg, #00d2ff 0%, #007bff 100%)' }}>
+                        Baca Selengkapnya
+                    </Link>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', width: '100%', padding: '2rem', color: 'var(--text-muted)' }}>Belum ada artikel.</div>
+            )}
           </div>
-          <div className="blog-card" style={{ background: 'var(--bg-light)', padding: '1.5rem', borderRadius: '20px' }}>
-            <img src="/gt-005.png" alt="Perbedaan Jantan & Betina" />
-            <div>
-              <h3>Jantan vs Betina</h3>
-              <p>Cara mudah membedakan jenis kelamin ikan cupang untuk pemula.</p>
-              <Link href="/jantan-vs-betina" style={{ color: 'var(--primary-dark)', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem' }}>
-                Baca Selengkapnya →
-              </Link>
-            </div>
-          </div>
+          <button className="slider-nav-btn next" onClick={() => scroll(articlesSliderRef, 'right')} disabled={!scrollArticles.right} aria-label="Next article">
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        
+        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+          <Link href="/artikel" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
+            Lihat Semua Artikel
+            <i className="fas fa-arrow-right"></i>
+          </Link>
         </div>
       </section>
 
