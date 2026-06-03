@@ -122,7 +122,8 @@ export default async function BlogDetailPage({ params }) {
                                 color: 'var(--text-dark)',
                                 fontSize: '1.1rem',
                                 lineHeight: '1.8',
-                                letterSpacing: '0.2px'
+                                letterSpacing: '0.2px',
+                                whiteSpace: 'pre-wrap'
                             }}
                             dangerouslySetInnerHTML={{ __html: article.content }}
                         />
