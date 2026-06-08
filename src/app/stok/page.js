@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
+import CaraOrder from '@/components/CaraOrder';
 
 const StokContent = () => {
     const searchParams = useSearchParams();
@@ -133,6 +134,8 @@ const StokContent = () => {
                 )}
             </div>
             </section>
+
+            <CaraOrder />
 
             <Footer />
             <FAB />

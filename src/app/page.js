@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
 import PromoPopup from '@/components/PromoPopup';
+import CaraOrder from '@/components/CaraOrder';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -326,6 +327,8 @@ async function fetchFeatured() {
         </div>
       </section>
 
+
+      <CaraOrder />
 
       {/* Supplies Collection Section */}
       <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
