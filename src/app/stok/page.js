@@ -76,6 +76,13 @@ const StokContent = () => {
                 </h1>
                 <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>Pilih ikan favoritmu dari berbagai kategori dan amankan sebelum terjual!</p>
                 
+                <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+                    <Link href="/cara-order" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '0.8rem 2rem', fontSize: '1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 8px 15px -3px rgba(0, 188, 212, 0.3)' }}>
+                        Cara Order
+                        <i className="fas fa-arrow-right"></i>
+                    </Link>
+                </div>
+                
                 <div className="search-bar" style={{ maxWidth: '500px', margin: '2rem auto 0', display: 'block' }}>
                     <i className="fas fa-search"></i>
                     <input 
@@ -134,13 +141,6 @@ const StokContent = () => {
                 )}
             </div>
             </section>
-
-            <div style={{ textAlign: 'center', marginTop: '3rem', marginBottom: '3rem' }}>
-                <Link href="/cara-order" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
-                    Cara Order
-                    <i className="fas fa-arrow-right"></i>
-                </Link>
-            </div>
 
             <Footer />
             <FAB />
