@@ -6,7 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
-import CaraOrder from '@/components/CaraOrder';
+import Link from 'next/link';
 
 const StokContent = () => {
     const searchParams = useSearchParams();
@@ -135,7 +135,12 @@ const StokContent = () => {
             </div>
             </section>
 
-            <CaraOrder />
+            <div style={{ textAlign: 'center', marginTop: '3rem', marginBottom: '3rem' }}>
+                <Link href="/cara-order" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
+                    Cara Order
+                    <i className="fas fa-arrow-right"></i>
+                </Link>
+            </div>
 
             <Footer />
             <FAB />

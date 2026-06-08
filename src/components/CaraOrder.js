@@ -15,7 +15,12 @@ export default function CaraOrder() {
                     <ul style={{ listStyleType: 'none', paddingLeft: 0, marginTop: '0.5rem' }}>
                         <li style={{ marginBottom: '0.5rem' }}><strong>Shopee / DANA:</strong> 085700846152 <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(a.n. Aditya Bintang Zidan Pratama)</span></li>
                         <li style={{ marginBottom: '0.5rem' }}><strong>SeaBank:</strong> 901709292959 <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(a.n. Aditya Bintang Zidan Pratama)</span></li>
-                        <li><strong>QRIS:</strong> Nama Toko: Cupang Depo <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(gunakan logo/gambar QRIS yang sudah ada)</span></li>
+                        <li>
+                            <strong>QRIS:</strong> Nama Toko: Cupang Depo <br/>
+                            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                                <img src="/qris.jpeg" alt="QRIS Cupang Depo" style={{ maxWidth: '250px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }} />
+                            </div>
+                        </li>
                     </ul>
                 </div>
                 <div style={{ marginBottom: '2rem' }}>
