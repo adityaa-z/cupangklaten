@@ -364,8 +364,8 @@ export default function KeuanganPage() {
                                 onChange={e => setFilterDate(e.target.value)}
                                 style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: 700, color: 'var(--text-dark)' }}
                             >
-                                <option value={getToday()}>Hari Ini Saja</option>
-                                <option value="all">Semua Waktu</option>
+                                <option value={getToday()} style={{ color: '#0f172a', background: '#ffffff' }}>Hari Ini Saja</option>
+                                <option value="all" style={{ color: '#0f172a', background: '#ffffff' }}>Semua Waktu</option>
                             </select>
                         </div>
                     </div>
