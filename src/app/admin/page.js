@@ -13,6 +13,45 @@ import './admin.css';
 
 export const dynamic = 'force-dynamic';
 
+const compressImage = async (file) => {
+    if (!file.type.startsWith('image/')) return file;
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const MAX_SIZE = 1200;
+                
+                if (width > height && width > MAX_SIZE) {
+                    height *= MAX_SIZE / width;
+                    width = MAX_SIZE;
+                } else if (height > MAX_SIZE) {
+                    width *= MAX_SIZE / height;
+                    height = MAX_SIZE;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+                    const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                        type: 'image/webp',
+                        lastModified: Date.now()
+                    });
+                    resolve(newFile);
+                }, 'image/webp', 0.8);
+            };
+        };
+    });
+};
+
 export default function AdminPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -294,7 +333,7 @@ export default function AdminPage() {
     };
 
     const handleFileUpload = async (e, field, isPrimary) => {
-        const file = e.target.files[0];
+        let file = e.target.files[0];
         if (!file) return;
 
         if (file.size > 20 * 1024 * 1024) {
@@ -305,6 +344,9 @@ export default function AdminPage() {
 
         setUploadingField(field);
         try {
+            if (file.type.startsWith('image/')) {
+                file = await compressImage(file);
+            }
             const formDataUpload = new FormData();
             formDataUpload.append('file', file);
 

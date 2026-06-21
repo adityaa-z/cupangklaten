@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 const ProductCard = ({ product }) => {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [lightboxImgLoaded, setLightboxImgLoaded] = useState(false);
 
     // Filter available images
     const images = [product.img, product.img2, product.img3, product.img4].filter(img => img && img.trim() !== '');
@@ -44,6 +46,10 @@ const ProductCard = ({ product }) => {
         setCurrentImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
+    useEffect(() => {
+        setLightboxImgLoaded(false);
+    }, [currentImgIndex]);
+
     return (
         <>
             <div className={cardClass}>
@@ -52,7 +58,12 @@ const ProductCard = ({ product }) => {
                     {product.is_video ? (
                         <video src={product.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                        <img src={product.img} alt={product.code} loading="lazy" decoding="async" />
+                        <>
+                            {!imgLoaded && (
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'loading-shimmer 1.5s infinite', zIndex: 1 }} />
+                            )}
+                            <img src={product.img} alt={product.code} loading="lazy" decoding="async" onLoad={() => setImgLoaded(true)} style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.3s' }} />
+                        </>
                     )}
                     <div className="img-overlay">
                         <i className="fas fa-search-plus"></i>
@@ -87,8 +98,11 @@ const ProductCard = ({ product }) => {
                                     </button>
                                 )}
                                 
-                                <div className="lightbox-img-wrapper">
-                                    <img key={currentImgIndex} src={images[currentImgIndex]} alt={`Product ${currentImgIndex}`} />
+                                <div className="lightbox-img-wrapper" style={{ position: 'relative' }}>
+                                    {!lightboxImgLoaded && (
+                                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(90deg, #111827 25%, #1f2937 50%, #111827 75%)', backgroundSize: '200% 100%', animation: 'loading-shimmer 1.5s infinite' }} />
+                                    )}
+                                    <img key={currentImgIndex} src={images[currentImgIndex]} alt={`Product ${currentImgIndex}`} onLoad={() => setLightboxImgLoaded(true)} style={{ opacity: lightboxImgLoaded ? 1 : 0, transition: 'opacity 0.3s' }} />
                                     <div className="lightbox-counter">{currentImgIndex + 1} / {images.length}</div>
                                 </div>
 
