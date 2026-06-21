@@ -143,6 +143,15 @@ export default function KeuanganPage() {
     const totalAsetIkan = filteredStok.reduce((s, r) => s + (Number(r.jumlah || 0) * Number(r.harga_satuan || 0)), 0);
     const totalStokIkan = filteredStok.reduce((s, r) => s + Number(r.jumlah || 0), 0);
 
+    const groupDataByDate = (data) => {
+        return data.reduce((acc, curr) => {
+            const dateStr = new Date(curr.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            if (!acc[dateStr]) acc[dateStr] = [];
+            acc[dateStr].push(curr);
+            return acc;
+        }, {});
+    };
+
     if (authStatus === 'loading' || loading) {
         return (
             <div className="finance-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -371,7 +380,7 @@ export default function KeuanganPage() {
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
                                         <th>Pengeluaran / Keterangan</th>
                                         <th>Harga Keluar</th>
                                         <th>Pendapatan Kotor</th>
@@ -382,13 +391,20 @@ export default function KeuanganPage() {
                                 <tbody>
                                     {filteredKeuangan.length === 0 ? (
                                         <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data di periode ini.</td></tr>
-                                    ) : filteredKeuangan.map((row, i) => (
-                                        <tr key={row.id}>
-                                            <td data-label="No">{i + 1}</td>
-                                            <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                                                {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                            </td>
-                                            <td data-label="Keterangan">
+                                    ) : Object.entries(groupDataByDate(filteredKeuangan)).map(([date, items]) => (
+                                        <React.Fragment key={date}>
+                                            <tr style={{ background: 'var(--bg-light)' }}>
+                                                <td colSpan={7} style={{ fontWeight: 800, color: 'var(--primary-dark)', padding: '0.8rem', borderBottom: '2px solid var(--border-color)' }}>
+                                                    <i className="fas fa-calendar-day" style={{ marginRight: '0.5rem', color: '#D4AF37' }}></i> {date}
+                                                </td>
+                                            </tr>
+                                            {items.map((row, i) => (
+                                                <tr key={row.id}>
+                                                    <td data-label="No">{row.id}</td>
+                                                    <td data-label="Waktu" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                                        {new Date(row.tanggal).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                                                    </td>
+                                                    <td data-label="Keterangan">
                                                 <EditableCell row={row} table="keuangan" field={row.pengeluaran ? 'pengeluaran' : 'keterangan'} val={row.pengeluaran || row.keterangan}>
                                                     <div>
                                                         <strong>{row.pengeluaran || row.keterangan || '-'}</strong>
@@ -419,6 +435,8 @@ export default function KeuanganPage() {
                                             </td>
                                         </tr>
                                     ))}
+                                        </React.Fragment>
+                                    ))}
                                 </tbody>
                                 {filteredKeuangan.length > 0 && (
                                     <tfoot>
@@ -447,7 +465,7 @@ export default function KeuanganPage() {
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
                                         <th>Jenis Ikan</th>
                                         <th>Jumlah</th>
                                         <th>Harga Satuan</th>
@@ -462,13 +480,20 @@ export default function KeuanganPage() {
                                 <tbody>
                                     {filteredStok.length === 0 ? (
                                         <tr><td colSpan={11} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data di periode ini.</td></tr>
-                                    ) : filteredStok.map((row, i) => (
-                                        <tr key={row.id}>
-                                            <td data-label="No">{i + 1}</td>
-                                            <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                                                {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                            </td>
-                                            <td data-label="Jenis Ikan">
+                                    ) : Object.entries(groupDataByDate(filteredStok)).map(([date, items]) => (
+                                        <React.Fragment key={date}>
+                                            <tr style={{ background: 'var(--bg-light)' }}>
+                                                <td colSpan={11} style={{ fontWeight: 800, color: 'var(--primary-dark)', padding: '0.8rem', borderBottom: '2px solid var(--border-color)' }}>
+                                                    <i className="fas fa-calendar-day" style={{ marginRight: '0.5rem', color: '#D4AF37' }}></i> {date}
+                                                </td>
+                                            </tr>
+                                            {items.map((row, i) => (
+                                                <tr key={row.id}>
+                                                    <td data-label="No">{row.id}</td>
+                                                    <td data-label="Waktu" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                                        {new Date(row.tanggal).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                                                    </td>
+                                                    <td data-label="Jenis Ikan">
                                                 <EditableCell row={row} table="stok" field="jenis_ikan" val={row.jenis_ikan}>
                                                     <strong>{row.jenis_ikan}</strong>
                                                 </EditableCell>
@@ -512,6 +537,8 @@ export default function KeuanganPage() {
                                                 </button>
                                             </td>
                                         </tr>
+                                    ))}
+                                        </React.Fragment>
                                     ))}
                                 </tbody>
                                 {filteredStok.length > 0 && (
