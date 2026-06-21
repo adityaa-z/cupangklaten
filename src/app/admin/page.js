@@ -497,7 +497,7 @@ export default function AdminPage() {
             <aside className="sidebar">
                 <div className="sidebar-header">
                     <img src="/logo.png" alt="Logo" style={{ height: '30px', borderRadius: '4px' }} />
-                    HQ Panel
+                    CK Admin
                 </div>
                 <div className="sidebar-nav">
                     {['Produk', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
@@ -512,9 +512,12 @@ export default function AdminPage() {
             <main className="main-content">
                 <header className="main-header">
                     <h2>{activeTab} Management</h2>
-                    <div className="user-profile">
-                        <span>Admin</span>
-                        <button className="btn btn-outline" onClick={handleLogout} style={{ color: 'red', borderColor: 'red' }}>Logout</button>
+                    <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <a href="/" className="btn btn-outline" style={{ color: 'var(--primary-dark)', borderColor: 'var(--border-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                            <i className="fas fa-home"></i> Beranda
+                        </a>
+                        <span style={{ fontWeight: '600' }}>Admin</span>
+                        <button className="btn btn-outline" onClick={handleLogout} style={{ color: '#dc2626', borderColor: '#fca5a5', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Logout</button>
                     </div>
                 </header>
 
