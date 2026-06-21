@@ -1541,8 +1541,8 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Link Shopee</label>
-                                        <input type="url" value={formData.shopee} onChange={e => setFormData({ ...formData, shopee: e.target.value })} placeholder="https://shopee.co.id/..." required />
+                                        <label>Link Checkout (Shopee / WA)</label>
+                                        <input type="url" value={formData.shopee} onChange={e => setFormData({ ...formData, shopee: e.target.value })} placeholder="https://shopee.co.id/... atau https://wa.me/..." required />
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
                                 </form>
