@@ -517,7 +517,7 @@ export default function AdminPage() {
                             <i className="fas fa-home"></i> Beranda
                         </a>
                         <span style={{ fontWeight: '600' }}>Admin</span>
-                        <button className="btn btn-outline" onClick={handleLogout} style={{ color: '#dc2626', borderColor: '#fca5a5', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Logout</button>
+                        <button className="btn btn-outline btn-logout" onClick={handleLogout} style={{ color: '#dc2626', borderColor: '#fca5a5', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Logout</button>
                     </div>
                 </header>
 

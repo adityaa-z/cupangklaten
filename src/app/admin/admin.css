@@ -527,10 +527,16 @@ input:checked + .slider:before {
 
     .main-header {
         padding: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .main-header h2 {
         font-size: 1.1rem;
+    }
+
+    .btn-logout {
+        display: none !important;
     }
 
     .content-body {
