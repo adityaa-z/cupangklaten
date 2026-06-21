@@ -171,6 +171,8 @@ header {
     top: calc(100% + 1rem);
     right: 0;
     min-width: 220px;
+    max-height: 75vh;
+    overflow-y: auto;
     background: var(--bg-white);
     border-radius: 16px;
     box-shadow: var(--card-shadow);
