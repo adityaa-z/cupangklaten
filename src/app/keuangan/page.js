@@ -1,503 +1,126 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import FAB from '@/components/FAB';
 import './keuangan.css';
 
 export const dynamic = 'force-dynamic';
+
+const formatRp = (n) => {
+    const num = Number(n) || 0;
+    return 'Rp ' + num.toLocaleString('id-ID');
+};
+
+const getNow = () => {
+    const now = new Date();
+    return now.toLocaleString('id-ID', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+};
 
 export default function KeuanganPage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
 
-    // Data states
-    const [categories, setCategories] = useState([]);
-    const [fishStocks, setFishStocks] = useState([]);
-    const [transactions, setTransactions] = useState([]);
-    const [stats, setStats] = useState({ saldo_kas: 0, estimasi_aset: 0 });
+    const [keuangan, setKeuangan] = useState([]);
+    const [stok, setStok] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(false);
-    
-    // Tab State: 'transaksi' or 'inventaris'
-    const [activeTab, setActiveTab] = useState('transaksi');
-    const [chartFilter, setChartFilter] = useState('minggu'); // hari, minggu, bulan, tahun
-    const [showChart, setShowChart] = useState(true);
-
-    // Form States
-    const [formData, setFormData] = useState({
-        tanggal: new Date().toISOString().split('T')[0],
-        category_id: '',
-        nominal: '',
-        keterangan: '',
-        fish_stock_id: ''
-    });
-
-    const [cart, setCart] = useState([]);
-    const [saleData, setSaleData] = useState({
-        fish: null,
-        qty: 1,
-        nominal: ''
-    });
-
-    const [purchaseData, setPurchaseData] = useState({
-        kode_ikan: '',
-        nama_tipe: '',
-        grade: 'A',
-        harga_beli_per_ekor: '',
-        stok_sisa: '',
-        lokasi: 'Pabrik_Pembesaran'
-    });
-
-    // Searchable dropdown state for Selling fish
-    const [fishSearch, setFishSearch] = useState('');
-    const [showFishDropdown, setShowFishDropdown] = useState(false);
-    const [showPurchaseFishDropdown, setShowPurchaseFishDropdown] = useState(false);
-
-    // Transfer Location inline state
-    const [transferLocations, setTransferLocations] = useState({});
-
-    // Toast
+    const [saving, setSaving] = useState(false);
+    const [activeInputTab, setActiveInputTab] = useState('pengeluaran');
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
+    // Form states
+    const [formPengeluaran, setFormPengeluaran] = useState({ pengeluaran: '', harga: '', keterangan: '' });
+    const [formPemasukan, setFormPemasukan] = useState({ keterangan: '', pendapatan_kotor: '' });
+    const [formStok, setFormStok] = useState({ jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' });
+
+    // Auth guard
     useEffect(() => {
-        // Guard check on frontend
-        if (authStatus === 'unauthenticated') {
-            alert('Akses Ditolak. Anda bukan administrator yang sah.');
-            router.push('/');
-            return;
-        }
-
-        if (session && session.user && session.user.email !== 'zidanp13794@gmail.com') {
-            alert('Akses Ditolak. Anda bukan administrator yang sah.');
-            router.push('/');
-            return;
-        }
-
-        if (session && session.user && session.user.email === 'zidanp13794@gmail.com') {
-            fetchData();
-        }
+        if (authStatus === 'unauthenticated') { router.push('/'); return; }
+        if (session && session.user?.email !== 'zidanp13794@gmail.com') { router.push('/'); return; }
+        if (session) fetchData();
     }, [session, authStatus]);
 
-    // Auto-calculate nominal when wholesale purchase numbers change
-    useEffect(() => {
-        if (Number(formData.category_id) === 2 && purchaseData.harga_beli_per_ekor && purchaseData.stok_sisa) {
-            const calculated = Number(purchaseData.harga_beli_per_ekor) * Number(purchaseData.stok_sisa);
-            setFormData(prev => ({ ...prev, nominal: calculated }));
-        }
-    }, [purchaseData.harga_beli_per_ekor, purchaseData.stok_sisa, formData.category_id]);
-
-    // Auto-calculate nominal when cart changes, but allow manual override
-    useEffect(() => {
-        if (Number(formData.category_id) === 1 || Number(formData.category_id) === 2) {
-            const total = cart.reduce((acc, item) => acc + Number(item.nominal), 0);
-            if (total > 0) {
-                setFormData(prev => ({ ...prev, nominal: total }));
-            }
-        }
-    }, [cart, formData.category_id]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/keuangan/');
-            if (res.status === 401) {
-                alert('Akses Ditolak. Anda bukan administrator yang sah.');
-                router.push('/');
-                return;
-            }
+            const res = await fetch('/api/finance');
             if (res.ok) {
                 const data = await res.json();
-                setCategories(data.categories || []);
-                setFishStocks(data.fishStocks || []);
-                setTransactions(data.transactions || []);
-                setStats(data.stats || { saldo_kas: 0, estimasi_aset: 0 });
+                setKeuangan(data.keuangan || []);
+                setStok(data.stok || []);
             }
-        } catch (err) {
-            console.error('Error fetching financial data:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
+        } catch (err) { console.error(err); }
+        finally { setLoading(false); }
+    }, []);
 
-    const showNotification = (message, type = 'success') => {
+    const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
-        setTimeout(() => setToast(prev => ({ ...prev, show: false })), 4000);
+        setTimeout(() => setToast(t => ({ ...t, show: false })), 3500);
     };
 
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handlePurchaseChange = (e) => {
-        const { name, value } = e.target;
-        setPurchaseData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSelectFish = (fish) => {
-        setSaleData(prev => ({ ...prev, fish, qty: 1, nominal: '' }));
-        setFishSearch(`${fish.kode_ikan} - ${fish.nama_tipe} (${fish.grade}) - Stok: ${fish.stok_sisa}`);
-        setShowFishDropdown(false);
-    };
-
-    const handleAddToCart = (e) => {
-        if (e) e.preventDefault();
-        if (Number(formData.category_id) === 1) {
-            if (!saleData.fish) return alert("Pilih ikan terlebih dahulu.");
-            if (!saleData.qty || saleData.qty < 1) return alert("Jumlah (Qty) tidak valid.");
-            if (saleData.qty > saleData.fish.stok_sisa) return alert(`Jumlah melebihi stok yang ada (${saleData.fish.stok_sisa}).`);
-            if (!saleData.nominal || saleData.nominal <= 0) return alert("Nominal (Harga Jual) harus diisi.");
-
-            setCart(prev => [...prev, { ...saleData }]);
-            setSaleData({ fish: null, qty: 1, nominal: '' });
-            setFishSearch('');
-        } else if (Number(formData.category_id) === 2) {
-            if (!purchaseData.kode_ikan || !purchaseData.nama_tipe || !purchaseData.harga_beli_per_ekor || !purchaseData.stok_sisa) {
-                return alert("Lengkapi semua data ikan grosir.");
-            }
-            const itemNominal = Number(purchaseData.harga_beli_per_ekor) * Number(purchaseData.stok_sisa);
-            setCart(prev => [...prev, { ...purchaseData, nominal: itemNominal }]);
-            setPurchaseData({
-                kode_ikan: '', nama_tipe: '', grade: 'A', harga_beli_per_ekor: '', stok_sisa: '', lokasi: 'Pabrik_Pembesaran'
-            });
-        }
-    };
-
-    const handleRemoveFromCart = (index) => {
-        setCart(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleDeleteStock = async (id, maxQty) => {
-        const qtyStr = prompt(`Berapa banyak ikan yang mati? (Maksimal ${maxQty})\nKetik 'ALL' jika ingin menghapus seluruh data ikan ini.`);
-        if (!qtyStr) return;
-        
-        let qtyToDeduct = 0;
-        let isDeleteAll = false;
-
-        if (qtyStr.toUpperCase() === 'ALL') {
-            isDeleteAll = true;
+    const handleSubmit = async (type) => {
+        let data;
+        if (type === 'pengeluaran') {
+            if (!formPengeluaran.pengeluaran || !formPengeluaran.harga) return showToast('Nama pengeluaran dan harga wajib diisi!', 'error');
+            data = { ...formPengeluaran };
+        } else if (type === 'pemasukan') {
+            if (!formPemasukan.keterangan || !formPemasukan.pendapatan_kotor) return showToast('Keterangan dan nominal wajib diisi!', 'error');
+            data = { ...formPemasukan };
         } else {
-            qtyToDeduct = parseInt(qtyStr, 10);
-            if (isNaN(qtyToDeduct) || qtyToDeduct <= 0) return alert("Jumlah tidak valid.");
-            if (qtyToDeduct > maxQty) return alert(`Jumlah melebihi stok yang ada (${maxQty}).`);
-            if (qtyToDeduct === maxQty) isDeleteAll = true;
+            if (!formStok.jenis_ikan || !formStok.jumlah) return showToast('Jenis ikan dan jumlah wajib diisi!', 'error');
+            data = { ...formStok };
         }
 
-        setActionLoading(true);
+        setSaving(true);
         try {
-            const url = isDeleteAll 
-                ? `/api/keuangan/stock/${id}` 
-                : `/api/keuangan/stock/${id}?reduce=${qtyToDeduct}`;
-            const method = isDeleteAll ? 'DELETE' : 'PATCH';
-            const res = await fetch(url, { method });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            showNotification(isDeleteAll ? 'Data stok ikan berhasil dihapus.' : `Stok ikan berhasil dikurangi ${qtyToDeduct}.`);
-            fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleResetData = async () => {
-        if (!confirm("PERINGATAN: Apakah Anda yakin ingin mereset PEMBUKUAN? Ini akan menghapus SELURUH riwayat transaksi dan SELURUH stok ikan yang ada! Pastikan Anda sudah membackup jika perlu.")) return;
-        setActionLoading(true);
-        try {
-            const res = await fetch('/api/keuangan/reset', { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            showNotification('Pembukuan berhasil direset dari awal.');
-            fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleEditTransaction = async (t) => {
-        const newNominal = prompt("Masukkan Nominal Baru:", t.nominal);
-        if (newNominal === null) return;
-        const newKeterangan = prompt("Masukkan Keterangan Baru:", t.keterangan || "");
-        if (newKeterangan === null) return;
-
-        if (isNaN(newNominal) || Number(newNominal) < 0) return alert("Nominal tidak valid.");
-
-        setActionLoading(true);
-        try {
-            const res = await fetch(`/api/keuangan/transaction/${t.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nominal: Number(newNominal), keterangan: newKeterangan })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            showNotification('Transaksi berhasil diubah.');
-            fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleDeleteTransaction = async (id) => {
-        if (!confirm("Peringatan: Menghapus transaksi ini TIDAK akan mengembalikan stok ikan secara otomatis. Lanjutkan?")) return;
-        setActionLoading(true);
-        try {
-            const res = await fetch(`/api/keuangan/transaction/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            showNotification('Transaksi berhasil dihapus.');
-            fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleEditSaldoKas = async () => {
-        const newSaldo = prompt("Masukkan Nominal Saldo Kas Utama Baru:", stats.saldo_kas);
-        if (newSaldo === null) return;
-        if (isNaN(newSaldo) || Number(newSaldo) < 0) return alert("Nominal saldo tidak valid.");
-
-        setActionLoading(true);
-        try {
-            const res = await fetch('/api/keuangan/', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target_saldo: Number(newSaldo) })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            showNotification('Saldo Kas Utama berhasil diperbarui.');
-            fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    // Chart Data Processing
-    const processChartData = () => {
-        if (!transactions || transactions.length === 0) return [];
-        
-        const now = new Date();
-        now.setHours(23, 59, 59, 999);
-        
-        const filtered = transactions.filter(t => {
-            if (t.nama_kategori === 'Saldo Awal') return false;
-            const tDate = new Date(t.tanggal);
-            const diffTime = now.getTime() - tDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (chartFilter === 'hari') return diffDays <= 1;
-            if (chartFilter === 'minggu') return diffDays <= 7;
-            if (chartFilter === 'bulan') return diffDays <= 30;
-            if (chartFilter === 'tahun') return diffDays <= 365;
-            return true;
-        });
-
-        const grouped = {};
-        filtered.forEach(t => {
-            let dateKey = '';
-            const tDate = new Date(t.tanggal);
-            if (chartFilter === 'tahun') {
-                dateKey = tDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
-            } else {
-                dateKey = tDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-            }
-            
-            // Generate a grouping key that is consistent for sorting if year/month
-            const sortKey = chartFilter === 'tahun' 
-                ? tDate.getFullYear() * 100 + tDate.getMonth() 
-                : tDate.getTime();
-
-            if (!grouped[dateKey]) {
-                grouped[dateKey] = { name: dateKey, sortKey: sortKey, pemasukan: 0, pengeluaran: 0 };
-            }
-            if (t.jenis === 'masuk') grouped[dateKey].pemasukan += Number(t.nominal);
-            if (t.jenis === 'keluar') grouped[dateKey].pengeluaran += Number(t.nominal);
-        });
-
-        return Object.values(grouped).sort((a, b) => a.sortKey - b.sortKey);
-    };
-    
-    const chartData = processChartData();
-
-    const handleTransactionSubmit = async (e) => {
-        e.preventDefault();
-        setActionLoading(true);
-
-        try {
-            const isBatch = Number(formData.category_id) === 1 || Number(formData.category_id) === 2;
-            let currentCart = [...cart];
-            
-            if (isBatch && currentCart.length === 0) {
-                if (Number(formData.category_id) === 1) {
-                    if (saleData.fish && saleData.qty && saleData.nominal) {
-                        currentCart.push({ ...saleData });
-                    } else {
-                        setActionLoading(false);
-                        return alert("Pilih ikan dan lengkapi data penjualan, atau klik Tambah ke Keranjang.");
-                    }
-                } else if (Number(formData.category_id) === 2) {
-                    if (purchaseData.kode_ikan && purchaseData.nama_tipe && purchaseData.harga_beli_per_ekor && purchaseData.stok_sisa) {
-                        const itemNominal = Number(purchaseData.harga_beli_per_ekor) * Number(purchaseData.stok_sisa);
-                        currentCart.push({ ...purchaseData, nominal: itemNominal });
-                    } else {
-                        setActionLoading(false);
-                        return alert("Lengkapi semua data ikan grosir terlebih dahulu.");
-                    }
-                }
-            }
-
-            const payload = {
-                tanggal: formData.tanggal,
-                category_id: Number(formData.category_id),
-                keterangan: formData.keterangan,
-            };
-
-            if (isBatch) {
-                let totalCartNominal = currentCart.reduce((acc, item) => acc + Number(item.nominal), 0);
-                let manualNominal = Number(formData.nominal);
-                
-                // If user didn't type anything in nominal, fallback to totalCartNominal
-                if (!manualNominal && manualNominal !== 0) {
-                    manualNominal = totalCartNominal;
-                }
-                
-                let diff = manualNominal - totalCartNominal;
-
-                payload.items = currentCart.map((item, index) => {
-                    let finalItemNominal = Number(item.nominal);
-                    if (index === 0) {
-                        finalItemNominal += diff; // Adjust first item so total matches manual nominal
-                    }
-                    if (Number(formData.category_id) === 1) {
-                        return { fish_stock_id: item.fish.id, qty: Number(item.qty), nominal: finalItemNominal };
-                    } else {
-                        return {
-                            purchase_data: {
-                                kode_ikan: item.kode_ikan, nama_tipe: item.nama_tipe, grade: item.grade,
-                                harga_beli_per_ekor: Number(item.harga_beli_per_ekor), stok_sisa: Number(item.stok_sisa), lokasi: item.lokasi
-                            },
-                            nominal: finalItemNominal
-                        };
-                    }
-                });
-            } else {
-                payload.nominal = Number(formData.nominal);
-            }
-
-            const res = await fetch('/api/keuangan/', {
+            const res = await fetch('/api/finance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ type, data })
             });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error);
 
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.error || 'Gagal menyimpan transaksi.');
-            }
-
-            showNotification('Transaksi berhasil dicatat!');
-            
-            // Reset forms
-            setFormData({
-                tanggal: new Date().toISOString().split('T')[0],
-                category_id: '',
-                nominal: '',
-                keterangan: '',
-                fish_stock_id: ''
-            });
-            setPurchaseData({
-                kode_ikan: '',
-                nama_tipe: '',
-                grade: 'A',
-                harga_beli_per_ekor: '',
-                stok_sisa: '',
-                lokasi: 'Pabrik_Pembesaran'
-            });
-            setFishSearch('');
-            setCart([]);
-            setSaleData({ fish: null, qty: 1, nominal: '' });
-            
-            // Refresh data
+            showToast('Data berhasil disimpan!');
+            if (type === 'pengeluaran') setFormPengeluaran({ pengeluaran: '', harga: '', keterangan: '' });
+            else if (type === 'pemasukan') setFormPemasukan({ keterangan: '', pendapatan_kotor: '' });
+            else setFormStok({ jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' });
             fetchData();
         } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
+            showToast('Error: ' + err.message, 'error');
+        } finally { setSaving(false); }
     };
 
-    const handleTransferSubmit = async (fishId) => {
-        const destLocation = transferLocations[fishId];
-        if (!destLocation) {
-            alert('Silakan pilih lokasi tujuan terlebih dahulu.');
-            return;
-        }
-
-        setActionLoading(true);
+    const handleDelete = async (id, table) => {
+        if (!confirm('Yakin ingin menghapus data ini?')) return;
+        setSaving(true);
         try {
-            const res = await fetch('/api/keuangan/transfer/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fish_stock_id: fishId,
-                    lokasi: destLocation
-                })
-            });
-
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.error || 'Gagal melakukan transfer lokasi.');
-            }
-
-            showNotification('Lokasi ikan berhasil diperbarui!');
+            const res = await fetch(`/api/finance?id=${id}&table=${table}`, { method: 'DELETE' });
+            if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+            showToast('Data berhasil dihapus.');
             fetchData();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        } finally {
-            setActionLoading(false);
-        }
+        } catch (err) { showToast('Error: ' + err.message, 'error'); }
+        finally { setSaving(false); }
     };
 
-    const handleTransferLocationChange = (fishId, location) => {
-        setTransferLocations(prev => ({ ...prev, [fishId]: location }));
-    };
+    // Summary calculations
+    const totalPengeluaran = keuangan.reduce((s, r) => s + Number(r.harga || 0), 0);
+    const totalPemasukan = keuangan.reduce((s, r) => s + Number(r.pendapatan_kotor || 0), 0);
+    const saldo = totalPemasukan - totalPengeluaran;
+    const totalAsetIkan = stok.reduce((s, r) => s + (Number(r.jumlah || 0) * Number(r.harga_satuan || 0)), 0);
+    const totalStokIkan = stok.reduce((s, r) => s + Number(r.jumlah || 0), 0);
 
-    // Filtered active fish stocks for selling searchable dropdown
-    const filteredFishStocks = fishStocks.filter(fish => {
-        if (fish.stok_sisa <= 0) return false;
-        const searchStr = `${fish.kode_ikan} ${fish.nama_tipe} ${fish.grade}`.toLowerCase();
-        return searchStr.includes(fishSearch.toLowerCase());
-    });
-
-    // Grouping fish stocks by physical locations for logistics grid
-    const fishByLocation = {
-        Pabrik_Pembesaran: fishStocks.filter(f => f.lokasi === 'Pabrik_Pembesaran'),
-        Gudang: fishStocks.filter(f => f.lokasi === 'Gudang'),
-        Showroom: fishStocks.filter(f => f.lokasi === 'Showroom')
-    };
-
-    if (authStatus === 'loading' || (loading && transactions.length === 0)) {
+    if (authStatus === 'loading' || loading) {
         return (
-            <div className="finance-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="finance-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <div className="spinner-mini" style={{ width: '40px', height: '40px', margin: '0 auto 1rem' }}></div>
-                    <p style={{ color: '#94a3b8' }}>Memuat Sistem Keuangan Cupang Klaten...</p>
+                    <div className="spinner-mini" style={{ width: '40px', height: '40px', margin: '0 auto 1rem', borderColor: 'rgba(212,175,55,0.3)', borderTopColor: '#D4AF37' }}></div>
+                    <p style={{ color: '#94a3b8' }}>Memuat Keuangan Cupang Klaten...</p>
                 </div>
             </div>
         );
@@ -508,6 +131,7 @@ export default function KeuanganPage() {
             <Navbar />
             <div className="finance-body">
                 <div className="finance-container">
+
                     {/* Header */}
                     <div className="finance-header">
                         <div className="finance-logo-group">
@@ -518,805 +142,306 @@ export default function KeuanganPage() {
                             </div>
                         </div>
                         <div className="finance-header-actions">
-                            <button onClick={handleResetData} className="btn-home" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                                <i className="fas fa-power-off"></i> Reset Pembukuan
-                            </button>
                             <Link href="/admin" className="btn-home">
                                 <i className="fas fa-arrow-left"></i> Dashboard Admin
                             </Link>
                         </div>
                     </div>
 
-                {/* Dashboard Stats */}
-                <section className="finance-stats-grid" style={{ gridTemplateColumns: '1fr' }}>
-                    <div className="finance-card" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-                        <span className="card-label">Saldo Kas Utama</span>
-                        <h2 className="card-value green" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                            <span>Rp {stats.saldo_kas.toLocaleString('id-ID')}</span>
-                            <button 
-                                onClick={handleEditSaldoKas}
-                                style={{ 
-                                    background: 'rgba(16, 185, 129, 0.1)', 
-                                    border: '1px solid rgba(16, 185, 129, 0.3)', 
-                                    color: '#10b981', 
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem',
-                                    padding: '0.4rem 0.8rem',
-                                    borderRadius: '8px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.4rem',
-                                    fontWeight: '600',
-                                    transition: 'all 0.2s ease'
-                                }}
-                                title="Edit Saldo Kas Utama"
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)';
-                                    e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
-                                    e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-                                }}
-                            >
-                                <i className="fas fa-edit"></i> Edit Saldo
-                            </button>
-                        </h2>
-                        <i className="fas fa-wallet card-icon"></i>
-                    </div>
-                </section>
+                    {/* ============ SUMMARY CARDS ============ */}
+                    <section className="finance-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '2rem' }}>
+                        <div className="finance-card">
+                            <span className="card-label">Total Pemasukan</span>
+                            <h2 className="card-value" style={{ fontSize: '1.6rem', color: '#10b981' }}>{formatRp(totalPemasukan)}</h2>
+                            <i className="fas fa-arrow-up card-icon" style={{ color: '#10b981' }}></i>
+                        </div>
+                        <div className="finance-card">
+                            <span className="card-label">Total Pengeluaran</span>
+                            <h2 className="card-value" style={{ fontSize: '1.6rem', color: '#ef4444' }}>{formatRp(totalPengeluaran)}</h2>
+                            <i className="fas fa-arrow-down card-icon" style={{ color: '#ef4444' }}></i>
+                        </div>
+                        <div className="finance-card">
+                            <span className="card-label">Saldo / Keuntungan</span>
+                            <h2 className="card-value" style={{ fontSize: '1.6rem', color: saldo >= 0 ? '#10b981' : '#ef4444' }}>{formatRp(saldo)}</h2>
+                            <i className="fas fa-wallet card-icon"></i>
+                        </div>
+                        <div className="finance-card">
+                            <span className="card-label">Total Stok Ikan</span>
+                            <h2 className="card-value" style={{ fontSize: '1.6rem', color: '#D4AF37' }}>{totalStokIkan} Ekor</h2>
+                            <i className="fas fa-fish card-icon" style={{ color: '#D4AF37' }}></i>
+                        </div>
+                        <div className="finance-card">
+                            <span className="card-label">Estimasi Aset Ikan</span>
+                            <h2 className="card-value" style={{ fontSize: '1.6rem', color: '#D4AF37' }}>{formatRp(totalAsetIkan)}</h2>
+                            <i className="fas fa-gem card-icon" style={{ color: '#D4AF37' }}></i>
+                        </div>
+                    </section>
 
-                {/* Main Content Area */}
-                <div className="finance-main-grid">
-                    
-                    {/* Left Column: Transaction Input Form */}
-                    <div className="form-panel">
-                        <h3 className="panel-title">
-                            <i className="fas fa-plus-circle"></i> Catat Transaksi Baru
-                        </h3>
-                        <form onSubmit={handleTransactionSubmit}>
-                            <div className="form-group">
-                                <label>Tanggal Transaksi</label>
-                                <input 
-                                    type="date" 
-                                    name="tanggal" 
-                                    value={formData.tanggal} 
-                                    onChange={handleFormChange} 
-                                    className="form-control" 
-                                    required 
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Kategori</label>
-                                <select 
-                                    name="category_id" 
-                                    value={formData.category_id} 
-                                    onChange={handleFormChange} 
-                                    className="form-control" 
-                                    required
-                                >
-                                    <option value="">Pilih Kategori...</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>
-                                            {cat.nama_kategori} ({cat.jenis.toUpperCase()})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Conditional Form: Jual Ikan Eceran (Category 1) */}
-                            {Number(formData.category_id) === 1 && (
-                                <div style={{ 
-                                    background: 'rgba(255, 255, 255, 0.02)', 
-                                    padding: '1rem', 
-                                    borderRadius: '12px', 
-                                    border: '1px solid rgba(255, 255, 255, 0.04)',
-                                    marginBottom: '1rem' 
-                                }}>
-                                    <h4 style={{ fontSize: '0.85rem', color: '#D4AF37', fontWeight: '700', marginBottom: '0.8rem' }}>Tambah Ikan ke Keranjang Penjualan</h4>
-                                    <div className="form-group" style={{ position: 'relative' }}>
-                                        <label>Pilih Ikan (Inventaris Aktif)</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Cari kode ikan, tipe, atau grade..."
-                                            value={fishSearch}
-                                            onChange={(e) => {
-                                                setFishSearch(e.target.value);
-                                                setShowFishDropdown(true);
-                                            }}
-                                            onFocus={() => setShowFishDropdown(true)}
-                                            className="form-control"
-                                        />
-                                        {showFishDropdown && (
-                                            <div style={{
-                                                position: 'absolute',
-                                                top: '100%',
-                                                left: 0,
-                                                width: '100%',
-                                                maxHeight: '200px',
-                                                overflowY: 'auto',
-                                                background: '#0f172a',
-                                                border: '1px solid rgba(212, 175, 55, 0.3)',
-                                                borderRadius: '8px',
-                                                zIndex: 50,
-                                                boxShadow: '0 10px 15px rgba(0,0,0,0.5)'
-                                            }}>
-                                                {filteredFishStocks.length > 0 ? (
-                                                    filteredFishStocks.map(fish => (
-                                                        <div 
-                                                            key={fish.id} 
-                                                            onClick={() => handleSelectFish(fish)}
-                                                            style={{
-                                                                padding: '0.6rem 1rem',
-                                                                cursor: 'pointer',
-                                                                borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                                                fontSize: '0.85rem'
-                                                            }}
-                                                            onMouseEnter={(e) => e.target.style.background = '#1e293b'}
-                                                            onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                                                        >
-                                                            <strong style={{ color: '#D4AF37' }}>{fish.kode_ikan}</strong> - {fish.nama_tipe} ({fish.grade}) - <span style={{ color: '#10b981' }}>Stok: {fish.stok_sisa}</span>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <div style={{ padding: '0.6rem 1rem', color: '#64748b', fontSize: '0.85rem' }}>Ikan tidak ditemukan / stok habis.</div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                                        <div className="form-group">
-                                            <label>Jumlah (Qty)</label>
-                                            <input 
-                                                type="number" 
-                                                value={saleData.qty}
-                                                onChange={(e) => setSaleData(prev => ({...prev, qty: e.target.value}))}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Harga Jual Total (Rp)</label>
-                                            <input 
-                                                type="number" 
-                                                value={saleData.nominal}
-                                                onChange={(e) => setSaleData(prev => ({...prev, nominal: e.target.value}))}
-                                                className="form-control"
-                                                placeholder="Contoh: 50000"
-                                            />
-                                        </div>
-                                    </div>
-                                    <button type="button" onClick={handleAddToCart} className="btn-submit" style={{ padding: '0.5rem', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                                        <i className="fas fa-plus"></i> Tambah ke Keranjang
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Conditional Form: Pembelian Stok Grosir (Category 2) */}
-                            {Number(formData.category_id) === 2 && (
-                                <div style={{ 
-                                    background: 'rgba(255, 255, 255, 0.02)', 
-                                    padding: '1rem', 
-                                    borderRadius: '12px', 
-                                    border: '1px solid rgba(255, 255, 255, 0.04)',
-                                    marginBottom: '1rem' 
-                                }}>
-                                    <h4 style={{ fontSize: '0.85rem', color: '#D4AF37', fontWeight: '700', marginBottom: '0.8rem' }}>Informasi Ikan Grosir</h4>
-                                    
-                                    <div className="form-group" style={{ position: 'relative' }}>
-                                        <label>Kode Ikan (Pilih yang sudah ada atau ketik baru)</label>
-                                        <input 
-                                            type="text" 
-                                            name="kode_ikan"
-                                            placeholder="Cari/Ketik kode ikan..."
-                                            value={purchaseData.kode_ikan}
-                                            onChange={(e) => {
-                                                handlePurchaseChange(e);
-                                                setShowPurchaseFishDropdown(true);
-                                            }}
-                                            onFocus={() => setShowPurchaseFishDropdown(true)}
-                                            onBlur={() => setTimeout(() => setShowPurchaseFishDropdown(false), 200)}
-                                            className="form-control"
-                                            required
-                                            autoComplete="off"
-                                        />
-                                        {showPurchaseFishDropdown && purchaseData.kode_ikan && (
-                                            <div style={{
-                                                position: 'absolute',
-                                                top: '100%',
-                                                left: 0,
-                                                width: '100%',
-                                                maxHeight: '200px',
-                                                overflowY: 'auto',
-                                                background: '#0f172a',
-                                                border: '1px solid rgba(212, 175, 55, 0.3)',
-                                                borderRadius: '8px',
-                                                zIndex: 50,
-                                                boxShadow: '0 10px 15px rgba(0,0,0,0.5)'
-                                            }}>
-                                                {(() => {
-                                                    const matches = fishStocks.filter(fish => 
-                                                        `${fish.kode_ikan} ${fish.nama_tipe} ${fish.grade}`.toLowerCase().includes(purchaseData.kode_ikan.toLowerCase())
-                                                    );
-                                                    return matches.length > 0 ? (
-                                                        matches.map(fish => (
-                                                            <div 
-                                                                key={fish.id} 
-                                                                onMouseDown={() => {
-                                                                    setPurchaseData({
-                                                                        kode_ikan: fish.kode_ikan,
-                                                                        nama_tipe: fish.nama_tipe,
-                                                                        grade: fish.grade,
-                                                                        harga_beli_per_ekor: fish.harga_beli_per_ekor,
-                                                                        stok_sisa: purchaseData.stok_sisa || '',
-                                                                        lokasi: fish.lokasi || 'Pabrik_Pembesaran'
-                                                                    });
-                                                                    setShowPurchaseFishDropdown(false);
-                                                                }}
-                                                                style={{
-                                                                    padding: '0.6rem 1rem',
-                                                                    cursor: 'pointer',
-                                                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                                                    fontSize: '0.85rem',
-                                                                    color: '#cbd5e1'
-                                                                }}
-                                                                onMouseEnter={(e) => e.target.style.background = '#1e293b'}
-                                                                onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                                                            >
-                                                                <strong style={{ color: '#D4AF37' }}>{fish.kode_ikan}</strong> - {fish.nama_tipe} ({fish.grade}) - <span style={{ color: '#10b981' }}>Stok: {fish.stok_sisa}</span>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <div style={{ padding: '0.6rem 1rem', color: '#64748b', fontSize: '0.85rem' }}>
-                                                            Ketik untuk membuat kode ikan baru.
-                                                        </div>
-                                                    );
-                                                 })()}
-                                            </div>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label>Tipe Ikan (Varian/Kategori)</label>
-                                        <input 
-                                            type="text" 
-                                            name="nama_tipe"
-                                            placeholder="Contoh: Plakat Blue Rim"
-                                            value={purchaseData.nama_tipe}
-                                            onChange={handlePurchaseChange}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                                        <div className="form-group">
-                                            <label>Grade</label>
-                                            <select 
-                                                name="grade" 
-                                                value={purchaseData.grade} 
-                                                onChange={handlePurchaseChange}
-                                                className="form-control"
-                                            >
-                                                <option value="A">A</option>
-                                                <option value="S">S</option>
-                                                <option value="S+">S+</option>
-                                                <option value="M">M</option>
-                                                <option value="Contest">Contest</option>
-                                            </select>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Lokasi Awal</label>
-                                            <select 
-                                                name="lokasi" 
-                                                value={purchaseData.lokasi} 
-                                                onChange={handlePurchaseChange}
-                                                className="form-control"
-                                            >
-                                                <option value="Pabrik_Pembesaran">Pabrik</option>
-                                                <option value="Gudang">Gudang</option>
-                                                <option value="Showroom">Showroom</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                                        <div className="form-group">
-                                            <label>Harga Beli /ekor (Rp)</label>
-                                            <input 
-                                                type="number" 
-                                                name="harga_beli_per_ekor"
-                                                placeholder="10000"
-                                                value={purchaseData.harga_beli_per_ekor}
-                                                onChange={handlePurchaseChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Jumlah (Qty)</label>
-                                            <input 
-                                                type="number" 
-                                                name="stok_sisa"
-                                                placeholder="10"
-                                                value={purchaseData.stok_sisa}
-                                                onChange={handlePurchaseChange}
-                                                className="form-control"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            
-                            {/* CART TABLE */}
-                            {(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) && cart.length > 0 && (
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <h4 style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.5rem' }}>Keranjang Transaksi:</h4>
-                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                        {cart.map((item, idx) => (
-                                            <li key={idx} style={{ 
-                                                background: 'rgba(255,255,255,0.03)', 
-                                                padding: '0.8rem', 
-                                                borderRadius: '8px',
-                                                marginBottom: '0.5rem',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                fontSize: '0.85rem'
-                                            }}>
-                                                <div>
-                                                    <div style={{ color: '#D4AF37', fontWeight: 'bold' }}>
-                                                        {Number(formData.category_id) === 1 ? `${item.fish.kode_ikan} - ${item.fish.nama_tipe}` : `${item.kode_ikan} - ${item.nama_tipe}`}
-                                                    </div>
-                                                    <div style={{ color: '#94a3b8' }}>
-                                                        Qty: {item.qty || item.stok_sisa} | Rp {Number(item.nominal).toLocaleString('id-ID')}
-                                                    </div>
-                                                </div>
-                                                <button type="button" onClick={() => handleRemoveFromCart(idx)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
-                                                    <i className="fas fa-times"></i>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-<div className="form-group">
-                                <label>Nominal Transaksi (Rp)</label>
-                                <input 
-                                    type="number" 
-                                    name="nominal" 
-                                    placeholder="Nominal rupiah..."
-                                    value={formData.nominal} 
-                                    onChange={handleFormChange} 
-                                    className="form-control"
-                                    required 
-                                />
-                                {(Number(formData.category_id) === 1 || Number(formData.category_id) === 2) && (
-                                    <small style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.2rem', display: 'block' }}>
-                                        * Anda bisa mengubah total nominal ini jika ada diskon/penyesuaian.
-                                    </small>
-                                )}
-                            </div>
-
-                            <div className="form-group">
-                                <label>Keterangan Tambahan (Opsional)</label>
-                                <textarea 
-                                    name="keterangan" 
-                                    placeholder="Catatan kecil transaksi..."
-                                    value={formData.keterangan} 
-                                    onChange={handleFormChange} 
-                                    className="form-control"
-                                    style={{ minHeight: '60px', resize: 'vertical' }}
-                                />
-                            </div>
-
-                            <button type="submit" className="btn-submit" disabled={actionLoading}>
-                                {actionLoading ? (
-                                    <>
-                                        <div className="spinner-mini"></div> Menyimpan...
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="fas fa-save"></i> Catat Transaksi
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Right Column: Dynamic Tabs & Records display */}
-                    <div>
-                        {/* Tab header selectors */}
-                        <div className="tab-header">
-                            <button 
-                                onClick={() => setActiveTab('transaksi')} 
-                                className={`tab-btn ${activeTab === 'transaksi' ? 'active' : ''}`}
-                            >
-                                <i className="fas fa-exchange-alt"></i> Jurnal Transaksi
-                            </button>
-                            <button 
-                                onClick={() => setActiveTab('inventaris')} 
-                                className={`tab-btn ${activeTab === 'inventaris' ? 'active' : ''}`}
-                            >
-                                <i className="fas fa-boxes"></i> Logistik Inventaris
-                            </button>
+                    {/* ============ INPUT SECTION ============ */}
+                    <div className="form-panel" style={{ marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <h3 className="panel-title" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+                                <i className="fas fa-plus-circle"></i> Catat Data Baru
+                            </h3>
+                            <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <i className="fas fa-clock"></i> {getNow()} (WIB)
+                            </span>
                         </div>
 
-                        {/* TAB 1: Transaksi Keuangan Ledger */}
-                        {activeTab === 'transaksi' && (
-                            <div className="table-panel">
-                                <h3 className="panel-title" style={{ border: 'none', marginBottom: '1rem', paddingBottom: 0 }}>
-                                    <i className="fas fa-history"></i> Riwayat Arus Kas Toko
-                                </h3>
-                                
-                                {(() => {
-                                     const totalPemasukan = transactions.filter(t => t.jenis === 'masuk' && t.nama_kategori !== 'Saldo Awal').reduce((acc, t) => acc + Number(t.nominal), 0);
-                                     const totalPengeluaran = transactions.filter(t => t.jenis === 'keluar').reduce((acc, t) => acc + Number(t.nominal), 0);
-                                     const totalHPP = transactions.filter(t => t.jenis === 'masuk' && t.nama_kategori !== 'Saldo Awal').reduce((acc, t) => acc + Number(t.hpp_total || 0), 0);
-                                     const labaKotor = totalPemasukan - totalHPP;
-                                     const totalBiayaOperasional = transactions.filter(t => t.jenis === 'keluar' && Number(t.category_id) !== 2).reduce((acc, t) => acc + Number(t.nominal), 0);
-                                     const labaBersih = labaKotor - totalBiayaOperasional;
+                        {/* Tab buttons */}
+                        <div className="tab-header" style={{ flexWrap: 'wrap' }}>
+                            {[
+                                { id: 'pengeluaran', icon: 'fa-arrow-down', label: 'Pengeluaran', color: '#ef4444' },
+                                { id: 'pemasukan', icon: 'fa-arrow-up', label: 'Pemasukan', color: '#10b981' },
+                                { id: 'stok', icon: 'fa-fish', label: 'Stok Ikan', color: '#D4AF37' },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    className={`tab-btn ${activeInputTab === tab.id ? 'active' : ''}`}
+                                    onClick={() => setActiveInputTab(tab.id)}
+                                    style={activeInputTab === tab.id ? { color: tab.color } : {}}
+                                >
+                                    <i className={`fas ${tab.icon}`} style={{ marginRight: '0.4rem' }}></i>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
 
-                                    return (
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Total Pemasukan</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#10b981' }}>Rp {totalPemasukan.toLocaleString('id-ID')}</div>
-                                            </div>
-                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Total Pengeluaran</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#ef4444' }}>Rp {totalPengeluaran.toLocaleString('id-ID')}</div>
-                                            </div>
-                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Laba Kotor</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#3b82f6' }}>Rp {labaKotor.toLocaleString('id-ID')}</div>
-                                            </div>
-                                            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Laba Bersih</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#D4AF37' }}>Rp {labaBersih.toLocaleString('id-ID')}</div>
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                                {/* CHART SECTION */}
-                                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                            <h4 style={{ fontSize: '1rem', color: '#D4AF37', margin: 0 }}>Grafik Arus Kas</h4>
-                                            <button 
-                                                onClick={() => setShowChart(!showChart)}
-                                                style={{ background: 'transparent', border: '1px solid #475569', color: '#94a3b8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer' }}
-                                                title={showChart ? "Sembunyikan Grafik" : "Tampilkan Grafik"}
-                                            >
-                                                <i className={`fas fa-eye${showChart ? '-slash' : ''}`}></i> {showChart ? 'Sembunyikan' : 'Tampilkan'}
-                                            </button>
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem', opacity: showChart ? 1 : 0.5, pointerEvents: showChart ? 'auto' : 'none' }}>
-                                            {['hari', 'minggu', 'bulan', 'tahun'].map(f => (
-                                                <button 
-                                                    key={f}
-                                                    onClick={() => setChartFilter(f)}
-                                                    style={{
-                                                        background: chartFilter === f ? 'rgba(212,175,55,0.2)' : 'transparent',
-                                                        border: `1px solid ${chartFilter === f ? '#D4AF37' : '#475569'}`,
-                                                        color: chartFilter === f ? '#D4AF37' : '#94a3b8',
-                                                        padding: '0.3rem 0.8rem',
-                                                        borderRadius: '20px',
-                                                        fontSize: '0.75rem',
-                                                        cursor: 'pointer',
-                                                        textTransform: 'capitalize'
-                                                    }}
-                                                >
-                                                    1 {f}
+                        {/* --- Form Pengeluaran --- */}
+                        {activeInputTab === 'pengeluaran' && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Nama Pengeluaran *</label>
+                                    <input className="form-control" type="text" placeholder="Contoh: Beli Pakan, Akuarium..." value={formPengeluaran.pengeluaran} onChange={e => setFormPengeluaran(p => ({ ...p, pengeluaran: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Nominal Harga (Rp) *</label>
+                                    <input className="form-control" type="number" placeholder="Contoh: 50000" value={formPengeluaran.harga} onChange={e => setFormPengeluaran(p => ({ ...p, harga: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Keterangan (Opsional)</label>
+                                    <input className="form-control" type="text" placeholder="Catatan tambahan..." value={formPengeluaran.keterangan} onChange={e => setFormPengeluaran(p => ({ ...p, keterangan: e.target.value }))} />
+                                </div>
+                                <button className="btn-submit" style={{ background: 'linear-gradient(135deg,#ef4444,#dc2626)', boxShadow: '0 4px 15px rgba(239,68,68,0.2)' }} onClick={() => handleSubmit('pengeluaran')} disabled={saving}>
+                                    <i className="fas fa-save"></i> {saving ? 'Menyimpan...' : 'Simpan Pengeluaran'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* --- Form Pemasukan --- */}
+                        {activeInputTab === 'pemasukan' && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Keterangan / Sumber Pemasukan *</label>
+                                    <input className="form-control" type="text" placeholder="Contoh: Jual HM, Jual Plakat..." value={formPemasukan.keterangan} onChange={e => setFormPemasukan(p => ({ ...p, keterangan: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Pendapatan Kotor (Rp) *</label>
+                                    <input className="form-control" type="number" placeholder="Contoh: 150000" value={formPemasukan.pendapatan_kotor} onChange={e => setFormPemasukan(p => ({ ...p, pendapatan_kotor: e.target.value }))} />
+                                </div>
+                                <button className="btn-submit" style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 4px 15px rgba(16,185,129,0.2)' }} onClick={() => handleSubmit('pemasukan')} disabled={saving}>
+                                    <i className="fas fa-save"></i> {saving ? 'Menyimpan...' : 'Simpan Pemasukan'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* --- Form Stok Ikan --- */}
+                        {activeInputTab === 'stok' && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Jenis Ikan *</label>
+                                    <input className="form-control" type="text" placeholder="Plakat, HM, HMPK..." value={formStok.jenis_ikan} onChange={e => setFormStok(p => ({ ...p, jenis_ikan: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Jumlah Ekor *</label>
+                                    <input className="form-control" type="number" placeholder="Contoh: 10" value={formStok.jumlah} onChange={e => setFormStok(p => ({ ...p, jumlah: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Harga Satuan (Rp)</label>
+                                    <input className="form-control" type="number" placeholder="Untuk hitung aset" value={formStok.harga_satuan} onChange={e => setFormStok(p => ({ ...p, harga_satuan: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Omah (Rp)</label>
+                                    <input className="form-control" type="number" placeholder="0" value={formStok.omah} onChange={e => setFormStok(p => ({ ...p, omah: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Online (Rp)</label>
+                                    <input className="form-control" type="number" placeholder="0" value={formStok.online} onChange={e => setFormStok(p => ({ ...p, online: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Ekspor (Rp)</label>
+                                    <input className="form-control" type="number" placeholder="0" value={formStok.ekspor} onChange={e => setFormStok(p => ({ ...p, ekspor: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Keterangan</label>
+                                    <input className="form-control" type="text" placeholder="Catatan..." value={formStok.keterangan} onChange={e => setFormStok(p => ({ ...p, keterangan: e.target.value }))} />
+                                </div>
+                                <button className="btn-submit" onClick={() => handleSubmit('stok')} disabled={saving}>
+                                    <i className="fas fa-save"></i> {saving ? 'Menyimpan...' : 'Simpan Stok'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ============ TABEL KEUANGAN ============ */}
+                    <div className="table-panel" style={{ marginBottom: '2rem' }}>
+                        <h3 className="panel-title">
+                            <i className="fas fa-table"></i> Riwayat Keuangan
+                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{keuangan.length} data</span>
+                        </h3>
+                        <div className="table-responsive">
+                            <table className="finance-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal</th>
+                                        <th>Pengeluaran / Keterangan</th>
+                                        <th>Harga Keluar</th>
+                                        <th>Pendapatan Kotor</th>
+                                        <th>Jenis</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {keuangan.length === 0 ? (
+                                        <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data. Isi formulir di atas untuk mulai mencatat.</td></tr>
+                                    ) : keuangan.map((row, i) => (
+                                        <tr key={row.id}>
+                                            <td data-label="No">{i + 1}</td>
+                                            <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                                {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </td>
+                                            <td data-label="Keterangan">
+                                                <strong>{row.pengeluaran || row.keterangan || '-'}</strong>
+                                                {row.keterangan && row.pengeluaran && <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{row.keterangan}</div>}
+                                            </td>
+                                            <td data-label="Harga Keluar" style={{ color: '#ef4444', fontWeight: 700 }}>
+                                                {Number(row.harga) > 0 ? formatRp(row.harga) : '-'}
+                                            </td>
+                                            <td data-label="Pendapatan" style={{ color: '#10b981', fontWeight: 700 }}>
+                                                {Number(row.pendapatan_kotor) > 0 ? formatRp(row.pendapatan_kotor) : '-'}
+                                            </td>
+                                            <td data-label="Jenis">
+                                                {Number(row.pendapatan_kotor) > 0
+                                                    ? <span className="finance-badge masuk"><i className="fas fa-arrow-up"></i> Masuk</span>
+                                                    : <span className="finance-badge keluar"><i className="fas fa-arrow-down"></i> Keluar</span>
+                                                }
+                                            </td>
+                                            <td data-label="Aksi">
+                                                <button onClick={() => handleDelete(row.id, 'keuangan')} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', fontSize: '0.8rem' }}>
+                                                    <i className="fas fa-trash"></i>
                                                 </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    
-                                    {showChart && (
-                                        <div style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
-                                        {chartData.length > 0 ? (
-                                            <ResponsiveContainer width="100%" height={300} minWidth={0}>
-                                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                                    <defs>
-                                                        <linearGradient id="colorMasuk" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                                        </linearGradient>
-                                                        <linearGradient id="colorKeluar" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
-                                                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
-                                                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                                                    <Tooltip 
-                                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                                                        itemStyle={{ fontSize: '0.85rem' }}
-                                                        labelStyle={{ color: '#D4AF37', marginBottom: '0.5rem' }}
-                                                        formatter={(value) => ['Rp ' + value.toLocaleString('id-ID'), '']}
-                                                    />
-                                                    <Area type="monotone" dataKey="pemasukan" name="Pemasukan" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" />
-                                                    <Area type="monotone" dataKey="pengeluaran" name="Pengeluaran" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
-                                        ) : (
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#64748b' }}>
-                                                Tidak ada data untuk periode ini.
-                                            </div>
-                                        )}
-                                        </div>
-                                    )}
-                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                {keuangan.length > 0 && (
+                                    <tfoot>
+                                        <tr style={{ fontWeight: 700, background: 'var(--bg-light)' }}>
+                                            <td colSpan={3} style={{ fontWeight: 700, textAlign: 'right' }}>TOTAL</td>
+                                            <td style={{ color: '#ef4444', fontWeight: 800 }}>{formatRp(totalPengeluaran)}</td>
+                                            <td style={{ color: '#10b981', fontWeight: 800 }}>{formatRp(totalPemasukan)}</td>
+                                            <td colSpan={2} style={{ color: saldo >= 0 ? '#10b981' : '#ef4444', fontWeight: 800 }}>
+                                                Saldo: {formatRp(saldo)}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                )}
+                            </table>
+                        </div>
+                    </div>
 
-                                <div className="table-responsive">
-                                    <table className="finance-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tanggal</th>
-                                                <th>Kategori</th>
-                                                <th>Item Ikan</th>
-                                                <th>Catatan</th>
-                                                <th>Nominal</th>
-                                                <th>Laba Kotor</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {transactions.length > 0 ? (
-                                                transactions.map(t => {
-                                                    const isIncome = t.jenis === 'masuk';
-                                                    const profit = isIncome && t.hpp_total > 0 ? Number(t.nominal) - Number(t.hpp_total) : null;
-                                                    return (
-                                                        <tr key={t.id}>
-                                                            <td data-label="Tanggal" style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
-                                                                {new Date(t.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                                            </td>
-                                                            <td data-label="Kategori">
-                                                                <span className={`finance-badge ${t.jenis}`}>
-                                                                    {isIncome ? '+' : '-'} {t.nama_kategori}
-                                                                </span>
-                                                            </td>
-                                                            <td data-label="Item Ikan" style={{ fontWeight: '600' }}>
-                                                                {t.kode_ikan ? (
-                                                                    <span style={{ color: '#D4AF37' }}>
-                                                                        {t.kode_ikan} <small style={{ color: '#94a3b8', fontWeight: 'normal' }}>({t.nama_tipe})</small>
-                                                                    </span>
-                                                                ) : '-'}
-                                                            </td>
-                                                            <td data-label="Catatan" style={{ fontSize: '0.85rem', color: '#94a3b8', maxWidth: '180px' }}>
-                                                                {t.keterangan || '-'}
-                                                            </td>
-                                                            <td data-label="Nominal" style={{ 
-                                                                fontWeight: '700', 
-                                                                color: isIncome ? '#10b981' : '#f87171',
-                                                                whiteSpace: 'nowrap'
-                                                            }}>
-                                                                {isIncome ? '+' : '-'} Rp {Number(t.nominal).toLocaleString('id-ID')}
-                                                            </td>
-                                                            <td data-label="Laba Kotor" style={{ whiteSpace: 'nowrap' }}>
-                                                                {profit !== null ? (
-                                                                    <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '0.85rem' }}>
-                                                                        +Rp {profit.toLocaleString('id-ID')}
-                                                                    </span>
-                                                                ) : '-'}
-                                                            </td>
-                                                            <td data-label="Aksi" style={{ whiteSpace: 'nowrap' }}>
-                                                                <button onClick={() => handleEditTransaction(t)} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', marginRight: '0.8rem' }} title="Edit Transaksi">
-                                                                    <i className="fas fa-edit"></i>
-                                                                </button>
-                                                                <button onClick={() => handleDeleteTransaction(t.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }} title="Hapus Transaksi">
-                                                                    <i className="fas fa-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="7" style={{ textAlign: 'center', color: '#64748b', padding: '3rem' }}>
-                                                        <i className="fas fa-info-circle" style={{ fontSize: '1.5rem', marginBottom: '0.5rem', display: 'block' }}></i>
-                                                        Belum ada catatan transaksi keuangan.
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* TAB 2: Logistics Inventaris Sebaran */}
-                        {activeTab === 'inventaris' && (
-                            <div>
-                                {/* Sebaran Lokasi Grid */}
-                                <div className="location-group-container">
-                                    
-                                    {/* Location 1: Pabrik */}
-                                    <div className="location-card">
-                                        <h4 className="location-title pabrik">
-                                            <i className="fas fa-warehouse"></i> Pabrik Pembesaran
-                                        </h4>
-                                        <div className="location-list">
-                                            {fishByLocation.Pabrik_Pembesaran.length > 0 ? (
-                                                fishByLocation.Pabrik_Pembesaran.map(fish => (
-                                                    <div key={fish.id} className="fish-item">
-                                                        <div className="fish-item-header">
-                                                            <span className="fish-code">{fish.kode_ikan}</span>
-                                                            <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
-                                                        </div>
-                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                                            <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
-                                                            <span>Grade: <strong>{fish.grade}</strong></span>
-                                                            <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
-                                                            <button 
-                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
-                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
-                                                                title="Hapus Ikan (Jika Mati/Invalid)"
-                                                            >
-                                                                <i className="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div className="transfer-group">
-                                                            <select 
-                                                                className="transfer-select"
-                                                                onChange={(e) => handleTransferLocationChange(fish.id, e.target.value)}
-                                                                defaultValue=""
-                                                            >
-                                                                <option value="" disabled>Pindahkan...</option>
-                                                                <option value="Gudang">Gudang</option>
-                                                                <option value="Showroom">Showroom</option>
-                                                            </select>
-                                                            <button 
-                                                                onClick={() => handleTransferSubmit(fish.id)}
-                                                                className="transfer-btn"
-                                                            >
-                                                                OK
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ color: '#64748b', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>Pabrik kosong.</div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Location 2: Gudang */}
-                                    <div className="location-card">
-                                        <h4 className="location-title gudang">
-                                            <i className="fas fa-boxes"></i> Gudang Sortir
-                                        </h4>
-                                        <div className="location-list">
-                                            {fishByLocation.Gudang.length > 0 ? (
-                                                fishByLocation.Gudang.map(fish => (
-                                                    <div key={fish.id} className="fish-item">
-                                                        <div className="fish-item-header">
-                                                            <span className="fish-code">{fish.kode_ikan}</span>
-                                                            <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
-                                                        </div>
-                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                                            <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
-                                                            <span>Grade: <strong>{fish.grade}</strong></span>
-                                                            <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
-                                                            <button 
-                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
-                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
-                                                                title="Hapus Ikan (Jika Mati/Invalid)"
-                                                            >
-                                                                <i className="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div className="transfer-group">
-                                                            <select 
-                                                                className="transfer-select"
-                                                                onChange={(e) => handleTransferLocationChange(fish.id, e.target.value)}
-                                                                defaultValue=""
-                                                            >
-                                                                <option value="" disabled>Pindahkan...</option>
-                                                                <option value="Pabrik_Pembesaran">Pabrik</option>
-                                                                <option value="Showroom">Showroom</option>
-                                                            </select>
-                                                            <button 
-                                                                onClick={() => handleTransferSubmit(fish.id)}
-                                                                className="transfer-btn"
-                                                            >
-                                                                OK
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ color: '#64748b', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>Gudang kosong.</div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Location 3: Showroom */}
-                                    <div className="location-card">
-                                        <h4 className="location-title showroom">
-                                            <i className="fas fa-store"></i> Showroom Utama
-                                        </h4>
-                                        <div className="location-list">
-                                            {fishByLocation.Showroom.length > 0 ? (
-                                                fishByLocation.Showroom.map(fish => (
-                                                    <div key={fish.id} className="fish-item">
-                                                        <div className="fish-item-header">
-                                                            <span className="fish-code">{fish.kode_ikan}</span>
-                                                            <span className={`fish-qty ${fish.stok_sisa <= 1 ? 'low' : ''}`}>Qty: {fish.stok_sisa}</span>
-                                                        </div>
-                                                        <div className="fish-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                                            <span>Tipe: <strong>{fish.nama_tipe}</strong></span>
-                                                            <span>Grade: <strong>{fish.grade}</strong></span>
-                                                            <span>Modal: <strong>Rp {Number(fish.harga_beli_per_ekor).toLocaleString('id-ID')}</strong></span>
-                                                            <button 
-                                                                onClick={() => handleDeleteStock(fish.id, fish.stok_sisa)} 
-                                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', padding: '0.2rem 0.5rem' }}
-                                                                title="Hapus Ikan (Jika Mati/Invalid)"
-                                                            >
-                                                                <i className="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div className="transfer-group">
-                                                            <select 
-                                                                className="transfer-select"
-                                                                onChange={(e) => handleTransferLocationChange(fish.id, e.target.value)}
-                                                                defaultValue=""
-                                                            >
-                                                                <option value="" disabled>Pindahkan...</option>
-                                                                <option value="Pabrik_Pembesaran">Pabrik</option>
-                                                                <option value="Gudang">Gudang</option>
-                                                            </select>
-                                                            <button 
-                                                                onClick={() => handleTransferSubmit(fish.id)}
-                                                                className="transfer-btn"
-                                                            >
-                                                                OK
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ color: '#64748b', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>Showroom kosong.</div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        )}
+                    {/* ============ TABEL STOK IKAN ============ */}
+                    <div className="table-panel">
+                        <h3 className="panel-title">
+                            <i className="fas fa-fish"></i> Riwayat Stok Ikan
+                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{stok.length} data · Total {totalStokIkan} ekor</span>
+                        </h3>
+                        <div className="table-responsive">
+                            <table className="finance-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal</th>
+                                        <th>Jenis Ikan</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Omah</th>
+                                        <th>Online</th>
+                                        <th>Ekspor</th>
+                                        <th>Keterangan</th>
+                                        <th>Est. Nilai</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {stok.length === 0 ? (
+                                        <tr><td colSpan={11} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data stok ikan.</td></tr>
+                                    ) : stok.map((row, i) => (
+                                        <tr key={row.id}>
+                                            <td data-label="No">{i + 1}</td>
+                                            <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                                {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </td>
+                                            <td data-label="Jenis Ikan"><strong>{row.jenis_ikan}</strong></td>
+                                            <td data-label="Jumlah" style={{ fontWeight: 700, color: '#D4AF37' }}>{row.jumlah} ekor</td>
+                                            <td data-label="Harga Satuan">{Number(row.harga_satuan) > 0 ? formatRp(row.harga_satuan) : '-'}</td>
+                                            <td data-label="Omah">{Number(row.omah) > 0 ? formatRp(row.omah) : '-'}</td>
+                                            <td data-label="Online">{Number(row.online) > 0 ? formatRp(row.online) : '-'}</td>
+                                            <td data-label="Ekspor">{Number(row.ekspor) > 0 ? formatRp(row.ekspor) : '-'}</td>
+                                            <td data-label="Keterangan" style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{row.keterangan || '-'}</td>
+                                            <td data-label="Est. Nilai" style={{ fontWeight: 700, color: '#D4AF37' }}>
+                                                {formatRp(Number(row.jumlah || 0) * Number(row.harga_satuan || 0))}
+                                            </td>
+                                            <td data-label="Aksi">
+                                                <button onClick={() => handleDelete(row.id, 'stok')} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', fontSize: '0.8rem' }}>
+                                                    <i className="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                {stok.length > 0 && (
+                                    <tfoot>
+                                        <tr style={{ fontWeight: 700, background: 'var(--bg-light)' }}>
+                                            <td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>TOTAL</td>
+                                            <td style={{ color: '#D4AF37', fontWeight: 800 }}>{totalStokIkan} ekor</td>
+                                            <td colSpan={5}></td>
+                                            <td style={{ color: '#D4AF37', fontWeight: 800 }}>{formatRp(totalAsetIkan)}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                )}
+                            </table>
+                        </div>
                     </div>
 
                 </div>
             </div>
 
-            {/* Success Toast */}
+            {/* Toast Notification */}
             {toast.show && (
                 <div style={{
-                    position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
-                    background: toast.type === 'success' ? '#10b981' : '#ef4444',
-                    color: '#fff',
-                    padding: '1rem 2rem',
-                    borderRadius: '12px',
+                    position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 9999,
+                    background: toast.type === 'error' ? '#1e1e2e' : '#0f172a',
+                    color: '#fff', padding: '1rem 1.5rem', borderRadius: '14px',
+                    display: 'flex', alignItems: 'center', gap: '0.8rem',
                     boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-                    zIndex: 10000,
-                    fontWeight: '700',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    animation: 'slideDown 0.3s ease'
+                    borderLeft: `4px solid ${toast.type === 'error' ? '#ef4444' : '#10b981'}`,
+                    animation: 'slideUp 0.3s ease'
                 }}>
-                    <i className={`fas fa-${toast.type === 'success' ? 'check-circle' : 'exclamation-circle'}`}></i>
-                    {toast.message}
+                    <i className={`fas ${toast.type === 'error' ? 'fa-times-circle' : 'fa-check-circle'}`}
+                        style={{ color: toast.type === 'error' ? '#ef4444' : '#10b981', fontSize: '1.2rem' }}></i>
+                    <span style={{ fontWeight: 500 }}>{toast.message}</span>
                 </div>
             )}
-            </div>
-            <Footer />
-            <FAB />
+
+            <style>{`
+                @keyframes slideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
         </>
     );
 }
