@@ -149,7 +149,7 @@ const ProductCard = ({ product }) => {
                                 {!isSoldOut && (
                                     <div className="checkout-bar">
                                         <a href={product.shopee && product.shopee.includes('wa.me') && !product.shopee.includes('text=') ? `${product.shopee}?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20tertarik%20dengan%20ikan%20ini:%0A%0A*%20Kode:%20${product.code}%0A*%20Varian:%20${titleDisplay}%0A*%20Harga:%20${formatRupiah(product.price)}` : product.shopee} target="_blank" rel="noopener noreferrer" className="checkout-shopee">
-                                            <i className={product.shopee?.toLowerCase().includes('shopee') ? "fas fa-shopping-bag" : "fab fa-whatsapp"}></i> Checkout disini
+                                            <i className="fas fa-shopping-bag"></i> Checkout disini
                                         </a>
                                         <a href={`https://wa.me/6285700846152?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20tertarik%20dengan%20ikan%20ini:%0A%0A*%20Kode:%20${product.code}%0A*%20Varian:%20${titleDisplay}%0A*%20Harga:%20${formatRupiah(product.price)}%0A%0AApakah%20produk%20ini%20masih%20tersedia?`} 
                                            target="_blank" rel="noopener noreferrer" className="checkout-wa">
