@@ -497,7 +497,7 @@ export default function KeuanganPage() {
             <div className="finance-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <div className="spinner-mini" style={{ width: '40px', height: '40px', margin: '0 auto 1rem' }}></div>
-                    <p style={{ color: '#94a3b8' }}>Memuat Sistem Keuangan Z-IFC...</p>
+                    <p style={{ color: '#94a3b8' }}>Memuat Sistem Keuangan Cupang Klaten...</p>
                 </div>
             </div>
         );
@@ -513,7 +513,7 @@ export default function KeuanganPage() {
                         <div className="finance-logo-group">
                             <i className="fas fa-coins" style={{ fontSize: '2rem', color: '#D4AF37' }}></i>
                             <div>
-                                <h1 className="finance-title">Z-IFC MODUL KEUANGAN</h1>
+                                <h1 className="finance-title">KEUANGAN CUPANG KLATEN</h1>
                                 <p className="finance-subtitle">Sistem Terintegrasi Cupang Klaten</p>
                             </div>
                         </div>
