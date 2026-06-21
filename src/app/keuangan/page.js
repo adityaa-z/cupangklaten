@@ -22,6 +22,8 @@ const getNow = () => {
     });
 };
 
+const getToday = () => new Date().toISOString().split('T')[0];
+
 export default function KeuanganPage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
@@ -34,9 +36,9 @@ export default function KeuanganPage() {
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     // Form states
-    const [formPengeluaran, setFormPengeluaran] = useState({ pengeluaran: '', harga: '', keterangan: '' });
-    const [formPemasukan, setFormPemasukan] = useState({ keterangan: '', pendapatan_kotor: '' });
-    const [formStok, setFormStok] = useState({ jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' });
+    const [formPengeluaran, setFormPengeluaran] = useState({ tanggal: getToday(), pengeluaran: '', harga: '', keterangan: '' });
+    const [formPemasukan, setFormPemasukan] = useState({ tanggal: getToday(), keterangan: '', pendapatan_kotor: '' });
+    const [formStok, setFormStok] = useState({ tanggal: getToday(), jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' });
 
     // Auth guard
     useEffect(() => {
@@ -87,9 +89,9 @@ export default function KeuanganPage() {
             if (!res.ok) throw new Error(result.error);
 
             showToast('Data berhasil disimpan!');
-            if (type === 'pengeluaran') setFormPengeluaran({ pengeluaran: '', harga: '', keterangan: '' });
-            else if (type === 'pemasukan') setFormPemasukan({ keterangan: '', pendapatan_kotor: '' });
-            else setFormStok({ jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' });
+            if (type === 'pengeluaran') setFormPengeluaran(p => ({ tanggal: p.tanggal, pengeluaran: '', harga: '', keterangan: '' }));
+            else if (type === 'pemasukan') setFormPemasukan(p => ({ tanggal: p.tanggal, keterangan: '', pendapatan_kotor: '' }));
+            else setFormStok(p => ({ tanggal: p.tanggal, jenis_ikan: '', jumlah: '', harga_satuan: '', omah: '', online: '', ekspor: '', keterangan: '' }));
             fetchData();
         } catch (err) {
             showToast('Error: ' + err.message, 'error');
@@ -211,6 +213,10 @@ export default function KeuanganPage() {
                         {activeInputTab === 'pengeluaran' && (
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Tanggal <span style={{fontWeight:400,color:'#94a3b8'}}>(bisa isi hari terlewat)</span></label>
+                                    <input className="form-control" type="date" max={getToday()} value={formPengeluaran.tanggal} onChange={e => setFormPengeluaran(p => ({ ...p, tanggal: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label>Nama Pengeluaran *</label>
                                     <input className="form-control" type="text" placeholder="Contoh: Beli Pakan, Akuarium..." value={formPengeluaran.pengeluaran} onChange={e => setFormPengeluaran(p => ({ ...p, pengeluaran: e.target.value }))} />
                                 </div>
@@ -232,6 +238,10 @@ export default function KeuanganPage() {
                         {activeInputTab === 'pemasukan' && (
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Tanggal <span style={{fontWeight:400,color:'#94a3b8'}}>(bisa isi hari terlewat)</span></label>
+                                    <input className="form-control" type="date" max={getToday()} value={formPemasukan.tanggal} onChange={e => setFormPemasukan(p => ({ ...p, tanggal: e.target.value }))} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label>Keterangan / Sumber Pemasukan *</label>
                                     <input className="form-control" type="text" placeholder="Contoh: Jual HM, Jual Plakat..." value={formPemasukan.keterangan} onChange={e => setFormPemasukan(p => ({ ...p, keterangan: e.target.value }))} />
                                 </div>
@@ -248,6 +258,10 @@ export default function KeuanganPage() {
                         {/* --- Form Stok Ikan --- */}
                         {activeInputTab === 'stok' && (
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Tanggal <span style={{fontWeight:400,color:'#94a3b8'}}>(bisa isi hari terlewat)</span></label>
+                                    <input className="form-control" type="date" max={getToday()} value={formStok.tanggal} onChange={e => setFormStok(p => ({ ...p, tanggal: e.target.value }))} />
+                                </div>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label>Jenis Ikan *</label>
                                     <input className="form-control" type="text" placeholder="Plakat, HM, HMPK..." value={formStok.jenis_ikan} onChange={e => setFormStok(p => ({ ...p, jenis_ikan: e.target.value }))} />
