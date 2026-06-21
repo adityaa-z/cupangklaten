@@ -1583,8 +1583,17 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Link Checkout (Shopee / WA)</label>
-                                        <input type="url" value={formData.shopee} onChange={e => setFormData({ ...formData, shopee: e.target.value })} placeholder="https://shopee.co.id/... atau https://wa.me/..." required />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <label style={{ margin: 0 }}>Link Checkout (Shopee / WA)</label>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setFormData({ ...formData, shopee: 'https://wa.me/6285700846152' })}
+                                                style={{ background: '#25D366', color: 'white', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 'bold' }}
+                                            >
+                                                <i className="fab fa-whatsapp"></i> Pakai WA Admin
+                                            </button>
+                                        </div>
+                                        <input type="url" value={formData.shopee} onChange={e => setFormData({ ...formData, shopee: e.target.value })} placeholder="https://shopee.co.id/... atau https://wa.me/..." required style={{ marginTop: '0' }} />
                                     </div>
                                     <button type="submit" className="btn btn-primary">Simpan Data Produk</button>
                                 </form>
