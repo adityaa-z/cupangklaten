@@ -1487,6 +1487,7 @@ export default function AdminPage() {
                                                 <option value="Dumbo Ear">Dumbo Ear</option>
                                                 <option value="Veiltail">Veiltail</option>
                                                 <option value="Rosetail">Rosetail</option>
+                                                <option value="Wild Betta">Wild Betta</option>
                                                 <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
                                             </select>
                                         </div>
