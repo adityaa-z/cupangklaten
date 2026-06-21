@@ -548,66 +548,7 @@
         justify-content: center;
     }
 
-    /* Modern Table-to-Card transformation on mobile */
-    .finance-table, .finance-table tbody, .finance-table th, .finance-table td, .finance-table tr {
-        display: block;
-        width: 100%;
-    }
-    
-    .finance-table thead {
-        display: none; /* Hide standard headers */
-    }
-    
-    .finance-table tr {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        margin-bottom: 1.25rem;
-        padding: 1.2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    
-    .finance-table tr:hover {
-        transform: translateY(-2px);
-        border-color: rgba(212, 175, 55, 0.3);
-    }
-    
-    .finance-table td {
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.05) !important;
-        position: relative;
-        padding: 0.75rem 0 !important;
-        padding-left: 45% !important;
-        text-align: right !important;
-        font-size: 0.9rem !important;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        min-height: 2.5rem;
-    }
-    
-    .finance-table td:last-child {
-        border-bottom: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    
-    .finance-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 40%;
-        text-align: left;
-        font-weight: 700;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-    }
 
-    .finance-badge {
-        padding: 0.2rem 0.6rem;
-        font-size: 0.7rem;
-    }
 }
 
 @media (max-width: 640px) {
