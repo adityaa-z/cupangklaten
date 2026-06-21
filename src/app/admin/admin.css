@@ -494,14 +494,23 @@ input:checked + .slider:before {
         display: flex;
         padding: 0;
         width: 100%;
-        justify-content: space-around;
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .nav-item {
-        flex: 1;
+        flex: 0 0 auto;
+        min-width: 70px;
         flex-direction: column;
         gap: 0.2rem;
-        padding: 0.6rem 0;
+        padding: 0.6rem 0.5rem;
         font-size: 0.7rem;
         text-align: center;
         border-right: none;
