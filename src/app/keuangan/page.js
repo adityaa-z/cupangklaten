@@ -33,6 +33,8 @@ export default function KeuanganPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [activeInputTab, setActiveInputTab] = useState('pengeluaran');
+    const [filterDate, setFilterDate] = useState(getToday());
+    const [editingCell, setEditingCell] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     // Form states
@@ -110,12 +112,36 @@ export default function KeuanganPage() {
         finally { setSaving(false); }
     };
 
+    const handleEditSave = async () => {
+        if (!editingCell) return;
+        setSaving(true);
+        try {
+            const res = await fetch('/api/finance', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingCell)
+            });
+            if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+            showToast('Data berhasil diperbarui.');
+            fetchData();
+        } catch (err) { showToast('Error: ' + err.message, 'error'); }
+        finally { setSaving(false); setEditingCell(null); }
+    };
+
+    // Filter data
+    const filteredKeuangan = filterDate === 'all' 
+        ? keuangan 
+        : keuangan.filter(k => new Date(k.tanggal).toLocaleDateString('en-CA') === filterDate);
+    const filteredStok = filterDate === 'all' 
+        ? stok 
+        : stok.filter(s => new Date(s.tanggal).toLocaleDateString('en-CA') === filterDate);
+
     // Summary calculations
-    const totalPengeluaran = keuangan.reduce((s, r) => s + Number(r.harga || 0), 0);
-    const totalPemasukan = keuangan.reduce((s, r) => s + Number(r.pendapatan_kotor || 0), 0);
+    const totalPengeluaran = filteredKeuangan.reduce((s, r) => s + Number(r.harga || 0), 0);
+    const totalPemasukan = filteredKeuangan.reduce((s, r) => s + Number(r.pendapatan_kotor || 0), 0);
     const saldo = totalPemasukan - totalPengeluaran;
-    const totalAsetIkan = stok.reduce((s, r) => s + (Number(r.jumlah || 0) * Number(r.harga_satuan || 0)), 0);
-    const totalStokIkan = stok.reduce((s, r) => s + Number(r.jumlah || 0), 0);
+    const totalAsetIkan = filteredStok.reduce((s, r) => s + (Number(r.jumlah || 0) * Number(r.harga_satuan || 0)), 0);
+    const totalStokIkan = filteredStok.reduce((s, r) => s + Number(r.jumlah || 0), 0);
 
     if (authStatus === 'loading' || loading) {
         return (
@@ -127,6 +153,28 @@ export default function KeuanganPage() {
             </div>
         );
     }
+
+    const EditableCell = ({ row, table, field, val, type="text", children }) => {
+        const isEditing = editingCell?.id === row.id && editingCell?.table === table && editingCell?.field === field;
+        if (isEditing) {
+            return (
+                <input
+                    type={type}
+                    value={editingCell.value}
+                    autoFocus
+                    onChange={e => setEditingCell({ ...editingCell, value: e.target.value })}
+                    onBlur={handleEditSave}
+                    onKeyDown={e => e.key === 'Enter' && handleEditSave()}
+                    style={{ width: '100%', padding: '0.4rem', border: '1px solid #D4AF37', borderRadius: '6px', background: 'var(--bg-white)', color: 'var(--text-dark)' }}
+                />
+            );
+        }
+        return (
+            <div onClick={() => setEditingCell({ id: row.id, table, field, value: val })} style={{ cursor: 'pointer', minHeight: '1.5rem', display: 'flex', alignItems: 'center' }} title="Klik untuk edit">
+                {children}
+            </div>
+        );
+    };
 
     return (
         <>
@@ -297,11 +345,26 @@ export default function KeuanganPage() {
                         )}
                     </div>
 
-                    {/* ============ TABEL KEUANGAN ============ */}
+                    {/* ============ FILTER & TABEL KEUANGAN ============ */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>📋 Riwayat Data</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-white)', padding: '0.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>Tampilkan:</label>
+                            <select 
+                                value={filterDate} 
+                                onChange={e => setFilterDate(e.target.value)}
+                                style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: 700, color: 'var(--text-dark)' }}
+                            >
+                                <option value={getToday()}>Hari Ini Saja</option>
+                                <option value="all">Semua Waktu</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div className="table-panel" style={{ marginBottom: '2rem' }}>
                         <h3 className="panel-title">
                             <i className="fas fa-table"></i> Riwayat Keuangan
-                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{keuangan.length} data</span>
+                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{filteredKeuangan.length} data</span>
                         </h3>
                         <div className="table-responsive">
                             <table className="finance-table">
@@ -317,23 +380,31 @@ export default function KeuanganPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {keuangan.length === 0 ? (
-                                        <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data. Isi formulir di atas untuk mulai mencatat.</td></tr>
-                                    ) : keuangan.map((row, i) => (
+                                    {filteredKeuangan.length === 0 ? (
+                                        <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data di periode ini.</td></tr>
+                                    ) : filteredKeuangan.map((row, i) => (
                                         <tr key={row.id}>
                                             <td data-label="No">{i + 1}</td>
                                             <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
                                                 {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             </td>
                                             <td data-label="Keterangan">
-                                                <strong>{row.pengeluaran || row.keterangan || '-'}</strong>
-                                                {row.keterangan && row.pengeluaran && <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{row.keterangan}</div>}
+                                                <EditableCell row={row} table="keuangan" field={row.pengeluaran ? 'pengeluaran' : 'keterangan'} val={row.pengeluaran || row.keterangan}>
+                                                    <div>
+                                                        <strong>{row.pengeluaran || row.keterangan || '-'}</strong>
+                                                        {row.keterangan && row.pengeluaran && <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{row.keterangan}</div>}
+                                                    </div>
+                                                </EditableCell>
                                             </td>
                                             <td data-label="Harga Keluar" style={{ color: '#ef4444', fontWeight: 700 }}>
-                                                {Number(row.harga) > 0 ? formatRp(row.harga) : '-'}
+                                                <EditableCell row={row} table="keuangan" field="harga" type="number" val={row.harga}>
+                                                    {Number(row.harga) > 0 ? formatRp(row.harga) : '-'}
+                                                </EditableCell>
                                             </td>
                                             <td data-label="Pendapatan" style={{ color: '#10b981', fontWeight: 700 }}>
-                                                {Number(row.pendapatan_kotor) > 0 ? formatRp(row.pendapatan_kotor) : '-'}
+                                                <EditableCell row={row} table="keuangan" field="pendapatan_kotor" type="number" val={row.pendapatan_kotor}>
+                                                    {Number(row.pendapatan_kotor) > 0 ? formatRp(row.pendapatan_kotor) : '-'}
+                                                </EditableCell>
                                             </td>
                                             <td data-label="Jenis">
                                                 {Number(row.pendapatan_kotor) > 0
@@ -349,7 +420,7 @@ export default function KeuanganPage() {
                                         </tr>
                                     ))}
                                 </tbody>
-                                {keuangan.length > 0 && (
+                                {filteredKeuangan.length > 0 && (
                                     <tfoot>
                                         <tr style={{ fontWeight: 700, background: 'var(--bg-light)' }}>
                                             <td colSpan={3} style={{ fontWeight: 700, textAlign: 'right' }}>TOTAL</td>
@@ -369,7 +440,7 @@ export default function KeuanganPage() {
                     <div className="table-panel">
                         <h3 className="panel-title">
                             <i className="fas fa-fish"></i> Riwayat Stok Ikan
-                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{stok.length} data · Total {totalStokIkan} ekor</span>
+                            <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{filteredStok.length} data · Total {totalStokIkan} ekor</span>
                         </h3>
                         <div className="table-responsive">
                             <table className="finance-table">
@@ -389,21 +460,49 @@ export default function KeuanganPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {stok.length === 0 ? (
-                                        <tr><td colSpan={11} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data stok ikan.</td></tr>
-                                    ) : stok.map((row, i) => (
+                                    {filteredStok.length === 0 ? (
+                                        <tr><td colSpan={11} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Belum ada data di periode ini.</td></tr>
+                                    ) : filteredStok.map((row, i) => (
                                         <tr key={row.id}>
                                             <td data-label="No">{i + 1}</td>
                                             <td data-label="Tanggal" style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
                                                 {new Date(row.tanggal).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             </td>
-                                            <td data-label="Jenis Ikan"><strong>{row.jenis_ikan}</strong></td>
-                                            <td data-label="Jumlah" style={{ fontWeight: 700, color: '#D4AF37' }}>{row.jumlah} ekor</td>
-                                            <td data-label="Harga Satuan">{Number(row.harga_satuan) > 0 ? formatRp(row.harga_satuan) : '-'}</td>
-                                            <td data-label="Omah">{Number(row.omah) > 0 ? formatRp(row.omah) : '-'}</td>
-                                            <td data-label="Online">{Number(row.online) > 0 ? formatRp(row.online) : '-'}</td>
-                                            <td data-label="Ekspor">{Number(row.ekspor) > 0 ? formatRp(row.ekspor) : '-'}</td>
-                                            <td data-label="Keterangan" style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{row.keterangan || '-'}</td>
+                                            <td data-label="Jenis Ikan">
+                                                <EditableCell row={row} table="stok" field="jenis_ikan" val={row.jenis_ikan}>
+                                                    <strong>{row.jenis_ikan}</strong>
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Jumlah" style={{ fontWeight: 700, color: '#D4AF37' }}>
+                                                <EditableCell row={row} table="stok" field="jumlah" type="number" val={row.jumlah}>
+                                                    {row.jumlah} ekor
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Harga Satuan">
+                                                <EditableCell row={row} table="stok" field="harga_satuan" type="number" val={row.harga_satuan}>
+                                                    {Number(row.harga_satuan) > 0 ? formatRp(row.harga_satuan) : '-'}
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Omah">
+                                                <EditableCell row={row} table="stok" field="omah" type="number" val={row.omah}>
+                                                    {Number(row.omah) > 0 ? formatRp(row.omah) : '-'}
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Online">
+                                                <EditableCell row={row} table="stok" field="online" type="number" val={row.online}>
+                                                    {Number(row.online) > 0 ? formatRp(row.online) : '-'}
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Ekspor">
+                                                <EditableCell row={row} table="stok" field="ekspor" type="number" val={row.ekspor}>
+                                                    {Number(row.ekspor) > 0 ? formatRp(row.ekspor) : '-'}
+                                                </EditableCell>
+                                            </td>
+                                            <td data-label="Keterangan" style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                                                <EditableCell row={row} table="stok" field="keterangan" val={row.keterangan}>
+                                                    {row.keterangan || '-'}
+                                                </EditableCell>
+                                            </td>
                                             <td data-label="Est. Nilai" style={{ fontWeight: 700, color: '#D4AF37' }}>
                                                 {formatRp(Number(row.jumlah || 0) * Number(row.harga_satuan || 0))}
                                             </td>
@@ -415,7 +514,7 @@ export default function KeuanganPage() {
                                         </tr>
                                     ))}
                                 </tbody>
-                                {stok.length > 0 && (
+                                {filteredStok.length > 0 && (
                                     <tfoot>
                                         <tr style={{ fontWeight: 700, background: 'var(--bg-light)' }}>
                                             <td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>TOTAL</td>
