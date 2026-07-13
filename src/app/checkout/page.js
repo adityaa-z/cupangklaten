@@ -13,23 +13,23 @@ export default function CheckoutPage() {
     const { cart, cartTotal, cartCount, clearCart } = useCart();
 
     const [loading, setLoading] = useState(false);
-    
+
     // Form State
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [addressDetail, setAddressDetail] = useState('');
-    
+
     // Location State
     const [provinces, setProvinces] = useState([]);
     const [cities, setCities] = useState([]);
     const [selectedProv, setSelectedProv] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
-    
+
     // Shipping State
     const [courier, setCourier] = useState('tiki');
     const [shippingCost, setShippingCost] = useState(0);
     const [shippingLoading, setShippingLoading] = useState(false);
-    
+
     // Calculation
     // Asumsi 1 ikan / item = 250 gram. Minimal berat 1000g untuk ongkir.
     const rawWeight = cartCount * 250;
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     useEffect(() => {
         async function fetchProvinces() {
             try {
-                const res = await fetch('/api/rajaongkir?type=province');
+                const res = await fetch('https://rajaongkir.komerce.id/api/v1/destination/province');
                 const data = await res.json();
                 if (Array.isArray(data)) setProvinces(data);
             } catch (err) {
@@ -67,7 +67,7 @@ export default function CheckoutPage() {
         }
         async function fetchCities() {
             try {
-                const res = await fetch(`/api/rajaongkir?type=city&province=${selectedProv}`);
+                const res = await fetch(`https://rajaongkir.komerce.id/api/v1/destination/city/${selectedProv}`);
                 const data = await res.json();
                 if (Array.isArray(data)) setCities(data);
             } catch (err) {
@@ -86,9 +86,12 @@ export default function CheckoutPage() {
         async function calcShipping() {
             setShippingLoading(true);
             try {
-                const res = await fetch('/api/rajaongkir', {
+                const res = await fetch('https://rajaongkir.komerce.id/api/v1/calculate/district/domestic-cost', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'api-key': process.env.RAJAONGKIR_API_KEY,
+                    },
                     body: JSON.stringify({
                         destination: selectedCity,
                         weight,
@@ -173,7 +176,7 @@ export default function CheckoutPage() {
         <>
             <Navbar />
             <div style={{ maxWidth: '1200px', margin: '100px auto', padding: '0 20px', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                
+
                 {/* Form Section */}
                 <div style={{ flex: '1 1 600px', background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                     <h2 style={{ marginBottom: '1.5rem', color: '#111827' }}>Alamat Pengiriman</h2>
@@ -227,7 +230,7 @@ export default function CheckoutPage() {
                 {/* Summary Section */}
                 <div style={{ flex: '1 1 350px', background: '#f9fafb', padding: '2rem', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
                     <h2 style={{ marginBottom: '1.5rem', color: '#111827' }}>Ringkasan Belanja</h2>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
                         {cart.map(item => (
                             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
