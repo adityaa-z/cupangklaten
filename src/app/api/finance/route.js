@@ -31,19 +31,21 @@ async function initTables() {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    // Migrate existing tables: add segmen column if not exists
-    try {
-        await execute(`
-            ALTER TABLE finance_keuangan
-            ADD COLUMN IF NOT EXISTS segmen ENUM('showroom','grosir') DEFAULT 'showroom'
-        `);
-    } catch (_) {}
-    try {
-        await execute(`
-            ALTER TABLE finance_stok_ikan
-            ADD COLUMN IF NOT EXISTS segmen ENUM('showroom','grosir') DEFAULT 'showroom'
-        `);
-    } catch (_) {}
+    // Migrate existing tables: add segmen column if not exists (MySQL 8.0 compatible)
+    const checkAndAddColumn = async (tableName) => {
+        try {
+            const rows = await query(
+                `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = 'segmen'`,
+                [tableName]
+            );
+            if (rows.length === 0) {
+                await execute(`ALTER TABLE ${tableName} ADD COLUMN segmen ENUM('showroom','grosir') DEFAULT 'showroom'`);
+            }
+        } catch (_) {}
+    };
+    await checkAndAddColumn('finance_keuangan');
+    await checkAndAddColumn('finance_stok_ikan');
 }
 
 export async function GET(req) {
