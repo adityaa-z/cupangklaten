@@ -91,15 +91,15 @@ export default function OrderInvoicePage({ params }) {
                         
                         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <div style={{ border: '1px solid #e5e7eb', padding: '1.5rem', borderRadius: '12px', flex: '1 1 250px', background: 'white' }}>
-                                <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/2560px-BNI_logo.svg.png" alt="BNI" style={{ height: '30px', marginBottom: '1rem' }} />
-                                <h4 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '2px', color: '#111827' }}>0821 234 567</h4>
-                                <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>a.n Aditya Cupang Klaten</p>
+                                <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#111827', marginBottom: '1rem' }}>SeaBank / DANA</h4>
+                                <p style={{ color: '#111827', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1px' }}>SeaBank: 901709292959</p>
+                                <p style={{ color: '#111827', margin: '0.5rem 0 0 0', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1px' }}>DANA: 085700846152</p>
+                                <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>a.n Aditya Bintang Zidan Pratama</p>
                             </div>
                             
-                            <div style={{ border: '1px solid #e5e7eb', padding: '1.5rem', borderRadius: '12px', flex: '1 1 250px', background: 'white' }}>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/QRIS_logo.svg/1200px-QRIS_logo.svg.png" alt="QRIS" style={{ height: '30px', marginBottom: '1rem' }} />
-                                <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#111827' }}>Scan QRIS Anda</h4>
-                                <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>(Minta QRIS via WA)</p>
+                            <div style={{ border: '1px solid #e5e7eb', padding: '1.5rem', borderRadius: '12px', flex: '1 1 250px', background: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#111827', marginBottom: '1rem' }}>Scan QRIS (Cupang Depo)</h4>
+                                <img src="/qris.jpeg" alt="QRIS Cupang Depo" style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
                             </div>
                         </div>
                     </div>
