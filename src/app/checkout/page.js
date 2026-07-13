@@ -170,6 +170,24 @@ export default function CheckoutPage() {
 
     const grandTotal = cartTotal + shippingCost + packingFee;
 
+    const waAdmin = "6285700846152";
+    const selectedCityNameStr = cities.find(c => String(c.id) === String(selectedCity))?.name || '';
+    const selectedProvNameStr = provinces.find(p => String(p.id) === String(selectedProv))?.name || '';
+    const fullAddressStr = `${addressDetail}, ${selectedCityNameStr}, ${selectedProvNameStr}`;
+    
+    let waText = `Halo Admin, saya ingin order ikan namun ongkir ke alamat saya tidak muncul.\n\n`;
+    waText += `*Nama:* ${name || 'Belum diisi'}\n`;
+    waText += `*Alamat:* ${fullAddressStr}\n\n`;
+    waText += `*Daftar Produk:*\n`;
+    cart.forEach(item => {
+        waText += `- ${item.quantity}x ${item.category} (Kode: ${item.code || item.id}) - ${formatRupiah(item.price * item.quantity)}\n`;
+    });
+    waText += `\n*Total Harga Ikan:* ${formatRupiah(cartTotal)}\n`;
+    waText += `*Biaya Packing:* ${formatRupiah(packingFee)}\n\n`;
+    waText += `Mohon info ongkos kirim menggunakan ${courier.toUpperCase()} ke alamat saya. Terima kasih.`;
+    
+    const waLinkOngkir = `https://wa.me/${waAdmin}?text=${encodeURIComponent(waText)}`;
+
     return (
         <>
             <Navbar />
@@ -219,8 +237,8 @@ export default function CheckoutPage() {
                                 <option value="pos">POS Indonesia</option>
                             </select>
                         </div>
-                        <button type="submit" disabled={loading || shippingLoading} style={{ marginTop: '1rem', padding: '1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', cursor: (loading || shippingLoading) ? 'not-allowed' : 'pointer', opacity: (loading || shippingLoading) ? 0.7 : 1 }}>
-                            {loading ? 'Memproses...' : 'Buat Pesanan'}
+                        <button type="submit" disabled={loading || shippingLoading || (selectedCity && shippingCost === 0 && !shippingLoading)} style={{ marginTop: '1rem', padding: '1rem', background: (selectedCity && shippingCost === 0 && !shippingLoading) ? '#9ca3af' : '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', cursor: (loading || shippingLoading || (selectedCity && shippingCost === 0 && !shippingLoading)) ? 'not-allowed' : 'pointer', opacity: (loading || shippingLoading) ? 0.7 : 1 }}>
+                            {loading ? 'Memproses...' : (selectedCity && shippingCost === 0 && !shippingLoading ? 'Ongkir Tidak Tersedia' : 'Buat Pesanan')}
                         </button>
                     </form>
                 </div>
@@ -263,6 +281,18 @@ export default function CheckoutPage() {
                         <span>Total Tagihan</span>
                         <span>{formatRupiah(grandTotal)}</span>
                     </div>
+
+                    {/* Warning Ongkir Tidak Ditemukan */}
+                    {selectedCity && !shippingLoading && shippingCost === 0 && (
+                        <div style={{ marginTop: '1.5rem', padding: '1.5rem', background: '#fef2f2', border: '1px solid #f87171', borderRadius: '12px' }}>
+                            <p style={{ color: '#b91c1c', margin: '0 0 1rem 0', fontWeight: 'bold', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                                <i className="fas fa-exclamation-triangle"></i> Ongkos kirim ekspedisi ini tidak tersedia di rute Anda.
+                            </p>
+                            <a href={waLinkOngkir} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', background: '#25d366', color: 'white', padding: '0.8rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1rem', transition: '0.3s' }}>
+                                <i className="fab fa-whatsapp"></i> Chat WA Cek Ongkir Manual
+                            </a>
+                        </div>
+                    )}
                 </div>
 
             </div>
