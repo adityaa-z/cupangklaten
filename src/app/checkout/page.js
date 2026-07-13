@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     useEffect(() => {
         async function fetchProvinces() {
             try {
-                const res = await fetch('https://rajaongkir.komerce.id/api/v1/destination/province');
+                const res = await fetch('/api/rajaongkir?type=province');
                 const data = await res.json();
                 if (Array.isArray(data)) setProvinces(data);
             } catch (err) {
@@ -67,7 +67,7 @@ export default function CheckoutPage() {
         }
         async function fetchCities() {
             try {
-                const res = await fetch(`https://rajaongkir.komerce.id/api/v1/destination/city/${selectedProv}`);
+                const res = await fetch(`/api/rajaongkir?type=city&province=${selectedProv}`);
                 const data = await res.json();
                 if (Array.isArray(data)) setCities(data);
             } catch (err) {
@@ -86,12 +86,9 @@ export default function CheckoutPage() {
         async function calcShipping() {
             setShippingLoading(true);
             try {
-                const res = await fetch('https://rajaongkir.komerce.id/api/v1/calculate/district/domestic-cost', {
+                const res = await fetch('/api/rajaongkir', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'api-key': process.env.RAJAONGKIR_API_KEY,
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         destination: selectedCity,
                         weight,
@@ -99,8 +96,9 @@ export default function CheckoutPage() {
                     })
                 });
                 const data = await res.json();
-                if (data && data.costs && data.costs.length > 0) {
-                    setShippingCost(data.costs[0].cost[0].value);
+                if (Array.isArray(data) && data.length > 0) {
+                    // Komerce returns an array of services. Find the first valid cost
+                    setShippingCost(data[0].cost || 0);
                 } else {
                     setShippingCost(0);
                 }
@@ -125,8 +123,8 @@ export default function CheckoutPage() {
             return;
         }
 
-        const selectedCityName = cities.find(c => c.city_id === selectedCity)?.city_name || '';
-        const selectedProvName = provinces.find(p => p.province_id === selectedProv)?.province_name || '';
+        const selectedCityName = cities.find(c => String(c.id) === String(selectedCity))?.name || '';
+        const selectedProvName = provinces.find(p => String(p.id) === String(selectedProv))?.name || '';
         const fullAddress = `${addressDetail}, ${selectedCityName}, ${selectedProvName}`;
 
         setLoading(true);
@@ -195,7 +193,7 @@ export default function CheckoutPage() {
                                 <select value={selectedProv} onChange={e => setSelectedProv(e.target.value)} required style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                                     <option value="">Pilih Provinsi...</option>
                                     {provinces.map(p => (
-                                        <option key={p.province_id} value={p.province_id}>{p.province_name}</option>
+                                        <option key={p.id} value={p.id}>{p.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -204,7 +202,7 @@ export default function CheckoutPage() {
                                 <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)} required disabled={!selectedProv} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                                     <option value="">Pilih Kota...</option>
                                     {cities.map(c => (
-                                        <option key={c.city_id} value={c.city_id}>{c.type} {c.city_name}</option>
+                                        <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>
                             </div>
