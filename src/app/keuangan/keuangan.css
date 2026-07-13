@@ -50,6 +50,80 @@
     letter-spacing: 2px;
 }
 
+/* ============ Segmen Tabs (Showroom / Grosir) ============ */
+.segmen-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.segmen-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: 16px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-white);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.segmen-tab-btn i {
+    font-size: 1.1rem;
+}
+
+.segmen-tab-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.segmen-tab-btn.active {
+    font-weight: 800;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.segmen-tab-badge {
+    background: var(--border-color);
+    color: var(--text-muted);
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-left: 0.2rem;
+    transition: var(--transition-smooth);
+    color: #fff;
+}
+
+/* Segmen Indicator */
+.segmen-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1.5px solid;
+    margin-bottom: 1.8rem;
+    font-size: 0.9rem;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .btn-home {
     background: var(--bg-white);
     border: 1px solid var(--border-color);

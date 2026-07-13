@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query, execute } from '@/lib/db';
 
-// Initialize tables if not exist
+// Initialize tables if not exist, and migrate existing tables
 async function initTables() {
     await execute(`
         CREATE TABLE IF NOT EXISTS finance_keuangan (
@@ -11,6 +11,7 @@ async function initTables() {
             harga DECIMAL(15,0) DEFAULT 0,
             pendapatan_kotor DECIMAL(15,0) DEFAULT 0,
             keterangan TEXT DEFAULT NULL,
+            segmen ENUM('showroom','grosir') DEFAULT 'showroom',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
@@ -25,16 +26,49 @@ async function initTables() {
             online DECIMAL(15,0) DEFAULT 0,
             ekspor DECIMAL(15,0) DEFAULT 0,
             keterangan TEXT DEFAULT NULL,
+            segmen ENUM('showroom','grosir') DEFAULT 'showroom',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
+
+    // Migrate existing tables: add segmen column if not exists
+    try {
+        await execute(`
+            ALTER TABLE finance_keuangan
+            ADD COLUMN IF NOT EXISTS segmen ENUM('showroom','grosir') DEFAULT 'showroom'
+        `);
+    } catch (_) {}
+    try {
+        await execute(`
+            ALTER TABLE finance_stok_ikan
+            ADD COLUMN IF NOT EXISTS segmen ENUM('showroom','grosir') DEFAULT 'showroom'
+        `);
+    } catch (_) {}
 }
 
-export async function GET() {
+export async function GET(req) {
     try {
         await initTables();
-        const keuangan = await query('SELECT * FROM finance_keuangan ORDER BY tanggal DESC, id DESC');
-        const stok = await query('SELECT * FROM finance_stok_ikan ORDER BY tanggal DESC, id DESC');
+        const { searchParams } = new URL(req.url);
+        const segmen = searchParams.get('segmen'); // 'showroom' | 'grosir' | null (all)
+
+        let keuanganQuery = 'SELECT * FROM finance_keuangan';
+        let stokQuery = 'SELECT * FROM finance_stok_ikan';
+        const params = [];
+        const paramsStok = [];
+
+        if (segmen && (segmen === 'showroom' || segmen === 'grosir')) {
+            keuanganQuery += ' WHERE segmen = ?';
+            stokQuery += ' WHERE segmen = ?';
+            params.push(segmen);
+            paramsStok.push(segmen);
+        }
+
+        keuanganQuery += ' ORDER BY tanggal DESC, id DESC';
+        stokQuery += ' ORDER BY tanggal DESC, id DESC';
+
+        const keuangan = await query(keuanganQuery, params);
+        const stok = await query(stokQuery, paramsStok);
         return NextResponse.json({ keuangan, stok });
     } catch (err) {
         console.error(err);
@@ -46,15 +80,16 @@ export async function POST(req) {
     try {
         await initTables();
         const body = await req.json();
-        const { type, data } = body;
+        const { type, data, segmen } = body;
+        const seg = (segmen === 'grosir') ? 'grosir' : 'showroom';
 
         if (type === 'pengeluaran') {
             const { tanggal, pengeluaran, harga, keterangan } = data;
             if (!pengeluaran || !harga) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
             const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
             const result = await execute(
-                'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan) VALUES (?, ?, ?, 0, ?)',
-                [tgl, pengeluaran, Number(harga), keterangan || '']
+                'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan, segmen) VALUES (?, ?, ?, 0, ?, ?)',
+                [tgl, pengeluaran, Number(harga), keterangan || '', seg]
             );
             return NextResponse.json({ id: result.insertId });
 
@@ -63,8 +98,8 @@ export async function POST(req) {
             if (!keterangan || !pendapatan_kotor) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
             const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
             const result = await execute(
-                'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan) VALUES (?, NULL, 0, ?, ?)',
-                [tgl, Number(pendapatan_kotor), keterangan]
+                'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan, segmen) VALUES (?, NULL, 0, ?, ?, ?)',
+                [tgl, Number(pendapatan_kotor), keterangan, seg]
             );
             return NextResponse.json({ id: result.insertId });
 
@@ -73,8 +108,8 @@ export async function POST(req) {
             if (!jenis_ikan || !jumlah) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
             const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
             const result = await execute(
-                'INSERT INTO finance_stok_ikan (tanggal, jenis_ikan, jumlah, harga_satuan, omah, online, ekspor, keterangan) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [tgl, jenis_ikan, Number(jumlah), Number(harga_satuan || 0), Number(omah || 0), Number(online || 0), Number(ekspor || 0), keterangan || '']
+                'INSERT INTO finance_stok_ikan (tanggal, jenis_ikan, jumlah, harga_satuan, omah, online, ekspor, keterangan, segmen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [tgl, jenis_ikan, Number(jumlah), Number(harga_satuan || 0), Number(omah || 0), Number(online || 0), Number(ekspor || 0), keterangan || '', seg]
             );
             return NextResponse.json({ id: result.insertId });
         }
