@@ -169,12 +169,22 @@ export default function KeuanganPage() {
     const activeData = activeSegmen === 'showroom' ? dataShowroom : dataGrosir;
 
     // Filter data
-    const filteredKeuangan = filterDate === 'all'
-        ? activeData.keuangan
-        : activeData.keuangan.filter(k => new Date(k.tanggal).toLocaleDateString('en-CA') === filterDate);
-    const filteredStok = filterDate === 'all'
-        ? activeData.stok
-        : activeData.stok.filter(s => new Date(s.tanggal).toLocaleDateString('en-CA') === filterDate);
+    const getLast30Days = () => {
+        const d = new Date();
+        d.setDate(d.getDate() - 30);
+        return d.toLocaleDateString('en-CA');
+    };
+
+    const filteredKeuangan = (() => {
+        if (filterDate === 'all') return activeData.keuangan;
+        if (filterDate === '1bulan') return activeData.keuangan.filter(k => new Date(k.tanggal).toLocaleDateString('en-CA') >= getLast30Days());
+        return activeData.keuangan.filter(k => new Date(k.tanggal).toLocaleDateString('en-CA') === filterDate);
+    })();
+    const filteredStok = (() => {
+        if (filterDate === 'all') return activeData.stok;
+        if (filterDate === '1bulan') return activeData.stok.filter(s => new Date(s.tanggal).toLocaleDateString('en-CA') >= getLast30Days());
+        return activeData.stok.filter(s => new Date(s.tanggal).toLocaleDateString('en-CA') === filterDate);
+    })();
 
     // Summary calculations
     const totalPengeluaran = filteredKeuangan.reduce((s, r) => s + Number(r.harga || 0), 0);
@@ -455,6 +465,7 @@ export default function KeuanganPage() {
                                 style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: 700, color: 'var(--text-dark)' }}
                             >
                                 <option value={getToday()} style={{ color: '#0f172a', background: '#ffffff' }}>Hari Ini Saja</option>
+                                <option value="1bulan" style={{ color: '#0f172a', background: '#ffffff' }}>1 Bulan Terakhir</option>
                                 <option value="all" style={{ color: '#0f172a', background: '#ffffff' }}>Semua Waktu</option>
                             </select>
                         </div>
