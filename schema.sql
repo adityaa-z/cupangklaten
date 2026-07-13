@@ -186,6 +186,40 @@ CREATE TABLE IF NOT EXISTS articles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Tabel: orders (Checkout System)
+-- ============================================
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    order_code VARCHAR(50) NOT NULL UNIQUE,
+    shipping_name VARCHAR(200) NOT NULL,
+    shipping_phone VARCHAR(50) NOT NULL,
+    shipping_address TEXT NOT NULL,
+    courier VARCHAR(50) NOT NULL,
+    shipping_cost INT NOT NULL,
+    total_amount INT NOT NULL,
+    status ENUM('pending', 'paid', 'shipped', 'cancelled') DEFAULT 'pending',
+    tracking_number VARCHAR(100) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Tabel: order_items (Checkout System)
+-- ============================================
+CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT DEFAULT NULL,
+    auction_id INT DEFAULT NULL,
+    quantity INT DEFAULT 1,
+    price INT NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Buat user database (opsional, ganti password)
 -- ============================================
 -- CREATE USER 'cupang_user'@'localhost' IDENTIFIED BY 'GANTI_PASSWORD_DISINI';

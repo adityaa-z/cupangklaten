@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { useCart } from './CartProvider';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
+    const { cartCount, setIsCartOpen } = useCart();
     const [menuOpen, setMenuOpen] = useState(false);
     const [theme, setTheme] = useState('light');
 
@@ -40,7 +42,16 @@ const Navbar = () => {
                     <span className="logo-text">CUPANGKLATEN</span>
                 </Link>
 
-                <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem' }}>
+                <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                    <button className="cart-btn" onClick={() => setIsCartOpen(true)} aria-label="Keranjang Belanja" style={{ background: 'none', border: 'none', position: 'relative', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--text-dark)' }}>
+                        <i className="fas fa-shopping-cart"></i>
+                        {cartCount > 0 && (
+                            <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#ef4444', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
+
                     <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle Theme">
                         <i className={theme === 'light' ? "fas fa-moon" : "fas fa-sun"}></i>
                     </button>

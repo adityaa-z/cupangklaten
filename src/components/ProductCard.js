@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useCart } from './CartProvider';
+import { useRouter } from 'next/navigation';
 
 const ProductCard = ({ product }) => {
+    const { addToCart } = useCart();
+    const router = useRouter();
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [imgLoaded, setImgLoaded] = useState(false);
@@ -11,8 +15,6 @@ const ProductCard = ({ product }) => {
 
     const isSoldOut = (!product.is_available || product.stock <= 0);
     const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
-    const btnText = isSoldOut ? 'Habis Terjual' : 'Beli di Sini';
-    const btnLink = isSoldOut ? '#' : product.shopee;
     
     const isKebutuhanIkan = product.category?.toLowerCase() === 'kebutuhan ikan';
     const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
@@ -44,6 +46,18 @@ const ProductCard = ({ product }) => {
     const handlePrevImg = (e) => {
         e.stopPropagation();
         setCurrentImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    };
+
+    const handleAddToCart = (e) => {
+        e.stopPropagation();
+        addToCart(product);
+        setIsLightboxOpen(false);
+    };
+
+    const handleBuyNow = (e) => {
+        e.stopPropagation();
+        addToCart(product);
+        router.push('/checkout');
     };
 
     useEffect(() => {
@@ -79,7 +93,7 @@ const ProductCard = ({ product }) => {
                     </div>
 
                     <button className="buy-btn" onClick={() => setIsLightboxOpen(true)}>
-                        {isSoldOut ? 'Detail Produk' : 'Beli di Sini'} <i className="fas fa-search-plus" style={{ marginLeft: '0.5rem' }}></i>
+                        {isSoldOut ? 'Detail Produk' : 'Beli Sekarang'} <i className="fas fa-shopping-cart" style={{ marginLeft: '0.5rem' }}></i>
                     </button>
                 </div>
             </div>
@@ -147,14 +161,13 @@ const ProductCard = ({ product }) => {
                                 </div>
 
                                 {!isSoldOut && (
-                                    <div className="checkout-bar">
-                                        <a href={product.shopee && product.shopee.includes('wa.me') && !product.shopee.includes('text=') ? `${product.shopee}?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20tertarik%20dengan%20ikan%20ini:%0A%0A*%20Kode:%20${product.code}%0A*%20Varian:%20${titleDisplay}%0A*%20Harga:%20${formatRupiah(product.price)}` : product.shopee} target="_blank" rel="noopener noreferrer" className="checkout-shopee">
-                                            <i className="fas fa-shopping-bag"></i> Checkout disini
-                                        </a>
-                                        <a href={`https://wa.me/6285700846152?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20tertarik%20dengan%20ikan%20ini:%0A%0A*%20Kode:%20${product.code}%0A*%20Varian:%20${titleDisplay}%0A*%20Harga:%20${formatRupiah(product.price)}%0A%0AApakah%20produk%20ini%20masih%20tersedia?`} 
-                                           target="_blank" rel="noopener noreferrer" className="checkout-wa">
-                                            <i className="fab fa-whatsapp"></i> Konfirmasi WA
-                                        </a>
+                                    <div className="checkout-bar" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                        <button onClick={handleAddToCart} style={{ flex: 1, padding: '0.8rem', background: '#e5e7eb', color: '#111827', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                            <i className="fas fa-cart-plus"></i> Tambah Keranjang
+                                        </button>
+                                        <button onClick={handleBuyNow} style={{ flex: 1, padding: '0.8rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                            <i className="fas fa-bolt"></i> Beli Sekarang
+                                        </button>
                                     </div>
                                 )}
                             </div>
@@ -162,6 +175,7 @@ const ProductCard = ({ product }) => {
                     </div>
                 </div>
             )}
+
         </>
     );
 };

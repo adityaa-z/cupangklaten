@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/components/CartProvider';
 import '../lelang.css'; // Kita re-use CSS dari /lelang
 
 export default function LelangRoomPage({ params }) {
     const resolvedParams = React.use(params);
     const id = resolvedParams.id;
     const { data: session, status } = useSession();
+    const router = useRouter();
+    const { addToCart } = useCart();
     const [auction, setAuction] = useState(null);
     const [bids, setBids] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -237,10 +241,24 @@ export default function LelangRoomPage({ params }) {
                                 {isEnded && isLeading && (
                                     <div style={{ marginTop: '1.5rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '1.5rem', borderRadius: '12px', textAlign: 'center', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.3)' }}>
                                         <h4 style={{ marginBottom: '0.5rem', fontSize: '1.2rem' }}>🎉 ANDA PEMENANGNYA! 🎉</h4>
-                                        <p style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: '0.9' }}>Selamat! Silakan hubungi Admin untuk konfirmasi pembayaran dan pengiriman ikan.</p>
-                                        <a href={`https://wa.me/6285700846152?text=Halo%20Admin,%20saya%20*${session.user.name}*%20adalah%20pemenang%20lelang%20*${encodeURIComponent(auction.title)}*%20dengan%20bid%20*Rp%20${currentMaxBid.toLocaleString('id-ID')}*.%20Mohon%20info%20pembayarannya.`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'white', color: '#059669', padding: '0.8rem 1.5rem', borderRadius: '30px', fontWeight: 'bold', textDecoration: 'none' }}>
-                                            <i className="fab fa-whatsapp" style={{ fontSize: '1.2rem' }}></i> Konfirmasi Sekarang
-                                        </a>
+                                        <p style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: '0.9' }}>Selamat! Silakan isi data pengiriman untuk ongkir otomatis.</p>
+                                        <button onClick={() => {
+                                            addToCart({
+                                                id: `auction-${auction.id}`,
+                                                code: `LELANG-${auction.id}`,
+                                                category: auction.title,
+                                                variant: 'Ikan Lelang',
+                                                price: currentMaxBid,
+                                                img: auction.image_url,
+                                                quantity: 1,
+                                                stock: 1,
+                                                isAuction: true,
+                                                auction_id: auction.id
+                                            });
+                                            router.push('/checkout');
+                                        }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'white', color: '#059669', padding: '0.8rem 1.5rem', borderRadius: '30px', fontWeight: 'bold', textDecoration: 'none', border: 'none', cursor: 'pointer' }}>
+                                            <i className="fas fa-shopping-cart" style={{ fontSize: '1.2rem' }}></i> Lanjut ke Pembayaran
+                                        </button>
                                     </div>
                                 )}
                             </div>

@@ -51,6 +51,9 @@ export const metadata = {
   },
 };
 
+import { CartProvider } from "@/components/CartProvider";
+import CartDrawer from "@/components/CartDrawer";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="id">
@@ -119,7 +122,10 @@ export default function RootLayout({ children }) {
       </head>
       <body className={outfit.className}>
         <Providers>
-          {children}
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
         </Providers>
       </body>
     </html>
