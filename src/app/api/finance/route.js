@@ -85,10 +85,18 @@ export async function POST(req) {
         const { type, data, segmen } = body;
         const seg = (segmen === 'grosir') ? 'grosir' : 'showroom';
 
+        // Helper: pakai waktu nyata jika hari ini, atau jam 12.00 WIB untuk tanggal lampau
+        const resolveDateTime = (tanggal) => {
+            const now = new Date();
+            const todayWIB = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+            if (!tanggal || tanggal === todayWIB) return now;
+            return new Date(tanggal + 'T12:00:00+07:00');
+        };
+
         if (type === 'pengeluaran') {
             const { tanggal, pengeluaran, harga, keterangan } = data;
             if (!pengeluaran || !harga) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
-            const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
+            const tgl = resolveDateTime(tanggal);
             const result = await execute(
                 'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan, segmen) VALUES (?, ?, ?, 0, ?, ?)',
                 [tgl, pengeluaran, Number(harga), keterangan || '', seg]
@@ -98,7 +106,7 @@ export async function POST(req) {
         } else if (type === 'pemasukan') {
             const { tanggal, keterangan, pendapatan_kotor } = data;
             if (!keterangan || !pendapatan_kotor) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
-            const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
+            const tgl = resolveDateTime(tanggal);
             const result = await execute(
                 'INSERT INTO finance_keuangan (tanggal, pengeluaran, harga, pendapatan_kotor, keterangan, segmen) VALUES (?, NULL, 0, ?, ?, ?)',
                 [tgl, Number(pendapatan_kotor), keterangan, seg]
@@ -108,7 +116,7 @@ export async function POST(req) {
         } else if (type === 'stok') {
             const { tanggal, jenis_ikan, jumlah, harga_satuan, omah, online, ekspor, keterangan } = data;
             if (!jenis_ikan || !jumlah) return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 });
-            const tgl = tanggal ? new Date(tanggal + 'T12:00:00+07:00') : new Date();
+            const tgl = resolveDateTime(tanggal);
             const result = await execute(
                 'INSERT INTO finance_stok_ikan (tanggal, jenis_ikan, jumlah, harga_satuan, omah, online, ekspor, keterangan, segmen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [tgl, jenis_ikan, Number(jumlah), Number(harga_satuan || 0), Number(omah || 0), Number(online || 0), Number(ekspor || 0), keterangan || '', seg]
