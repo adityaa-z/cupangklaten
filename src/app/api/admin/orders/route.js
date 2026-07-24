@@ -70,10 +70,33 @@ export async function PUT(req) {
 
         if (updates.length === 0) return NextResponse.json({ message: 'No changes' });
 
+        // Cek status saat ini
+        let currentStatus = null;
+        if (status !== undefined) {
+            const currentOrder = await query('SELECT status FROM orders WHERE id = ?', [order_id]);
+            if (currentOrder.length > 0) currentStatus = currentOrder[0].status;
+        }
+
         const sql = 'UPDATE orders SET ' + updates.join(', ') + ' WHERE id = ?';
         params.push(order_id);
 
         await execute(sql, params);
+
+        // Jika status diubah menjadi 'done' dan sebelumnya bukan 'done'
+        if (status === 'done' && currentStatus !== 'done') {
+            const items = await query('SELECT product_id, quantity FROM order_items WHERE order_id = ? AND product_id IS NOT NULL', [order_id]);
+            for (const item of items) {
+                // Kurangi stok, jika stok <= 0 maka jadikan tidak tersedia
+                await execute(
+                    `UPDATE products 
+                     SET stock = GREATEST(0, stock - ?), 
+                         is_available = CASE WHEN (stock - ?) <= 0 THEN 0 ELSE is_available END,
+                         sold_at = CASE WHEN (stock - ?) <= 0 THEN CURRENT_TIMESTAMP ELSE sold_at END
+                     WHERE id = ?`,
+                    [item.quantity, item.quantity, item.quantity, item.product_id]
+                );
+            }
+        }
         
         return NextResponse.json({ success: true });
     } catch (error) {
