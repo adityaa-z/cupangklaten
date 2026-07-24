@@ -16,11 +16,11 @@ export async function GET(req, { params }) {
         const isAdmin = session.user.email === 'zidanp13794@gmail.com';
 
         let orderQuery = 'SELECT * FROM orders WHERE id = ?';
-        let queryParams = [id];
+        let queryParams = [id ?? null];
 
         if (!isAdmin) {
             orderQuery += ' AND user_id = (SELECT id FROM users WHERE email = ? LIMIT 1)';
-            queryParams.push(session.user.email);
+            queryParams.push(session.user.email ?? null);
         }
 
         const orders = await query(orderQuery, queryParams);
@@ -41,7 +41,7 @@ export async function GET(req, { params }) {
             LEFT JOIN products p ON oi.product_id = p.id
             LEFT JOIN auctions a ON oi.auction_id = a.id
             WHERE oi.order_id = ?
-        `, [id]);
+        `, [id ?? null]);
 
         return NextResponse.json({ order, items });
     } catch (error) {
