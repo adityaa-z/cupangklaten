@@ -87,13 +87,14 @@ export async function PUT(req) {
             const items = await query('SELECT product_id, quantity FROM order_items WHERE order_id = ? AND product_id IS NOT NULL', [order_id]);
             for (const item of items) {
                 // Kurangi stok, jika stok <= 0 maka jadikan tidak tersedia
+                // MySQL evaluates left-to-right, so 'stock' in the CASE statements refers to the already updated stock value.
                 await execute(
                     `UPDATE products 
                      SET stock = GREATEST(0, stock - ?), 
-                         is_available = CASE WHEN (stock - ?) <= 0 THEN 0 ELSE is_available END,
-                         sold_at = CASE WHEN (stock - ?) <= 0 THEN CURRENT_TIMESTAMP ELSE sold_at END
+                         is_available = CASE WHEN stock <= 0 THEN 0 ELSE is_available END,
+                         sold_at = CASE WHEN stock <= 0 THEN CURRENT_TIMESTAMP ELSE sold_at END
                      WHERE id = ?`,
-                    [item.quantity, item.quantity, item.quantity, item.product_id]
+                    [item.quantity, item.product_id]
                 );
             }
         }

@@ -36,6 +36,9 @@ const ProductCard = ({ product }) => {
         } else {
             document.body.style.overflow = 'auto';
         }
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
     }, [isLightboxOpen]);
 
     const handleNextImg = (e) => {
@@ -57,6 +60,7 @@ const ProductCard = ({ product }) => {
     const handleBuyNow = (e) => {
         e.stopPropagation();
         addToCart(product);
+        setIsLightboxOpen(false);
         router.push('/checkout');
     };
 
