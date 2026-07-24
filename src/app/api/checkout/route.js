@@ -99,17 +99,6 @@ export async function POST(req) {
                     'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
                     [orderId ?? null, item.id ?? null, item.quantity ?? 1, item.price ?? 0]
                 );
-
-                await connection.execute(
-                    'UPDATE products SET stock = stock - ? WHERE id = ?',
-                    [item.quantity ?? 1, item.id ?? null]
-                );
-
-                // Jika stok habis, set is_available = 0, sold_at = NOW()
-                await connection.execute(
-                    'UPDATE products SET is_available = 0, sold_at = NOW() WHERE id = ? AND stock <= 0',
-                    [item.id ?? null]
-                );
             }
         }
 
