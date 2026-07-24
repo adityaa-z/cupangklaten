@@ -547,7 +547,7 @@ async function fetchFeatured() {
                                 {[...Array(r.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
                                 <span className="verify-badge-container">
                                     <i className="fas fa-check-circle verify-badge"></i>
-                                    <span className="tooltip">berhasil terverifikasi bahwa sumber asli dari Google</span>
+                                    <span className="tooltip">terverifikasi langsung oleh cupangklaten</span>
                                 </span>
                             </div>
                             <p className="review-content">{r.content}</p>
