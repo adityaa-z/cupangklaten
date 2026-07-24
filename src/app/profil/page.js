@@ -162,14 +162,13 @@ export default function ProfilPage() {
                                             <div className="won-price">Bid Anda: Rp {Number(a.win_bid).toLocaleString('id-ID')}</div>
                                         </div>
 
-                                        <a 
-                                            href={`https://wa.me/6285700846152?text=Halo%20Admin,%20saya%20*${userData.name}*%20adalah%20pemenang%20lelang%20*${encodeURIComponent(a.title)}*%20dengan%20bid%20*Rp%20${Number(a.win_bid).toLocaleString('id-ID')}*.%20Mohon%20info%20pembayaran%20dan%20pengirimannya.`} 
-                                            target="_blank" 
-                                            rel="noreferrer" 
+                                        <button
+                                            onClick={() => handleCheckoutAuction(a)}
                                             className="btn-wa"
+                                            style={{ background: '#38bdf8', color: 'white', border: 'none', cursor: 'pointer' }}
                                         >
-                                            <i className="fab fa-whatsapp" style={{ fontSize: '1.2rem' }}></i> Konfirmasi
-                                        </a>
+                                            <i className="fas fa-shopping-cart" style={{ fontSize: '1.2rem' }}></i> Checkout Lelang
+                                        </button>
                                     </div>
                                 ))}
                             </div>
