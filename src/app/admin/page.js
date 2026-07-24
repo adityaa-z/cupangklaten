@@ -82,6 +82,11 @@ export default function AdminPage() {
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const [uploadingField, setUploadingField] = useState(null);
 
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
+
     // Promo Tab States
     const [promoActiveTab, setPromoActiveTab] = useState('voucher');
     const [promoActive, setPromoActive] = useState(false);
