@@ -63,6 +63,7 @@ export default function AdminPage() {
     const [members, setMembers] = useState([]);
     const [auctions, setAuctions] = useState([]);
     const [articles, setArticles] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Auth State
@@ -133,6 +134,14 @@ export default function AdminPage() {
             console.error('Unexpected error fetching data:', err);
         }
         setLoading(false);
+
+        // Fetch orders separately
+        try {
+            const oRes = await fetch('/api/admin/orders');
+            if (oRes.ok) setOrders(await oRes.json());
+        } catch (err) {
+            console.error('Error fetching orders:', err);
+        }
 
     const fetchPromoData = async () => {
         try {
@@ -772,41 +781,105 @@ export default function AdminPage() {
 
                     {activeTab === 'Pesanan' && (
                         <div className="tab-view">
-                            <div className="table-container">
-                                <table>
+                            <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                                     <thead>
-                                        <tr>
-                                            <th>Media</th>
-                                            <th>Info Pesanan</th>
-                                            <th>Detail Ikan</th>
-                                            <th>Harga</th>
-                                            <th>Aksi</th>
+                                        <tr style={{ background: '#f3f4f6', borderBottom: '2px solid #e5e7eb' }}>
+                                            <th style={{ padding: '1rem' }}>Order ID</th>
+                                            <th style={{ padding: '1rem' }}>Pelanggan</th>
+                                            <th style={{ padding: '1rem' }}>Ikan Dipesan</th>
+                                            <th style={{ padding: '1rem' }}>Total</th>
+                                            <th style={{ padding: '1rem' }}>Status Paket</th>
+                                            <th style={{ padding: '1rem' }}>No. Resi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {products.filter(p => (!p.is_available || p.stock <= 0) && !p.is_archived).map(p => (
-                                            <tr key={p.id}>
-                                                <td className="td-img" data-label="Media">
-                                                    {p.is_video ? <video src={p.img} muted /> : <img src={p.img} alt="" />}
-                                                </td>
-                                                <td data-label="Info Pesanan">
-                                                    <div style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{p.code}</div>
-                                                    <div style={{ fontSize: '0.75rem', color: '#718096' }}>
-                                                        <i className="fas fa-clock"></i> Checkout: {p.sold_at ? new Date(p.sold_at).toLocaleDateString('id-ID') : '-'}
-                                                    </div>
-                                                </td>
-                                                <td data-label="Detail Ikan">
-                                                    <div style={{ fontWeight: '600' }}>{p.category}</div>
-                                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{p.variant || '-'}</div>
-                                                </td>
-                                                <td style={{ fontWeight: '600', color: '#10b981' }} data-label="Harga">Rp {p.price.toLocaleString()}</td>
-                                                <td data-label="Aksi">
-                                                    <button className="btn btn-primary" onClick={() => archiveOrder(p.id)} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: '#6366f1' }}>
-                                                        Selesai Pengiriman
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {orders.length === 0 ? (
+                                            <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af' }}>Belum ada pesanan masuk dari checkout website.</td></tr>
+                                        ) : orders.map(order => {
+                                            const statusMap = {
+                                                'pending':   { label: '⏳ Menunggu Konfirmasi', bg: '#fef9c3', color: '#854d0e' },
+                                                'confirmed': { label: '✅ Dikonfirmasi', bg: '#dcfce7', color: '#166534' },
+                                                'packing':   { label: '📦 Sedang Packing', bg: '#e0f2fe', color: '#0369a1' },
+                                                'shipped':   { label: '🚚 Sudah Dikirim', bg: '#ede9fe', color: '#5b21b6' },
+                                                'done':      { label: '🎉 Selesai', bg: '#f0fdf4', color: '#15803d' },
+                                                'cancelled': { label: '❌ Dibatalkan', bg: '#fee2e2', color: '#991b1b' },
+                                            };
+                                            const st = statusMap[order.status] || statusMap['pending'];
+                                            return (
+                                                <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                                    <td style={{ padding: '1rem' }}>
+                                                        <div style={{ fontWeight: 'bold', color: '#1e40af' }}>{order.order_code}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{new Date(order.created_at).toLocaleString('id-ID')}</div>
+                                                    </td>
+                                                    <td style={{ padding: '1rem' }}>
+                                                        <div style={{ fontWeight: '600' }}>{order.shipping_name || '-'}</div>
+                                                        {order.shipping_phone && (
+                                                            <a href={`https://wa.me/${order.shipping_phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" style={{ color: '#25d366', textDecoration: 'none', fontSize: '0.85rem' }}>
+                                                                <i className="fab fa-whatsapp"></i> {order.shipping_phone}
+                                                            </a>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>
+                                                        <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                                                            {(order.items || []).map(item => (
+                                                                <li key={item.id}>{item.quantity}x {item.category} ({item.code})</li>
+                                                            ))}
+                                                        </ul>
+                                                    </td>
+                                                    <td style={{ padding: '1rem', fontWeight: 'bold', color: '#059669' }}>
+                                                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(order.total_amount)}
+                                                    </td>
+                                                    <td style={{ padding: '1rem' }}>
+                                                        <select
+                                                            value={order.status}
+                                                            onChange={async (e) => {
+                                                                const res = await fetch('/api/admin/orders', {
+                                                                    method: 'PUT',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({ order_id: order.id, status: e.target.value })
+                                                                });
+                                                                if (res.ok) {
+                                                                    const oRes = await fetch('/api/admin/orders');
+                                                                    if (oRes.ok) setOrders(await oRes.json());
+                                                                } else alert('Gagal update status');
+                                                            }}
+                                                            style={{ padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid #d1d5db', background: st.bg, color: st.color, fontWeight: 'bold', cursor: 'pointer', width: '100%' }}
+                                                        >
+                                                            <option value="pending">⏳ Menunggu Konfirmasi</option>
+                                                            <option value="confirmed">✅ Dikonfirmasi</option>
+                                                            <option value="packing">📦 Sedang Packing</option>
+                                                            <option value="shipped">🚚 Sudah Dikirim</option>
+                                                            <option value="done">🎉 Selesai</option>
+                                                            <option value="cancelled">❌ Dibatalkan</option>
+                                                        </select>
+                                                    </td>
+                                                    <td style={{ padding: '1rem' }}>
+                                                        <div style={{ fontWeight: 'bold', color: '#2563eb', marginBottom: '0.3rem' }}>
+                                                            {order.tracking_number || <span style={{ color: '#9ca3af', fontWeight: 'normal' }}>Belum ada</span>}
+                                                        </div>
+                                                        <button
+                                                            onClick={async () => {
+                                                                const resi = prompt('Masukkan Nomor Resi / Catatan Pengiriman:', order.tracking_number || '');
+                                                                if (resi === null) return;
+                                                                const res = await fetch('/api/admin/orders', {
+                                                                    method: 'PUT',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({ order_id: order.id, tracking_number: resi })
+                                                                });
+                                                                if (res.ok) {
+                                                                    const oRes = await fetch('/api/admin/orders');
+                                                                    if (oRes.ok) setOrders(await oRes.json());
+                                                                }
+                                                            }}
+                                                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', background: 'none', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }}
+                                                        >
+                                                            <i className="fas fa-edit"></i> Isi Resi
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

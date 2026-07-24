@@ -90,6 +90,11 @@ const Navbar = () => {
                                 <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
                                     <i className="fas fa-user-circle"></i> Halo, {session.user.name?.split(' ')[0] || 'Member'}
                                 </Link>
+                                {session.user?.email !== 'zidanp13794@gmail.com' && (
+                                    <Link href="/pesanan-saya" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: '#2563eb', fontWeight: 'bold' }}>
+                                        <i className="fas fa-box-open" style={{ color: '#2563eb' }}></i> Pesanan Saya
+                                    </Link>
+                                )}
                                 {session.user?.email === 'zidanp13794@gmail.com' && (
                                     <>
                                         <Link href="/keuangan" className="menu-item" onClick={() => setMenuOpen(false)}>
