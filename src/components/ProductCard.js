@@ -160,6 +160,10 @@ const ProductCard = ({ product }) => {
                                     </div>
                                 </div>
 
+                                <a href="https://shopee.co.id/" target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '0.8rem', background: '#ee4d2d', color: 'white', borderRadius: '8px', textAlign: 'center', marginTop: '1rem', fontWeight: 'bold', textDecoration: 'none', fontSize: '0.9rem' }}>
+                                    <i className="fas fa-shopping-bag"></i> Link Shopee (Khusus Ongkir & Packing Rp 10.000)
+                                </a>
+
                                 {!isSoldOut && (
                                     <div className="checkout-bar" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
                                         <button onClick={handleAddToCart} style={{ flex: 1, padding: '0.8rem', background: '#e5e7eb', color: '#111827', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>

@@ -109,13 +109,17 @@ export default function OrderInvoicePage({ params }) {
                     </div>
 
                     <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
-                        <h4 style={{ color: '#1e40af', margin: '0 0 0.5rem 0' }}><i className="fas fa-info-circle"></i> Langkah Terakhir: Konfirmasi</h4>
-                        <p style={{ color: '#1d4ed8', margin: 0 }}>Silakan klik tombol di bawah ini untuk <strong>melanjutkan proses pemesanan ke WhatsApp</strong> (cek total tagihan+ongkir / minta link Shopee).</p>
-                    </div>
+                        <h4 style={{ color: '#1e40af', margin: '0 0 0.5rem 0' }}><i className="fas fa-info-circle"></i> Langkah Terakhir: Konfirmasi & Ongkir</h4>
+                        <p style={{ color: '#1d4ed8', margin: 0, marginBottom: '1rem' }}>Silakan klik tombol WhatsApp di bawah ini untuk <strong>konfirmasi pembayaran ikan</strong>. Untuk pembayaran biaya Ongkir & Packing (Rp 10.000), Anda bisa menggunakan link Shopee di bawah ini.</p>
+                        
+                        <a href="https://shopee.co.id/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', width: '100%', padding: '1rem', background: '#ee4d2d', color: 'white', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', textDecoration: 'none', transition: 'background 0.3s', marginBottom: '1rem' }}>
+                            <i className="fas fa-shopping-bag" style={{ fontSize: '1.3rem', marginRight: '0.5rem' }}></i> Link Shopee (Khusus Ongkir & Packing)
+                        </a>
 
-                    <a href={waLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', width: '100%', padding: '1rem', background: '#25d366', color: 'white', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', textDecoration: 'none', transition: 'background 0.3s' }}>
-                        <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', marginRight: '0.5rem' }}></i> Lanjut ke WhatsApp
-                    </a>
+                        <a href={waLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', width: '100%', padding: '1rem', background: '#25d366', color: 'white', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', textDecoration: 'none', transition: 'background 0.3s' }}>
+                            <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', marginRight: '0.5rem' }}></i> Lanjut ke WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
             <Footer />
