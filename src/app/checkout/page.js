@@ -19,24 +19,6 @@ export default function CheckoutPage() {
     const [phone, setPhone] = useState('');
     const [addressDetail, setAddressDetail] = useState('');
 
-    // Location State
-    const [provinces, setProvinces] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [selectedProv, setSelectedProv] = useState('');
-    const [selectedCity, setSelectedCity] = useState('');
-
-    // Shipping State
-    const [courier, setCourier] = useState('tiki');
-    const [shippingCost, setShippingCost] = useState(0);
-    const [shippingLoading, setShippingLoading] = useState(false);
-
-    // Calculation
-    // Asumsi 1 ikan / item = 250 gram. Minimal berat 1000g untuk ongkir.
-    const rawWeight = cartCount * 250;
-    const weight = rawWeight < 1000 ? 1000 : rawWeight;
-    const weightInKg = Math.ceil(weight / 1000);
-    const packingFee = weightInKg * 10000;
-
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login?callbackUrl=/checkout');
@@ -45,87 +27,16 @@ export default function CheckoutPage() {
         }
     }, [status, session, router]);
 
-    // Fetch Provinces
-    useEffect(() => {
-        async function fetchProvinces() {
-            try {
-                const res = await fetch('/api/rajaongkir?type=province');
-                const data = await res.json();
-                if (Array.isArray(data)) setProvinces(data);
-            } catch (err) {
-                console.error('Gagal memuat provinsi', err);
-            }
-        }
-        fetchProvinces();
-    }, []);
-
-    // Fetch Cities when Province changes
-    useEffect(() => {
-        if (!selectedProv) {
-            setCities([]);
-            return;
-        }
-        async function fetchCities() {
-            try {
-                const res = await fetch(`/api/rajaongkir?type=city&province=${selectedProv}`);
-                const data = await res.json();
-                if (Array.isArray(data)) setCities(data);
-            } catch (err) {
-                console.error('Gagal memuat kota', err);
-            }
-        }
-        fetchCities();
-    }, [selectedProv]);
-
-    // Calculate Shipping when City or Courier changes
-    useEffect(() => {
-        if (!selectedCity || cartCount === 0) {
-            setShippingCost(0);
-            return;
-        }
-        async function calcShipping() {
-            setShippingLoading(true);
-            try {
-                const res = await fetch('/api/rajaongkir', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        destination: selectedCity,
-                        weight,
-                        courier
-                    })
-                });
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    // Komerce returns an array of services. Find the first valid cost
-                    setShippingCost(data[0].cost || 0);
-                } else {
-                    setShippingCost(0);
-                }
-            } catch (err) {
-                console.error('Gagal hitung ongkir', err);
-                setShippingCost(0);
-            } finally {
-                setShippingLoading(false);
-            }
-        }
-        calcShipping();
-    }, [selectedCity, courier, weight, cartCount]);
-
     const formatRupiah = (number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
     };
 
     const handleCheckout = async (e) => {
         e.preventDefault();
-        if (!selectedCity || !addressDetail || !phone) {
+        if (!addressDetail || !phone) {
             alert('Harap lengkapi semua data pengiriman');
             return;
         }
-
-        const selectedCityName = cities.find(c => String(c.id) === String(selectedCity))?.name || '';
-        const selectedProvName = provinces.find(p => String(p.id) === String(selectedProv))?.name || '';
-        const fullAddress = `${addressDetail}, ${selectedCityName}, ${selectedProvName}`;
 
         setLoading(true);
         try {
@@ -136,10 +47,10 @@ export default function CheckoutPage() {
                     cart,
                     shipping_name: name,
                     shipping_phone: phone,
-                    shipping_address: fullAddress,
-                    courier,
-                    shipping_cost: shippingCost + packingFee, // Ongkir digabung biaya packing di DB
-                    total_amount: cartTotal + shippingCost + packingFee
+                    shipping_address: addressDetail,
+                    courier: 'wa',
+                    shipping_cost: 0, 
+                    total_amount: cartTotal
                 })
             });
 
@@ -168,25 +79,7 @@ export default function CheckoutPage() {
         </>
     );
 
-    const grandTotal = cartTotal + shippingCost + packingFee;
-
-    const waAdmin = "6285700846152";
-    const selectedCityNameStr = cities.find(c => String(c.id) === String(selectedCity))?.name || '';
-    const selectedProvNameStr = provinces.find(p => String(p.id) === String(selectedProv))?.name || '';
-    const fullAddressStr = `${addressDetail}, ${selectedCityNameStr}, ${selectedProvNameStr}`;
-    
-    let waText = `Halo Admin, saya ingin order ikan namun ongkir ke alamat saya tidak muncul.\n\n`;
-    waText += `*Nama:* ${name || 'Belum diisi'}\n`;
-    waText += `*Alamat:* ${fullAddressStr}\n\n`;
-    waText += `*Daftar Produk:*\n`;
-    cart.forEach(item => {
-        waText += `- ${item.quantity}x ${item.category} (Kode: ${item.code || item.id}) - ${formatRupiah(item.price * item.quantity)}\n`;
-    });
-    waText += `\n*Total Harga Ikan:* ${formatRupiah(cartTotal)}\n`;
-    waText += `*Biaya Packing:* ${formatRupiah(packingFee)}\n\n`;
-    waText += `Mohon info ongkos kirim menggunakan ${courier.toUpperCase()} ke alamat saya. Terima kasih.`;
-    
-    const waLinkOngkir = `https://wa.me/${waAdmin}?text=${encodeURIComponent(waText)}`;
+    const grandTotal = cartTotal;
 
     return (
         <>
@@ -205,40 +98,17 @@ export default function CheckoutPage() {
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>No WhatsApp</label>
                             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required placeholder="Contoh: 08123456789" style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }} />
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ flex: 1 }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Provinsi</label>
-                                <select value={selectedProv} onChange={e => setSelectedProv(e.target.value)} required style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                                    <option value="">Pilih Provinsi...</option>
-                                    {provinces.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Kota/Kabupaten</label>
-                                <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)} required disabled={!selectedProv} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                                    <option value="">Pilih Kota...</option>
-                                    {cities.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Alamat Lengkap (Jalan, RT/RW, Patokan)</label>
-                            <textarea value={addressDetail} onChange={e => setAddressDetail(e.target.value)} required rows="3" style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}></textarea>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Alamat Lengkap (Provinsi, Kota/Kab, Kecamatan, Jalan, RT/RW)</label>
+                            <textarea value={addressDetail} onChange={e => setAddressDetail(e.target.value)} required rows="4" style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }} placeholder="Tuliskan alamat lengkap pengiriman..."></textarea>
                         </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Pilih Ekspedisi</label>
-                            <select value={courier} onChange={e => setCourier(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                                <option value="tiki">TIKI</option>
-                                <option value="jne">JNE</option>
-                                <option value="pos">POS Indonesia</option>
-                            </select>
+                        
+                        <div style={{ padding: '1rem', background: '#fef3c7', borderRadius: '8px', color: '#92400e', fontSize: '0.9rem' }}>
+                            <i className="fas fa-info-circle"></i> Harga belum termasuk biaya packing & ongkos kirim. Ongkos kirim akan diinfokan via WhatsApp atau bisa checkout via Shopee.
                         </div>
-                        <button type="submit" disabled={loading || shippingLoading || (selectedCity && shippingCost === 0 && !shippingLoading)} style={{ marginTop: '1rem', padding: '1rem', background: (selectedCity && shippingCost === 0 && !shippingLoading) ? '#9ca3af' : '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', cursor: (loading || shippingLoading || (selectedCity && shippingCost === 0 && !shippingLoading)) ? 'not-allowed' : 'pointer', opacity: (loading || shippingLoading) ? 0.7 : 1 }}>
-                            {loading ? 'Memproses...' : (selectedCity && shippingCost === 0 && !shippingLoading ? 'Ongkir Tidak Tersedia' : 'Buat Pesanan')}
+
+                        <button type="submit" disabled={loading} style={{ marginTop: '1rem', padding: '1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+                            {loading ? 'Memproses...' : 'Buat Pesanan'}
                         </button>
                     </form>
                 </div>
@@ -260,17 +130,17 @@ export default function CheckoutPage() {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', color: '#4b5563' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Total Harga ({cartCount} Ikan)</span>
+                            <span>Total Harga Ikan ({cartCount})</span>
                             <span style={{ fontWeight: 'bold', color: '#111827' }}>{formatRupiah(cartTotal)}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Biaya Packing ({weightInKg} kg)</span>
-                            <span style={{ fontWeight: 'bold', color: '#111827' }}>{formatRupiah(packingFee)}</span>
+                            <span>Biaya Packing</span>
+                            <span style={{ fontWeight: 'bold', color: '#111827' }}>Menyusul</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Ongkos Kirim ({courier.toUpperCase()})</span>
+                            <span>Ongkos Kirim</span>
                             <span style={{ fontWeight: 'bold', color: '#111827' }}>
-                                {shippingLoading ? 'Menghitung...' : (shippingCost > 0 ? formatRupiah(shippingCost) : '-')}
+                                Menyusul
                             </span>
                         </div>
                     </div>
@@ -278,21 +148,9 @@ export default function CheckoutPage() {
                     <hr style={{ borderColor: '#e5e7eb', margin: '1.5rem 0' }} />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: 'bold', color: '#2563eb' }}>
-                        <span>Total Tagihan</span>
+                        <span>Total Ikan</span>
                         <span>{formatRupiah(grandTotal)}</span>
                     </div>
-
-                    {/* Warning Ongkir Tidak Ditemukan */}
-                    {selectedCity && !shippingLoading && shippingCost === 0 && (
-                        <div style={{ marginTop: '1.5rem', padding: '1.5rem', background: '#fef2f2', border: '1px solid #f87171', borderRadius: '12px' }}>
-                            <p style={{ color: '#b91c1c', margin: '0 0 1rem 0', fontWeight: 'bold', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                                <i className="fas fa-exclamation-triangle"></i> Ongkos kirim ekspedisi ini tidak tersedia di rute Anda.
-                            </p>
-                            <a href={waLinkOngkir} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', background: '#25d366', color: 'white', padding: '0.8rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1rem', transition: '0.3s' }}>
-                                <i className="fab fa-whatsapp"></i> Chat WA Cek Ongkir Manual
-                            </a>
-                        </div>
-                    )}
                 </div>
 
             </div>

@@ -51,11 +51,11 @@ export default function OrderInvoicePage({ params }) {
 
     if (!order) return null;
 
-    const waAdmin = "6285700846152"; // Sesuai nomor yang sudah ada di source code
+    const waAdmin = "6285700846152"; 
     
     // Generate text for WA
     let itemText = items.map(i => `- ${i.category} ${i.variant ? `(${i.variant})` : ''} x${i.quantity} (Kode: ${i.code})`).join('%0A');
-    const waText = `Halo Admin Cupang Klaten,%0A%0ASaya sudah melakukan pemesanan di website.%0A%0A*📌 Order ID:* ${order.order_code}%0A*👤 Nama:* ${order.shipping_name}%0A*📦 Ekspedisi:* ${order.courier.toUpperCase()}%0A%0A*Detail Pesanan:*%0A${itemText}%0A%0A*💰 Total Tagihan:* ${formatRupiah(order.total_amount)}%0A%0ABerikut saya lampirkan foto/screenshot BUKTI TRANSFER pembayaran saya. Terima kasih.`;
+    const waText = `Halo Admin Cupang Klaten,%0A%0ASaya sudah melakukan pemesanan di website.%0A%0A*📌 Order ID:* ${order.order_code}%0A*👤 Nama:* ${order.shipping_name}%0A*📍 Alamat:* ${order.shipping_address}%0A%0A*Detail Pesanan Ikan:*%0A${itemText}%0A%0A*💰 Total Harga Ikan:* ${formatRupiah(order.total_amount)}%0A%0AMohon info ketersediaan pengiriman & biaya packing / ongkir, atau link Shopee jika bisa. Terima kasih.`;
     const waLink = `https://wa.me/${waAdmin}?text=${waText}`;
 
     return (
@@ -69,25 +69,29 @@ export default function OrderInvoicePage({ params }) {
                     <h1 style={{ color: '#111827', marginBottom: '0.5rem' }}>Pesanan Berhasil Dibuat!</h1>
                     <p style={{ color: '#6b7280', fontSize: '1.1rem', marginBottom: '2rem' }}>Order ID: <strong>{order.order_code}</strong></p>
 
+                    <div style={{ background: '#fef3c7', color: '#92400e', borderRadius: '12px', padding: '1.5rem', textAlign: 'left', marginBottom: '2rem', border: '1px solid #fde68a' }}>
+                        <strong>Perhatian:</strong> Harga di bawah ini <strong>HANYA UNTUK IKAN</strong> dan belum termasuk biaya packing serta ongkos kirim. Silakan hubungi admin via WhatsApp untuk total keseluruhan atau untuk meminta link checkout via Shopee.
+                    </div>
+
                     <div style={{ background: '#f9fafb', borderRadius: '12px', padding: '1.5rem', textAlign: 'left', marginBottom: '2rem', border: '1px solid #e5e7eb' }}>
-                        <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '0.5rem', marginBottom: '1rem', color: '#111827' }}>Rincian Tagihan</h3>
+                        <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '0.5rem', marginBottom: '1rem', color: '#111827' }}>Rincian Belanja Ikan</h3>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4b5563' }}>
-                            <span>Subtotal Produk</span>
-                            <span>{formatRupiah(order.total_amount - order.shipping_cost)}</span>
+                            <span>Total Harga Ikan</span>
+                            <span>{formatRupiah(order.total_amount)}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4b5563' }}>
-                            <span>Ongkos Kirim & Packing ({order.courier.toUpperCase()})</span>
-                            <span>{formatRupiah(order.shipping_cost)}</span>
+                            <span>Ongkos Kirim & Packing</span>
+                            <span>Menyusul</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed #d1d5db', fontSize: '1.25rem', fontWeight: 'bold', color: '#ef4444' }}>
-                            <span>Total Pembayaran</span>
+                            <span>Total (Ikan Saja)</span>
                             <span>{formatRupiah(order.total_amount)}</span>
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '2rem' }}>
-                        <h3 style={{ color: '#111827', marginBottom: '1rem' }}>Instruksi Pembayaran</h3>
-                        <p style={{ color: '#4b5563', marginBottom: '1rem' }}>Silakan transfer tepat <strong>{formatRupiah(order.total_amount)}</strong> ke salah satu rekening berikut:</p>
+                        <h3 style={{ color: '#111827', marginBottom: '1rem' }}>Pilihan Pembayaran</h3>
+                        <p style={{ color: '#4b5563', marginBottom: '1rem' }}>Anda bisa transfer langsung sesuai instruksi WhatsApp (setelah ongkir diinfokan) atau bayar via Shopee.</p>
                         
                         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <div style={{ border: '1px solid #e5e7eb', padding: '1.5rem', borderRadius: '12px', flex: '1 1 250px', background: 'white' }}>
@@ -106,11 +110,11 @@ export default function OrderInvoicePage({ params }) {
 
                     <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
                         <h4 style={{ color: '#1e40af', margin: '0 0 0.5rem 0' }}><i className="fas fa-info-circle"></i> Langkah Terakhir: Konfirmasi</h4>
-                        <p style={{ color: '#1d4ed8', margin: 0 }}>Setelah transfer, Anda <strong>wajib</strong> mengklik tombol di bawah ini untuk mengirimkan bukti transfer ke WhatsApp admin agar pesanan segera diproses.</p>
+                        <p style={{ color: '#1d4ed8', margin: 0 }}>Silakan klik tombol di bawah ini untuk <strong>melanjutkan proses pemesanan ke WhatsApp</strong> (cek total tagihan+ongkir / minta link Shopee).</p>
                     </div>
 
                     <a href={waLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', width: '100%', padding: '1rem', background: '#25d366', color: 'white', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', textDecoration: 'none', transition: 'background 0.3s' }}>
-                        <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', marginRight: '0.5rem' }}></i> Konfirmasi Pembayaran via WA
+                        <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', marginRight: '0.5rem' }}></i> Lanjut ke WhatsApp
                     </a>
                 </div>
             </div>
