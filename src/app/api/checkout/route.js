@@ -34,7 +34,7 @@ export async function POST(req) {
         // 1. Verify Stock for Normal Products
         for (const item of cart) {
             if (!item.isAuction) {
-                const [rows] = await connection.execute('SELECT stock, is_available FROM products WHERE id = ? FOR UPDATE', [item.id]);
+                const [rows] = await connection.execute('SELECT stock, is_available FROM products WHERE id = ? FOR UPDATE', [item.id ?? null]);
                 if (rows.length === 0) throw new Error(`Produk dengan ID ${item.id} tidak ditemukan.`);
                 
                 const product = rows[0];
@@ -43,7 +43,7 @@ export async function POST(req) {
                 }
             } else {
                 // Verify Auction
-                const [rows] = await connection.execute('SELECT status, payment_status FROM auctions WHERE id = ? FOR UPDATE', [item.auction_id]);
+                const [rows] = await connection.execute('SELECT status, payment_status FROM auctions WHERE id = ? FOR UPDATE', [item.auction_id ?? null]);
                 if (rows.length === 0) throw new Error(`Lelang dengan ID ${item.auction_id} tidak ditemukan.`);
                 if (rows[0].payment_status === 'paid' || rows[0].payment_status === 'confirmed') {
                     throw new Error(`Lelang ${item.code} sudah diproses.`);
@@ -54,7 +54,7 @@ export async function POST(req) {
         // 2. Insert Order
         const orderCode = generateOrderCode();
         // Cek email user di db untuk dapet ID-nya
-        const [userRows] = await connection.execute('SELECT id, name, phone, address FROM users WHERE email = ?', [session.user.email]);
+        const [userRows] = await connection.execute('SELECT id, name, phone, address FROM users WHERE email = ?', [session.user.email ?? null]);
         let userId, userPhone, userAddress, userName;
         if (userRows.length > 0) {
             userId = userRows[0].id;
@@ -65,7 +65,7 @@ export async function POST(req) {
             // Jika user pakai google auth dan belum masuk tabel users secara utuh, ini jaga-jaga
             const [insertUser] = await connection.execute(
                 'INSERT INTO users (name, email, role, status) VALUES (?, ?, ?, ?)',
-                [session.user.name || null, session.user.email || null, 'member', 'approved']
+                [session.user.name ?? null, session.user.email ?? null, 'member', 'approved']
             );
             userId = insertUser.insertId;
             userName = session.user.name;
@@ -78,7 +78,7 @@ export async function POST(req) {
         const [orderResult] = await connection.execute(
             `INSERT INTO orders (user_id, order_code, shipping_name, shipping_phone, shipping_address, courier, shipping_cost, total_amount, status)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-            [userId ?? null, orderCode, finalName, finalPhone, finalAddress, courier ?? null, shipping_cost ?? 0, total_amount ?? 0]
+            [userId ?? null, orderCode ?? null, finalName ?? 'Belum diisi', finalPhone ?? 'Belum diisi', finalAddress ?? 'Belum diisi', courier ?? null, shipping_cost ?? 0, total_amount ?? 0]
         );
         const orderId = orderResult.insertId;
 
@@ -87,28 +87,28 @@ export async function POST(req) {
             if (item.isAuction) {
                 await connection.execute(
                     'INSERT INTO order_items (order_id, auction_id, quantity, price) VALUES (?, ?, ?, ?)',
-                    [orderId, item.auction_id, item.quantity, item.price]
+                    [orderId ?? null, item.auction_id ?? null, item.quantity ?? 1, item.price ?? 0]
                 );
 
                 await connection.execute(
                     'UPDATE auctions SET payment_status = "confirmed" WHERE id = ?',
-                    [item.auction_id]
+                    [item.auction_id ?? null]
                 );
             } else {
                 await connection.execute(
                     'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
-                    [orderId, item.id, item.quantity, item.price]
+                    [orderId ?? null, item.id ?? null, item.quantity ?? 1, item.price ?? 0]
                 );
 
                 await connection.execute(
                     'UPDATE products SET stock = stock - ? WHERE id = ?',
-                    [item.quantity, item.id]
+                    [item.quantity ?? 1, item.id ?? null]
                 );
 
                 // Jika stok habis, set is_available = 0, sold_at = NOW()
                 await connection.execute(
                     'UPDATE products SET is_available = 0, sold_at = NOW() WHERE id = ? AND stock <= 0',
-                    [item.id]
+                    [item.id ?? null]
                 );
             }
         }
