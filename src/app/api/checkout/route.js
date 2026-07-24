@@ -62,7 +62,7 @@ export async function POST(req) {
             // Jika user pakai google auth dan belum masuk tabel users secara utuh, ini jaga-jaga
             const [insertUser] = await connection.execute(
                 'INSERT INTO users (name, email, role, status) VALUES (?, ?, ?, ?)',
-                [session.user.name, session.user.email, 'member', 'approved']
+                [session.user.name || null, session.user.email || null, 'member', 'approved']
             );
             userId = insertUser.insertId;
         }
@@ -70,7 +70,7 @@ export async function POST(req) {
         const [orderResult] = await connection.execute(
             `INSERT INTO orders (user_id, order_code, shipping_name, shipping_phone, shipping_address, courier, shipping_cost, total_amount, status)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-            [userId, orderCode, shipping_name, shipping_phone, shipping_address, courier, shipping_cost, total_amount]
+            [userId ?? null, orderCode, shipping_name ?? null, shipping_phone ?? null, shipping_address ?? null, courier ?? null, shipping_cost ?? 0, total_amount ?? 0]
         );
         const orderId = orderResult.insertId;
 
