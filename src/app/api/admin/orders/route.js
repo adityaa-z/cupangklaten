@@ -15,7 +15,8 @@ export async function GET() {
         await checkAdmin();
         const orders = await query('SELECT * FROM orders ORDER BY created_at DESC');
         
-        // Fetch items for all orders
+        if (orders.length === 0) return NextResponse.json([]);
+
         const items = await query(`
             SELECT oi.*, 
                    COALESCE(p.category, a.title) as category, 
@@ -26,17 +27,15 @@ export async function GET() {
             LEFT JOIN auctions a ON oi.auction_id = a.id
         `);
 
-        // Group items by order_id
-        const ordersWithItems = orders.map(order => {
-            return {
-                ...order,
-                items: items.filter(item => item.order_id === order.id)
-            };
-        });
+        const ordersWithItems = orders.map(order => ({
+            ...order,
+            items: items.filter(item => item.order_id === order.id)
+        }));
 
         return NextResponse.json(ordersWithItems);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 401 });
+        console.error('GET orders error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
@@ -48,29 +47,49 @@ export async function PUT(req) {
 
         if (!order_id) return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
 
-        let sql = 'UPDATE orders SET ';
-        let params = [];
         let updates = [];
+        let params = [];
 
-        if (status) {
+        if (status !== undefined && status !== null) {
             updates.push('status = ?');
             params.push(status);
         }
 
         if (tracking_number !== undefined) {
             updates.push('tracking_number = ?');
-            params.push(tracking_number);
+            params.push(tracking_number ?? null);
         }
 
         if (updates.length === 0) return NextResponse.json({ message: 'No changes' });
 
-        sql += updates.join(', ') + ' WHERE id = ?';
+        const sql = 'UPDATE orders SET ' + updates.join(', ') + ' WHERE id = ?';
         params.push(order_id);
 
         await execute(sql, params);
         
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error('PUT orders error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function DELETE(req) {
+    try {
+        await checkAdmin();
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+
+        if (!id) return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
+
+        // Delete order items first
+        await execute('DELETE FROM order_items WHERE order_id = ?', [id]);
+        // Delete order
+        await execute('DELETE FROM orders WHERE id = ?', [id]);
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('DELETE orders error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
