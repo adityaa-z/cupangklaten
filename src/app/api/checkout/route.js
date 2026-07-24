@@ -54,10 +54,13 @@ export async function POST(req) {
         // 2. Insert Order
         const orderCode = generateOrderCode();
         // Cek email user di db untuk dapet ID-nya
-        const [userRows] = await connection.execute('SELECT id FROM users WHERE email = ?', [session.user.email]);
-        let userId;
+        const [userRows] = await connection.execute('SELECT id, name, phone, address FROM users WHERE email = ?', [session.user.email]);
+        let userId, userPhone, userAddress, userName;
         if (userRows.length > 0) {
             userId = userRows[0].id;
+            userName = userRows[0].name;
+            userPhone = userRows[0].phone;
+            userAddress = userRows[0].address;
         } else {
             // Jika user pakai google auth dan belum masuk tabel users secara utuh, ini jaga-jaga
             const [insertUser] = await connection.execute(
@@ -65,12 +68,17 @@ export async function POST(req) {
                 [session.user.name || null, session.user.email || null, 'member', 'approved']
             );
             userId = insertUser.insertId;
+            userName = session.user.name;
         }
+
+        const finalName = shipping_name || userName || 'Belum diisi';
+        const finalPhone = shipping_phone || userPhone || 'Belum diisi';
+        const finalAddress = shipping_address || userAddress || 'Belum diisi';
 
         const [orderResult] = await connection.execute(
             `INSERT INTO orders (user_id, order_code, shipping_name, shipping_phone, shipping_address, courier, shipping_cost, total_amount, status)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-            [userId ?? null, orderCode, shipping_name ?? null, shipping_phone ?? null, shipping_address ?? null, courier ?? null, shipping_cost ?? 0, total_amount ?? 0]
+            [userId ?? null, orderCode, finalName, finalPhone, finalAddress, courier ?? null, shipping_cost ?? 0, total_amount ?? 0]
         );
         const orderId = orderResult.insertId;
 
