@@ -25,7 +25,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div className="footer-links">
-                    <h4>Kontak</h4>
+                    <h4>Temukan Kami</h4>
                     <a href="https://maps.app.goo.gl/mkFP6BYoa9MmM4UM8" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fas fa-map-marker-alt" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
@@ -42,8 +42,13 @@ const Footer = () => {
                         @cupangklaten
                     </a>
                     <a href="https://www.tiktok.com/@cupangklaten" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginTop: '0.8rem', transition: 'color 0.3s' }}>
+                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fab fa-tiktok" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
+                        @cupangklaten
+                    </a>
+                    <a href="https://youtube.com/@cupangklaten?si=man02VByXAAVcjIf" target="_blank" rel="noopener noreferrer"
+                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
+                        <i className="fab fa-youtube" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
                         @cupangklaten
                     </a>
                 </div>
