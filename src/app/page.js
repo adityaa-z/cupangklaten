@@ -521,7 +521,7 @@ async function fetchFeatured() {
       <section className="reviews-section" id="reviews">
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <h2 className="section-title">Kata Pelanggan cupangklaten.id</h2>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Ulasan asli dari Google Maps</p>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Ulasan asli pelanggan cupangklaten</p>
               
               <div className="slider-container">
                 <button className="slider-nav-btn prev" onClick={() => scroll(reviewsSliderRef, 'left')} disabled={!scrollReviews.left} aria-label="Previous review">
