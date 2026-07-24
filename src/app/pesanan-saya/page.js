@@ -152,11 +152,22 @@ export default function PesananSayaPage() {
                                                 </div>
                                             )}
 
-                                            {/* No. Resi */}
+                                            {/* No. Resi / Shopee */}
                                             {order.tracking_number && (
                                                 <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
-                                                    <div style={{ fontWeight: 'bold', color: '#166534', marginBottom: '0.3rem' }}>🚚 Nomor Resi / Info Pengiriman:</div>
-                                                    <div style={{ color: '#15803d', fontWeight: 'bold', fontSize: '1.1rem', letterSpacing: '1px' }}>{order.tracking_number}</div>
+                                                    {order.tracking_number.startsWith('http') ? (
+                                                        <>
+                                                            <div style={{ fontWeight: 'bold', color: '#166534', marginBottom: '0.5rem' }}>🛍️ Pembayaran Ongkir via Shopee:</div>
+                                                            <a href={order.tracking_number} target="_blank" rel="noreferrer" style={{ display: 'inline-block', padding: '0.7rem 1.5rem', background: '#ee4d2d', color: 'white', borderRadius: '8px', fontWeight: 'bold', textDecoration: 'none', fontSize: '0.95rem' }}>
+                                                                <i className="fas fa-shopping-bag" style={{ marginRight: '0.5rem' }}></i> Klik untuk Bayar Ongkir Shopee
+                                                            </a>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div style={{ fontWeight: 'bold', color: '#166534', marginBottom: '0.3rem' }}>🚚 Nomor Resi / Info Pengiriman:</div>
+                                                            <div style={{ color: '#15803d', fontWeight: 'bold', fontSize: '1.1rem', letterSpacing: '1px' }}>{order.tracking_number}</div>
+                                                        </>
+                                                    )}
                                                 </div>
                                             )}
 

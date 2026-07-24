@@ -64,6 +64,7 @@ export default function AdminPage() {
     const [auctions, setAuctions] = useState([]);
     const [articles, setArticles] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [resiModal, setResiModal] = useState(null); // { orderId, type: 'resi'|'shopee', value: '' }
     const [loading, setLoading] = useState(false);
 
     // Auth State
@@ -855,26 +856,19 @@ export default function AdminPage() {
                                                         </select>
                                                     </td>
                                                     <td style={{ padding: '1rem' }}>
-                                                        <div style={{ fontWeight: 'bold', color: '#2563eb', marginBottom: '0.3rem' }}>
-                                                            {order.tracking_number || <span style={{ color: '#9ca3af', fontWeight: 'normal' }}>Belum ada</span>}
+                                                        <div style={{ fontWeight: 'bold', color: '#2563eb', marginBottom: '0.3rem', fontSize: '0.85rem', wordBreak: 'break-all' }}>
+                                                            {order.tracking_number
+                                                                ? order.tracking_number.startsWith('http')
+                                                                    ? <a href={order.tracking_number} target="_blank" rel="noreferrer" style={{ color: '#ee4d2d' }}><i className="fas fa-shopping-bag"></i> Link Shopee</a>
+                                                                    : order.tracking_number
+                                                                : <span style={{ color: '#9ca3af', fontWeight: 'normal' }}>Belum ada</span>
+                                                            }
                                                         </div>
                                                         <button
-                                                            onClick={async () => {
-                                                                const resi = prompt('Masukkan Nomor Resi / Catatan Pengiriman:', order.tracking_number || '');
-                                                                if (resi === null) return;
-                                                                const res = await fetch('/api/admin/orders', {
-                                                                    method: 'PUT',
-                                                                    headers: { 'Content-Type': 'application/json' },
-                                                                    body: JSON.stringify({ order_id: order.id, tracking_number: resi })
-                                                                });
-                                                                if (res.ok) {
-                                                                    const oRes = await fetch('/api/admin/orders');
-                                                                    if (oRes.ok) setOrders(await oRes.json());
-                                                                }
-                                                            }}
+                                                            onClick={() => setResiModal({ orderId: order.id, type: 'resi', value: order.tracking_number || '' })}
                                                             style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', background: 'none', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }}
                                                         >
-                                                            <i className="fas fa-edit"></i> Isi Resi
+                                                            <i className="fas fa-edit"></i> Isi Resi / Shopee
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -1730,6 +1724,83 @@ export default function AdminPage() {
                                     <button type="submit" className="btn btn-primary">Simpan Ulasan</button>
                                 </form>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Resi / Shopee Modal */}
+            {resiModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', maxWidth: '480px', width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+                        <h3 style={{ margin: '0 0 1.5rem 0', color: '#111827' }}>
+                            <i className="fas fa-truck" style={{ color: '#2563eb', marginRight: '0.5rem' }}></i>
+                            Isi Info Pengiriman
+                        </h3>
+
+                        {/* Pilihan tipe */}
+                        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                            <button
+                                onClick={() => setResiModal(m => ({ ...m, type: 'resi', value: '' }))}
+                                style={{ flex: 1, padding: '0.8rem', borderRadius: '10px', border: `2px solid ${resiModal.type === 'resi' ? '#2563eb' : '#e5e7eb'}`, background: resiModal.type === 'resi' ? '#eff6ff' : 'white', color: resiModal.type === 'resi' ? '#1e40af' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.95rem' }}
+                            >
+                                📦 Nomor Resi
+                            </button>
+                            <button
+                                onClick={() => setResiModal(m => ({ ...m, type: 'shopee', value: 'https://id.shp.ee/zQm8HFez' }))}
+                                style={{ flex: 1, padding: '0.8rem', borderRadius: '10px', border: `2px solid ${resiModal.type === 'shopee' ? '#ee4d2d' : '#e5e7eb'}`, background: resiModal.type === 'shopee' ? '#fff5f2' : 'white', color: resiModal.type === 'shopee' ? '#ee4d2d' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.95rem' }}
+                            >
+                                🛍️ Link Shopee
+                            </button>
+                        </div>
+
+                        {/* Input */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                {resiModal.type === 'resi' ? 'Nomor Resi Pengiriman:' : 'Link Shopee:'}
+                            </label>
+                            <input
+                                type="text"
+                                value={resiModal.value}
+                                onChange={e => setResiModal(m => ({ ...m, value: e.target.value }))}
+                                placeholder={resiModal.type === 'resi' ? 'Contoh: JNE12345678...' : 'https://id.shp.ee/...'}
+                                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none' }}
+                                autoFocus
+                            />
+                            {resiModal.type === 'shopee' && (
+                                <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginTop: '0.4rem' }}>
+                                    Link Shopee Anda sudah diisi otomatis. Ubah jika perlu.
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Tombol Aksi */}
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <button
+                                onClick={() => setResiModal(null)}
+                                style={{ flex: 1, padding: '0.8rem', background: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', color: '#6b7280' }}
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    if (!resiModal.value.trim()) { alert('Mohon isi terlebih dahulu.'); return; }
+                                    const res = await fetch('/api/admin/orders', {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ order_id: resiModal.orderId, tracking_number: resiModal.value.trim() })
+                                    });
+                                    if (res.ok) {
+                                        const oRes = await fetch('/api/admin/orders');
+                                        if (oRes.ok) setOrders(await oRes.json());
+                                        setResiModal(null);
+                                    } else {
+                                        alert('Gagal menyimpan.');
+                                    }
+                                }}
+                                style={{ flex: 1, padding: '0.8rem', background: resiModal.type === 'shopee' ? '#ee4d2d' : '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                            >
+                                <i className="fas fa-save" style={{ marginRight: '0.5rem' }}></i> Simpan
+                            </button>
                         </div>
                     </div>
                 </div>
