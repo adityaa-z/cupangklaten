@@ -86,7 +86,7 @@ export default function CheckoutPage() {
                         <strong>Perhatian:</strong> Harga di bawah ini <strong>HANYA UNTUK IKAN</strong> dan belum termasuk biaya packing serta ongkos kirim. Silakan hubungi admin via WhatsApp untuk total keseluruhan atau untuk meminta link checkout via Shopee.
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem', textAlign: 'left', color: '#111827' }}>
                         {cart.map(item => (
                             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', padding: '0.8rem', background: '#f9fafb', borderRadius: '8px' }}>
                                 <span>{item.quantity}x {item.category} {item.variant ? `- ${item.variant}` : ''}</span>
