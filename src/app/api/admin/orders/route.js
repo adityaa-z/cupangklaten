@@ -13,6 +13,14 @@ const checkAdmin = async () => {
 export async function GET() {
     try {
         await checkAdmin();
+        
+        // Ensure status column supports all new statuses
+        try {
+            await execute("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'packing', 'shipped', 'done', 'cancelled', 'paid') DEFAULT 'pending'");
+        } catch (e) {
+            console.log("Alter table warning:", e.message);
+        }
+
         const orders = await query('SELECT * FROM orders ORDER BY created_at DESC');
         
         if (orders.length === 0) return NextResponse.json([]);
