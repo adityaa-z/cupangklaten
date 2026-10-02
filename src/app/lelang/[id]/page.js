@@ -128,7 +128,7 @@ export default function LelangRoomPage({ params }) {
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <i className="fas fa-stopwatch" style={{ color: '#38bdf8', fontSize: '1.2rem' }}></i>
                 {timeLeft.hari > 0 && <span>{timeLeft.hari}h </span>}
-                <span>{timeLeft.jam}j : {timeLeft.menit}m : <span style={{ color: timeLeft.menit === 0 && timeLeft.detik <= 30 ? '#ef4444' : 'inherit' }}>{timeLeft.detik}s</span></span>
+                <span>{String(timeLeft.jam || 0).padStart(2, '0')} : {String(timeLeft.menit || 0).padStart(2, '0')} : <span style={{ color: timeLeft.menit === 0 && timeLeft.detik <= 30 ? '#ef4444' : 'inherit' }}>{String(timeLeft.detik || 0).padStart(2, '0')}</span></span>
             </div>
         );
     };
