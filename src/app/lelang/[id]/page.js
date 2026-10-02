@@ -101,10 +101,20 @@ export default function LelangRoomPage({ params }) {
 
     // Komponen Timer Internal
     const Timer = ({ endTime }) => {
-        const [timeLeft, setTimeLeft] = useState({});
-        const [isEnded, setIsEnded] = useState(false);
+        const [timeLeft, setTimeLeft] = useState(() => {
+            const diff = new Date(endTime) - new Date();
+            if (diff <= 0) return { ended: true };
+            return {
+                hari: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                jam: Math.floor((diff / (1000 * 60 * 60)) % 24),
+                menit: Math.floor((diff / 1000 / 60) % 60),
+                detik: Math.floor((diff / 1000) % 60)
+            };
+        });
+        const [isEnded, setIsEnded] = useState(timeLeft.ended || false);
 
         useEffect(() => {
+            if (isEnded) return;
             const timer = setInterval(() => {
                 const diff = new Date(endTime) - new Date();
                 if (diff <= 0) {
@@ -120,7 +130,7 @@ export default function LelangRoomPage({ params }) {
                 }
             }, 1000);
             return () => clearInterval(timer);
-        }, [endTime]);
+        }, [endTime, isEnded]);
 
         if (isEnded) return <span style={{color: '#ef4444', fontWeight: 'bold'}}>LELANG BERAKHIR</span>;
 
