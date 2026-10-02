@@ -11,7 +11,7 @@ export default function ClaimGaransiPage() {
             <Navbar />
             <div style={{ padding: '4rem 2rem', maxWidth: '800px', margin: '0 auto', minHeight: '60vh' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: '800' }}>
-                    Kebijakan <span style={{ color: 'var(--primary-cyan)' }}>Garansi Ikan Hidap</span>
+                    Kebijakan <span style={{ color: 'var(--primary-cyan)' }}>Garansi Ikan Hidup</span>
                 </h1>
                 <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '1.1rem' }}>
                     Kami memastikan setiap ikan dikirim dalam kondisi prima. Namun jika terjadi hal yang tidak diinginkan, silakan ikuti prosedur klaim berikut.
