@@ -248,16 +248,6 @@ export default function SoliterGame({ embedded = false }) {
     if (state) saveState(state);
   }, [state]);
 
-  const checkedAutoRef = useRef(false);
-  useEffect(() => {
-    if (!state || checkedAutoRef.current) return;
-    checkedAutoRef.current = true;
-    const today = getLocalDateString();
-    if (state.checkin.lastCheckinDate !== today) {
-      setModal('checkin');
-    }
-  }, [state]);
-
   useEffect(() => {
     if (flareCooldown <= 0) return;
     const id = setInterval(() => {
@@ -898,7 +888,29 @@ export default function SoliterGame({ embedded = false }) {
               <div style={{ fontWeight: 700, fontSize: '14.5px', lineHeight: 1.2, color: '#f3f4f6' }}>
                 Soliter Virtual
               </div>
-              <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
+                {unclaimedToday && (
+                  <button
+                    type="button"
+                    onClick={() => setModal('checkin')}
+                    style={{
+                      background: 'rgba(217, 164, 65, 0.14)',
+                      border: '1px solid rgba(217, 164, 65, 0.4)',
+                      color: '#d9a441',
+                      borderRadius: '5px',
+                      padding: '1px 7px',
+                      fontSize: '10.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <i className="fas fa-gift" style={{ fontSize: '9.5px' }} />
+                    <span>Klaim Poin Harian</span>
+                  </button>
+                )}
                 <span>{aqCfg.shortName}</span>
                 <span>·</span>
                 <span>{fishCfg.species}</span>
