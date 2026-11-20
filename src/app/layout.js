@@ -11,7 +11,7 @@ const outfit = Outfit({
 
 export const metadata = {
   title: "cans.betta cupangklaten | Soliter Virtual, Informasi Stok & Edukasi Ikan Cupang",
-  description: "Galeri ikan cupang hias Kelas Kompetisi di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 35rb, dan simulasi edukatif Soliter Virtual.",
+  description: "Galeri ikan cupang hias Kelas Kompetisi di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 50rb, dan simulasi edukatif Soliter Virtual.",
   keywords: "cans.betta, cupang klaten, info stok cupang klaten, ikan cupang klaten, soliter virtual cupang, cupang kelas kompetisi klaten",
   verification: {
     google: "Cm3Ij7HVbOgV1-1DpBXwz4qqYm9Yjgftqt8HN5m0qsM",
@@ -22,7 +22,7 @@ export const metadata = {
   },
   openGraph: {
     title: "cans.betta cupangklaten | Soliter Virtual & Informasi Koleksi Ikan Cupang",
-    description: "Galeri ikan cupang Kelas Kompetisi Klaten sejak Desember 2022. Harga mulai Rp 35rb & mainkan Soliter Virtual.",
+    description: "Galeri ikan cupang Kelas Kompetisi Klaten sejak Desember 2022. Harga mulai Rp 50rb & mainkan Soliter Virtual.",
     url: "https://www.cupangklaten.my.id",
     siteName: "cans.betta cupangklaten",
     images: [

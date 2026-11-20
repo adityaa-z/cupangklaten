@@ -558,7 +558,7 @@ export default function AdminPage() {
                     {activeTab === 'Produk' && (
                         <div className="tab-view">
                             <div className="dashboard-controls">
-                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ code: '', category: '', variant: '', gender: 'Jantan', age: '', size: 'M', stock: 1, price: 35000, price_max: '', shopee: 'https://wa.me/628992020444', img: '', img2: '', img3: '', img4: '', is_video: false }); setModalType('product'); setIsModalOpen(true); }}>
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ code: '', category: '', variant: '', gender: 'Jantan', age: '', size: 'M', stock: 1, price: 50000, price_max: '', shopee: 'https://wa.me/628992020444', img: '', img2: '', img3: '', img4: '', is_video: false }); setModalType('product'); setIsModalOpen(true); }}>
                                     <i className="fas fa-plus"></i> Tambah Ikan
                                 </button>
                             </div>
@@ -1716,7 +1716,7 @@ export default function AdminPage() {
                                                 min="0"
                                                 value={formData.price}
                                                 onChange={e => setFormData({ ...formData, price: parseInt(e.target.value, 10) || 0 })}
-                                                placeholder="Contoh: 35000"
+                                                placeholder="Contoh: 50000"
                                                 required
                                             />
                                         </div>

@@ -23,7 +23,7 @@ const Footer = () => {
                             </span>
                         </Link>
                         <p style={{ color: 'var(--ck-text-2)', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
-                            Galeri ikan cupang hias Kelas Kompetisi di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 35rb, dan simulasi edukatif Soliter Virtual.
+                            Galeri ikan cupang hias Kelas Kompetisi di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 50rb, dan simulasi edukatif Soliter Virtual.
                         </p>
                     </div>
 
