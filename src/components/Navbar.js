@@ -40,7 +40,7 @@ const Navbar = () => {
                 <Link href="/" className="logo" style={{ gap: '0.65rem' }}>
                     <img
                         src="/logo-cansbetta.jpg"
-                        alt="cans.betta cupangklaten"
+                        alt="cans.betta x cupangklaten"
                         style={{
                             width: '40px',
                             height: '40px',
@@ -52,7 +52,7 @@ const Navbar = () => {
                     <span
                         className="logo-text"
                         style={{
-                            fontSize: 'clamp(1rem, 2.8vw, 1.3rem)',
+                            fontSize: 'clamp(0.95rem, 2.6vw, 1.25rem)',
                             fontWeight: 800,
                             letterSpacing: '-0.3px',
                             background: 'linear-gradient(90deg, #ff2e55 0%, #d926ff 48%, #00c8ff 100%)',
@@ -62,7 +62,7 @@ const Navbar = () => {
                             lineHeight: 1.1,
                         }}
                     >
-                        cans.betta cupangklaten
+                        cans.betta x cupangklaten
                     </span>
                 </Link>
 

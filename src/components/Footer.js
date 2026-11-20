@@ -12,14 +12,14 @@ const Footer = () => {
                         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '12px' }}>
                             <img
                                 src="/logo-cansbetta.jpg"
-                                alt="cans.betta cupangklaten"
+                                alt="cans.betta x cupangklaten"
                                 style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--ck-border-strong)' }}
                             />
                             <span
                                 className="ck-brand-gradient"
                                 style={{ fontSize: '1.15rem', fontWeight: 800, letterSpacing: '-0.3px' }}
                             >
-                                cans.betta cupangklaten
+                                cans.betta x cupangklaten
                             </span>
                         </Link>
                         <p style={{ color: 'var(--ck-text-2)', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
@@ -120,7 +120,7 @@ const Footer = () => {
                 </div>
 
                 <div className="ck-footer-bottom">
-                    <span>&copy; {new Date().getFullYear()} cans.betta cupangklaten — All Rights Reserved.</span>
+                    <span>&copy; {new Date().getFullYear()} cans.betta x cupangklaten — All Rights Reserved.</span>
                     <span>Est. Desember 2022 · Klaten, Jawa Tengah</span>
                 </div>
             </div>
