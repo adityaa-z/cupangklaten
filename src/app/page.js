@@ -303,8 +303,8 @@ async function fetchFeatured() {
         </a>
       </div>
 
-      {/* Supplies Collection Section */}
-      <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
+      {/* Supplies Collection Section - HIDDEN */}
+      {false && <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
             Kebutuhan <span style={{ background: 'linear-gradient(to right, #ff7043, #f4511e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan & Aksesoris</span>
@@ -345,7 +345,7 @@ async function fetchFeatured() {
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>
-      </section>
+      </section>}
 
       {/* Artikel Terbaru Section */}
       <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
