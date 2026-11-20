@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import '@/app/game/soliter.css';
 
 export default function StudioHero() {
@@ -57,27 +56,6 @@ export default function StudioHero() {
                 <span className="ck-hero-metric-label">Kualitas</span>
                 <strong className="ck-hero-metric-val">Kelas Kompetisi</strong>
               </div>
-            </div>
-
-            {/* Clean Action Links */}
-            <div className="ck-hero-actions">
-              <Link href="/stok" className="ck-hero-btn-primary">
-                <i className="fas fa-fish" />
-                <span>Cek Stok & Harga</span>
-              </Link>
-              <a
-                href="https://wa.me/628992020444?text=Halo%20cans.betta%20cupangklaten,%20saya%20ingin%20tanya%20stok%20dan%20kisaran%20harga%20ikan"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ck-hero-btn-ghost"
-              >
-                <i className="fab fa-whatsapp" style={{ color: '#22c55e' }} />
-                <span>Tanya via WA</span>
-              </a>
-              <a href="#soliter-virtual" className="ck-hero-btn-ghost">
-                <i className="fas fa-gamepad" />
-                <span>Soliter Virtual</span>
-              </a>
             </div>
           </div>
         </div>
