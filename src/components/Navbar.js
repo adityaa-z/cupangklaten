@@ -7,10 +7,10 @@ import { useSession, signOut } from 'next-auth/react';
 const Navbar = () => {
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState('dark');
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         setTheme(savedTheme);
         document.documentElement.setAttribute('data-theme', savedTheme);
 
@@ -50,6 +50,9 @@ const Navbar = () => {
                     </button>
                     
                     <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
+                        <Link href="/game" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-gamepad"></i> Soliter Virtual
+                        </Link>
                         <Link href="/stok" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-fish"></i> Stok & Harga Ikan
                         </Link>

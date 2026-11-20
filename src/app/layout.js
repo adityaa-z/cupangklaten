@@ -10,9 +10,9 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "Cupang Klaten | Jual Ikan Cupang Klaten Berkualitas & Bergaransi",
-  description: "Pusat Ikan Cupang Klaten terbaik. Jual Cupang HMPK, Giant, Plakat, dan Crowntail dengan genetik stabil dan warna tajam. Kirim ke seluruh Indonesia dengan garansi ikan hidup.",
-  keywords: "cupang klaten, jual cupang klaten, ikan cupang klaten, cupang hmpk klaten, giant betta klaten, cupang hias klaten, cupang kontes klaten",
+  title: "Cupang Klaten | Soliter Virtual, Informasi Stok & Edukasi Ikan Cupang",
+  description: "Media promosi, etalase informasi stok & kisaran harga ikan cupang Klaten, serta simulasi edukatif Soliter Virtual Cupang Klaten.",
+  keywords: "cupang klaten, info stok cupang klaten, ikan cupang klaten, soliter virtual cupang, cupang hmpk klaten, giant betta klaten, edukasi cupang",
   verification: {
     google: "Cm3Ij7HVbOgV1-1DpBXwz4qqYm9Yjgftqt8HN5m0qsM",
   },
@@ -21,8 +21,8 @@ export const metadata = {
     apple: "/logo.png",
   },
   openGraph: {
-    title: "Cupang Klaten | Koleksi Ikan Cupang Terbaik",
-    description: "Jual Ikan Cupang Klaten berkualitas. Koleksi Cupang HMPK, Giant, Plakat, dan Crowntail terbaik dari Klaten.",
+    title: "Cupang Klaten | Soliter Virtual & Informasi Koleksi Ikan Cupang",
+    description: "Mainkan Soliter Virtual Cupang Klaten sambil melihat etalase stok, kisaran harga, dan edukasi perawatan ikan cupang terbaik dari Klaten.",
     url: "https://www.cupangklaten.my.id",
     siteName: "Cupang Klaten",
     images: [
@@ -51,17 +51,14 @@ export const metadata = {
   },
 };
 
-import { CartProvider } from "@/components/CartProvider";
-import CartDrawer from "@/components/CartDrawer";
-
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
+    <html lang="id" data-theme="dark">
       <head>
         {/* Google Analytics */}
-        <Script 
-          src="https://www.googletagmanager.com/gtag/js?id=G-FK0V45L2R9" 
-          strategy="afterInteractive" 
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-FK0V45L2R9"
+          strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
@@ -84,7 +81,7 @@ export default function RootLayout({ children }) {
               "logo": "https://www.cupangklaten.my.id/logo.png",
               "@id": "https://www.cupangklaten.my.id",
               "url": "https://www.cupangklaten.my.id",
-              "telephone": "+6281234567890",
+              "telephone": "+628992020444",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Klaten",
@@ -94,8 +91,8 @@ export default function RootLayout({ children }) {
                 "addressCountry": "ID"
               },
               "sameAs": [
-                "https://www.instagram.com/cupangklaten.id",
-                "https://www.tiktok.com/@cupangklaten.id"
+                "https://www.instagram.com/cupangklaten",
+                "https://www.tiktok.com/@cupangklaten"
               ]
             })
           }}
@@ -122,10 +119,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={outfit.className}>
         <Providers>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-          </CartProvider>
+          {children}
         </Providers>
       </body>
     </html>
