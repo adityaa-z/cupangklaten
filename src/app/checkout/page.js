@@ -63,7 +63,7 @@ export default function CheckoutPage() {
             if (!res.ok) throw new Error(data.error || 'Gagal membuat pesanan');
 
             // Generate WA Link
-            const waAdmin = "6285700846152"; 
+            const waAdmin = "628992020444"; 
             let itemText = savedCart.map(i => `- ${i.category} ${i.variant ? `(${i.variant})` : ''} x${i.quantity} (Kode: ${i.code})`).join('%0A');
             const waText = `Halo Admin Cupang Klaten,%0A%0ASaya sudah melakukan pemesanan di website.%0A%0A*📌 Order ID:* ${data.order_code}%0A%0A*Detail Pesanan Ikan:*%0A${itemText}%0A%0A*💰 Total Harga Ikan:* ${formatRupiah(savedTotal)}%0A%0AMohon info ketersediaan pengiriman & biaya packing / ongkir, atau link Shopee jika bisa. Terima kasih.`;
             const generatedWaLink = `https://wa.me/${waAdmin}?text=${waText}`;
@@ -134,7 +134,7 @@ export default function CheckoutPage() {
                             <div style={{ border: '1px solid #e5e7eb', padding: '1.5rem', borderRadius: '12px', flex: '1 1 250px', background: 'white' }}>
                                 <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#111827', marginBottom: '1rem' }}>SeaBank / DANA</h4>
                                 <p style={{ color: '#111827', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1px' }}>SeaBank: 901709292959</p>
-                                <p style={{ color: '#111827', margin: '0.5rem 0 0 0', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1px' }}>DANA: 085700846152</p>
+                                <p style={{ color: '#111827', margin: '0.5rem 0 0 0', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1px' }}>DANA: 08992020444</p>
                                 <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>a.n Aditya Bintang Zidan Pratama</p>
                             </div>
                             

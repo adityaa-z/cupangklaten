@@ -1718,7 +1718,7 @@ export default function AdminPage() {
                                             <label style={{ margin: 0 }}>Link Checkout (Shopee / WA)</label>
                                             <button 
                                                 type="button" 
-                                                onClick={() => setFormData({ ...formData, shopee: 'https://wa.me/6285700846152' })}
+                                                onClick={() => setFormData({ ...formData, shopee: 'https://wa.me/628992020444' })}
                                                 style={{ background: '#25D366', color: 'white', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 'bold' }}
                                             >
                                                 <i className="fab fa-whatsapp"></i> Pakai WA Admin

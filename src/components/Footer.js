@@ -18,7 +18,7 @@ const Footer = () => {
                 <div className="footer-links">
                     <h4>Bantuan</h4>
                     <ul>
-                        <li><a href="https://wa.me/6285700846152?text=Halo%20Admin%20Cupang%20Klaten%2C%20saya%20ingin%20mengonfirmasi%20pembayaran%20atas%20pesanan%20saya%20di%20Shopee.%20Nomor%20pesanan%2Fresi%20saya%20adalah%3A%20"
+                        <li><a href="https://wa.me/628992020444?text=Halo%20Admin%20Cupang%20Klaten%2C%20saya%20ingin%20mengonfirmasi%20pembayaran%20atas%20pesanan%20saya%20di%20Shopee.%20Nomor%20pesanan%2Fresi%20saya%20adalah%3A%20"
                                 target="_blank" rel="noopener noreferrer">Konfirmasi Pembayaran</a></li>
                         <li><Link href="/cara-order">Cara Order</Link></li>
                         <li><Link href="/faq">FAQ</Link></li>
@@ -31,10 +31,10 @@ const Footer = () => {
                         <i className="fas fa-map-marker-alt" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
                         Klaten, Jawa Tengah, Indonesia
                     </a>
-                    <a href="https://wa.me/6285700846152" target="_blank" rel="noopener noreferrer"
+                    <a href="https://wa.me/628992020444" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
                         <i className="fab fa-whatsapp" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        +62 857-0084-6152
+                        +62 899-2020-444
                     </a>
                     <a href="https://www.instagram.com/cupangklaten?igsh=b284dWl3eGdxdTA5" target="_blank" rel="noopener noreferrer"
                         style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>

@@ -78,7 +78,7 @@ export default function ClaimVoucherPage() {
                         </div>
 
                         <a 
-                            href={`https://wa.me/6285700846152?text=Halo%20Admin,%20saya%20sudah%20Claim%20Voucher%20dan%20mendapatkan%20tiket%20QR%20Code%20Promo%20Maps%20(${successCode}).%20Apakah%20toko%20sedang%20buka%20untuk%20penukaran%20hari%20ini?`}
+                            href={`https://wa.me/628992020444?text=Halo%20Admin,%20saya%20sudah%20Claim%20Voucher%20dan%20mendapatkan%20tiket%20QR%20Code%20Promo%20Maps%20(${successCode}).%20Apakah%20toko%20sedang%20buka%20untuk%20penukaran%20hari%20ini?`}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ display: 'block', width: '100%', padding: '1rem', background: '#25D366', color: 'white', textDecoration: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '1.1rem' }}

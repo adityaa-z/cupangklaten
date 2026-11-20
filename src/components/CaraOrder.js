@@ -13,7 +13,7 @@ export default function CaraOrder() {
                     <h3>2. Lakukan Pembayaran</h3>
                     <p>Transfer pembayaran via:</p>
                     <ul style={{ listStyleType: 'none', paddingLeft: 0, marginTop: '0.5rem' }}>
-                        <li style={{ marginBottom: '0.5rem' }}><strong>Shopee / DANA:</strong> 085700846152 <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(a.n. Aditya Bintang Zidan Pratama)</span></li>
+                        <li style={{ marginBottom: '0.5rem' }}><strong>Shopee / DANA:</strong> 08992020444 <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(a.n. Aditya Bintang Zidan Pratama)</span></li>
                         <li style={{ marginBottom: '0.5rem' }}><strong>SeaBank:</strong> 901709292959 <br/><span style={{ fontSize: '0.9em', color: '#666' }}>(a.n. Aditya Bintang Zidan Pratama)</span></li>
                         <li>
                             <strong>QRIS:</strong> Nama Toko: Cupang Depo <br/>

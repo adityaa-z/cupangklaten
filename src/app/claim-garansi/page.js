@@ -75,7 +75,7 @@ export default function ClaimGaransiPage() {
                     </div>
                     
                     <div style={{ marginTop: '3rem', textAlign: 'center' }}>
-                        <a href="https://wa.me/6285700846152?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20ingin%20mengajukan%20klaim%20garansi%20ikan." 
+                        <a href="https://wa.me/628992020444?text=Halo%20Admin%20Cupang%20Klaten,%20saya%20ingin%20mengajukan%20klaim%20garansi%20ikan." 
                            className="checkout-wa" 
                            style={{ textDecoration: 'none', display: 'inline-flex', padding: '1rem 2rem' }}>
                             <i className="fab fa-whatsapp" style={{ marginRight: '0.8rem' }}></i> Hubungi Admin untuk Klaim

@@ -91,7 +91,7 @@ export default async function PromoPage() {
                                                 {new Date(promo.end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </strong>
                                         </div>
-                                        <a href="https://wa.me/6285700846152" target="_blank" rel="noreferrer" style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#25D366', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', boxShadow: '0 4px 10px rgba(37,211,102,0.3)' }}>
+                                        <a href="https://wa.me/628992020444" target="_blank" rel="noreferrer" style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#25D366', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', boxShadow: '0 4px 10px rgba(37,211,102,0.3)' }}>
                                             <i className="fab fa-whatsapp"></i>
                                         </a>
                                     </div>

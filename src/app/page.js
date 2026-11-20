@@ -277,7 +277,7 @@ async function fetchFeatured() {
               <Link href="#products" className="filter-btn active" style={{ textDecoration: 'none' }}>
                 Lihat Koleksi
               </Link>
-              <a href="https://wa.me/6285700846152?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20konsultasi"
+              <a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20konsultasi"
                 className="filter-btn" style={{ textDecoration: 'none' }}>
                 Konsultasi Gratis
               </a>
