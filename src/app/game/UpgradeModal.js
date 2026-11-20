@@ -20,7 +20,7 @@ const modalStyle = {
   border: '1px solid #334155',
   borderRadius: '18px',
   padding: '20px 18px',
-  maxWidth: '380px',
+  maxWidth: '460px',
   width: '100%',
   color: '#f1f5f9',
   boxShadow: '0 24px 60px rgba(0,0,0,0.65)',

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import '@/app/game/soliter.css';
 
 function formatShortRupiah(num) {
   const n = Number(num) || 0;
@@ -23,6 +24,7 @@ export default function ProductStrip() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [imgIdx, setImgIdx] = useState(0);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -33,14 +35,13 @@ export default function ProductStrip() {
         const data = await res.json();
         if (!active) return;
 
-        // Prioritaskan ikan ready & pinned di strip etalase atas
         const sorted = [...(data || [])].sort((a, b) => {
           const aReady = a.is_available && a.stock > 0 ? 1 : 0;
           const bReady = b.is_available && b.stock > 0 ? 1 : 0;
           if (bReady !== aReady) return bReady - aReady;
           return (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0);
         });
-        setProducts(sorted.slice(0, 20));
+        setProducts(sorted.slice(0, 24));
       } catch (err) {
         console.error('ProductStrip fetch error:', err);
       } finally {
@@ -60,6 +61,12 @@ export default function ProductStrip() {
     return () => { document.body.style.overflow = ''; };
   }, [selected]);
 
+  function scrollByAmount(dir) {
+    if (!scrollRef.current) return;
+    const step = Math.max(240, scrollRef.current.clientWidth * 0.65);
+    scrollRef.current.scrollBy({ left: dir * step, behavior: 'smooth' });
+  }
+
   function getTitle(p) {
     const isKebutuhan = p.category?.toLowerCase() === 'kebutuhan ikan';
     const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
@@ -73,155 +80,128 @@ export default function ProductStrip() {
     : [];
 
   return (
-    <section
-      aria-label="Etalase Koleksi Cupang Klaten"
-      style={{
-        width: '100%',
-        maxWidth: '480px',
-        margin: '0 auto',
-        background: '#0f172a',
-        borderBottom: '1px solid #1e293b',
-        padding: '8px 0 10px',
-      }}
-    >
-      {/* Strip Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0 12px 6px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '13px' }}>🏷️</span>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: '#f1f5f9', letterSpacing: '0.2px' }}>
-            Etalase Stok & Kisaran Harga
-          </span>
-        </div>
-        <Link
-          href="/stok"
-          style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            color: '#38bdf8',
-            textDecoration: 'none',
-          }}
-        >
-          Semua Stok →
-        </Link>
-      </div>
-
-      {/* 1-Row Horizontal Scroll Strip (PRD Modul 1.2) */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'nowrap',
-          overflowX: 'auto',
-          scrollSnapType: 'x mandatory',
-          gap: '8px',
-          padding: '2px 12px 4px',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-        }}
-      >
-        {loading ? (
-          [...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              style={{
-                flex: '0 0 116px',
-                height: '126px',
-                borderRadius: '11px',
-                background: '#1e293b',
-                border: '1px solid #334155',
-                scrollSnapAlign: 'start',
-                opacity: 0.6,
-              }}
-            />
-          ))
-        ) : products.length === 0 ? (
-          <div style={{ fontSize: '12px', color: '#94a3b8', padding: '12px 4px' }}>
-            Koleksi stok sedang diperbarui.{' '}
-            <a href="https://wa.me/628992020444" target="_blank" rel="noopener noreferrer" style={{ color: '#34d399' }}>
-              Tanya via WA
-            </a>
+    <section aria-label="Etalase Koleksi Cupang Klaten" className="ck-strip-section">
+      <div className="ck-strip-inner">
+        {/* Strip Header */}
+        <div className="ck-strip-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '14px' }}>🏷️</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#f1f5f9', letterSpacing: '0.2px' }}>
+              Etalase Stok & Kisaran Harga
+            </span>
           </div>
-        ) : (
-          products.map((item) => {
-            const isHabis = !item.is_available || item.stock <= 0;
-            const title = getTitle(item);
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => { setSelected(item); setImgIdx(0); }}
-                style={{
-                  flex: '0 0 118px',
-                  scrollSnapAlign: 'start',
-                  background: '#1e293b',
-                  border: isHabis ? '1px solid #334155' : '1px solid rgba(56, 189, 248, 0.28)',
-                  borderRadius: '11px',
-                  overflow: 'hidden',
-                  padding: 0,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  color: '#f1f5f9',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  opacity: isHabis ? 0.65 : 1,
-                }}
-              >
-                <div style={{ position: 'relative', width: '100%', height: '72px', background: '#0b1120' }}>
-                  {item.is_video ? (
-                    <video
-                      src={item.img}
-                      muted
-                      loop
-                      autoPlay
-                      playsInline
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <img
-                      src={item.img || '/logo.png'}
-                      alt={title}
-                      loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    />
-                  )}
-                  <span style={{
-                    position: 'absolute',
-                    top: '4px',
-                    left: '4px',
-                    fontSize: '9px',
-                    fontWeight: 800,
-                    padding: '1px 5px',
-                    borderRadius: '6px',
-                    background: isHabis ? 'rgba(239,68,68,0.88)' : 'rgba(16,185,129,0.9)',
-                    color: '#ffffff',
-                  }}>
-                    {isHabis ? 'Habis' : `Stok ${item.stock}`}
-                  </span>
-                </div>
-                <div style={{ padding: '6px 7px' }}>
-                  <div style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#f8fafc',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    marginBottom: '2px',
-                  }}>
-                    {title}
-                  </div>
-                  <div style={{ fontSize: '10.5px', fontWeight: 800, color: '#38bdf8' }}>
-                    {formatShortRupiah(item.price)}
-                  </div>
-                </div>
-              </button>
-            );
-          })
-        )}
+          <Link
+            href="/stok"
+            style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              color: '#38bdf8',
+              textDecoration: 'none',
+            }}
+          >
+            Semua Stok →
+          </Link>
+        </div>
+
+        {/* 1-Row Horizontal Scroll Strip + Tablet/Desktop Arrows */}
+        <div className="ck-strip-track-wrap">
+          <button
+            type="button"
+            className="ck-strip-arrow left"
+            onClick={() => scrollByAmount(-1)}
+            aria-label="Geser kiri"
+          >
+            ‹
+          </button>
+
+          <div ref={scrollRef} className="ck-strip-scroll">
+            {loading ? (
+              [...Array(7)].map((_, i) => <div key={i} className="ck-strip-skeleton" />)
+            ) : products.length === 0 ? (
+              <div style={{ fontSize: '12.5px', color: '#94a3b8', padding: '12px 4px' }}>
+                Koleksi stok sedang diperbarui.{' '}
+                <a href="https://wa.me/628992020444" target="_blank" rel="noopener noreferrer" style={{ color: '#34d399' }}>
+                  Tanya via WA
+                </a>
+              </div>
+            ) : (
+              products.map((item) => {
+                const isHabis = !item.is_available || item.stock <= 0;
+                const title = getTitle(item);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="ck-strip-card"
+                    onClick={() => { setSelected(item); setImgIdx(0); }}
+                    style={{
+                      border: isHabis ? '1px solid #334155' : '1px solid rgba(56, 189, 248, 0.35)',
+                      opacity: isHabis ? 0.85 : 1,
+                    }}
+                  >
+                    <div className="ck-strip-thumb">
+                      {item.is_video ? (
+                        <video
+                          src={item.img}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <img
+                          src={item.img || '/logo.png'}
+                          alt={title}
+                          loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                      )}
+                      <span style={{
+                        position: 'absolute',
+                        top: '5px',
+                        left: '5px',
+                        fontSize: '9.5px',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: '6px',
+                        background: isHabis ? 'rgba(220,38,38,0.88)' : 'rgba(16,185,129,0.92)',
+                        color: '#ffffff',
+                      }}>
+                        {isHabis ? 'Habis' : `Stok ${item.stock}`}
+                      </span>
+                    </div>
+                    <div style={{ padding: '7px 8px' }}>
+                      <div style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        color: '#f8fafc',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        marginBottom: '2px',
+                      }}>
+                        {title}
+                      </div>
+                      <div style={{ fontSize: '11.5px', fontWeight: 800, color: '#38bdf8' }}>
+                        {formatShortRupiah(item.price)}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          <button
+            type="button"
+            className="ck-strip-arrow right"
+            onClick={() => scrollByAmount(1)}
+            aria-label="Geser kanan"
+          >
+            ›
+          </button>
+        </div>
       </div>
 
       {/* Info Detail Modal (Non-Transaksi — Info Edukatif & Kontak WA Resmi) */}
@@ -244,17 +224,18 @@ export default function ProductStrip() {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: '370px',
+              maxWidth: '400px',
               background: 'linear-gradient(145deg, #0f172a, #1e293b)',
               border: '1px solid #334155',
               borderRadius: '18px',
               overflow: 'hidden',
               color: '#f1f5f9',
               boxShadow: '0 24px 60px rgba(0,0,0,0.7)',
+              maxHeight: '92vh',
+              overflowY: 'auto',
             }}
           >
-            {/* Modal Media */}
-            <div style={{ position: 'relative', width: '100%', height: '220px', background: '#0b1120' }}>
+            <div style={{ position: 'relative', width: '100%', height: '230px', background: '#0b1120' }}>
               {selected.is_video && imgIdx === 0 ? (
                 <video src={modalImages[0]} controls autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -269,17 +250,9 @@ export default function ProductStrip() {
                 onClick={() => setSelected(null)}
                 aria-label="Tutup"
                 style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  border: 'none',
-                  background: 'rgba(15,23,42,0.8)',
-                  color: '#f8fafc',
-                  fontSize: '16px',
-                  cursor: 'pointer',
+                  position: 'absolute', top: '10px', right: '10px',
+                  width: '32px', height: '32px', borderRadius: '50%', border: 'none',
+                  background: 'rgba(15,23,42,0.82)', color: '#f8fafc', fontSize: '16px', cursor: 'pointer',
                 }}
               >
                 ✕
@@ -319,7 +292,6 @@ export default function ProductStrip() {
               )}
             </div>
 
-            {/* Modal Info */}
             <div style={{ padding: '16px' }}>
               <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '2px' }}>
                 Etalase Info · {selected.category}

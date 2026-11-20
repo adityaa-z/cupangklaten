@@ -304,13 +304,15 @@ export default function FishSVG({
 
   return (
     <svg
-      width={size}
-      height={size}
+      width={size === 'fluid' ? '100%' : size}
+      height={size === 'fluid' ? '100%' : size}
       viewBox="0 0 210 200"
       style={{
         animation: animStyle,
         display: 'block',
         overflow: 'visible',
+        maxWidth: size === 'fluid' ? '230px' : undefined,
+        maxHeight: size === 'fluid' ? '210px' : undefined,
       }}
       aria-label={fishConfig.species}
     >

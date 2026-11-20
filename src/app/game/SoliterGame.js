@@ -17,6 +17,7 @@ import CheckinModal from './CheckinModal';
 import UpgradeModal from './UpgradeModal';
 import FishCollectionModal from './FishCollectionModal';
 import ShopModal from './ShopModal';
+import './soliter.css';
 
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
@@ -928,44 +929,58 @@ export default function SoliterGame({ embedded = false }) {
   const moodColor = fish.mood > 55 ? '#fb923c' : '#94a3b8';
   const phPct = clamp(((aq.waterPH - 5.0) / (8.5 - 5.0)) * 100, 0, 100);
 
-  return (
+  const hudContent = (
     <div style={{
-      minHeight: embedded ? 'auto' : '100vh',
-      background: '#0b1120',
-      color: '#f1f5f9',
-      fontFamily: 'var(--font-outfit, system-ui, sans-serif)',
+      background: '#0f172a',
+      borderRadius: '14px',
+      padding: '10px 12px',
+      border: '1px solid #1e293b',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      gap: '8px',
     }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '480px',
-        minHeight: embedded ? 'auto' : '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-      }}>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <HudBar icon="🍖" label="Lapar" value={fish.hunger} color={hungerColor} />
+        <HudBar icon="💧" label="Air" value={aq.waterClarity} color={waterColor} />
+        <HudBar icon="⚗️" label="pH" value={phPct} displayText={aq.waterPH.toFixed(1)} color={phColor} />
+      </div>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <HudBar icon="❤️" label="Sehat" value={fish.health} color={healthColor} />
+        <HudBar icon="🔥" label="Mood" value={fish.mood} color={moodColor} />
+      </div>
+    </div>
+  );
 
-        {/* ── Standalone Top Bar (hidden if embedded header handled externally, or compact HUD header) ── */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: embedded ? '10px 14px 6px' : '12px 16px',
-          background: 'rgba(15, 23, 42, 0.96)',
-          borderBottom: '1px solid #1e293b',
-          position: embedded ? 'relative' : 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <span style={{ fontSize: '22px' }}>🐠</span>
+  const navItems = (
+    <>
+      <NavBtn emoji="📅" label="Check-In" onClick={() => setModal('checkin')} active={modal === 'checkin'} dot={unclaimedToday} />
+      <NavBtn emoji="🎁" label="Tukar Poin" onClick={() => setModal('shop')} active={modal === 'shop'} />
+      <NavBtn emoji="🏠" label="Akuarium" onClick={() => setModal('upgrade')} active={modal === 'upgrade'} />
+      <NavBtn emoji="🐟" label="Koleksi" onClick={() => setModal('collection')} active={modal === 'collection'} />
+      <NavBtn emoji="ℹ️" label="Panduan" onClick={() => setModal('info')} active={modal === 'info'} />
+    </>
+  );
+
+  return (
+    <div className="ck-game-root" style={{ minHeight: embedded ? 'auto' : '100vh' }}>
+      <div className="ck-game-container" style={{ minHeight: embedded ? 'auto' : '100vh' }}>
+
+        {/* ── Top Bar: Title + Check-In Points ── */}
+        <div
+          className="ck-game-topbar"
+          style={{
+            position: embedded ? 'relative' : 'sticky',
+            top: 0,
+            zIndex: 100,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '24px' }}>🐠</span>
             <div>
-              <div style={{ fontWeight: 800, fontSize: '14.5px', lineHeight: 1.1, color: '#f8fafc' }}>
+              <div style={{ fontWeight: 800, fontSize: '15px', lineHeight: 1.15, color: '#f8fafc' }}>
                 Soliter Virtual Cupang Klaten
               </div>
-              <div style={{ fontSize: '11px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontSize: '11.5px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span>{aqCfg.shortName}</span>
                 {!embedded && (
                   <Link href="/" style={{ color: '#38bdf8', textDecoration: 'none', fontWeight: 600 }}>
@@ -982,11 +997,12 @@ export default function SoliterGame({ embedded = false }) {
               background: '#1e293b',
               border: unclaimedToday ? '1px solid #fbbf24' : '1px solid #334155',
               borderRadius: '999px',
-              padding: '5px 12px',
+              padding: '6px 14px',
               display: 'flex',
               alignItems: 'center',
               gap: '5px',
               cursor: 'pointer',
+              flexShrink: 0,
             }}
             title="Poin Check-In Harian"
           >
@@ -1006,415 +1022,397 @@ export default function SoliterGame({ embedded = false }) {
           </button>
         </div>
 
-        {/* ── Main Arena ── */}
-        <main style={{
-          flex: 1,
-          padding: '10px 12px 82px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}>
+        {/* ── Responsive Arena Grid (1-col Mobile/Tablet, 2-col Laptop/Desktop) ── */}
+        <main className="ck-game-grid">
 
-          {/* ── HUD Status (5 Indicators: Hunger, Water, pH, Health, Mood) ── */}
-          <div style={{
-            background: '#0f172a',
-            borderRadius: '14px',
-            padding: '10px 12px',
-            border: '1px solid #1e293b',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <HudBar icon="🍖" label="Lapar" value={fish.hunger} color={hungerColor} />
-              <HudBar icon="💧" label="Air" value={aq.waterClarity} color={waterColor} />
-              <HudBar icon="⚗️" label="pH" value={phPct} displayText={aq.waterPH.toFixed(1)} color={phColor} />
+          {/* ── LEFT / TOP COLUMN: Mobile HUD + Aquarium Stage + Visual Traits ── */}
+          <div className="ck-stage-col">
+            <div className="ck-hud-mobile">{hudContent}</div>
+
+            {/* ── Soliter / Aquarium Stage ── */}
+            <div
+              className="ck-stage-card"
+              style={{
+                border: isFlaring ? '1.5px solid #fbbf24' : '1px solid #1e293b',
+              }}
+            >
+              {/* Top subtle environment badges */}
+              <div style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: '11px',
+                marginBottom: '4px',
+                padding: '0 4px',
+                gap: '6px',
+                flexWrap: 'wrap',
+              }}>
+                <span style={{
+                  background: 'rgba(15,23,42,0.78)',
+                  border: '1px solid #334155',
+                  borderRadius: '99px',
+                  padding: '3px 10px',
+                  color: '#e2e8f0',
+                  fontWeight: 700,
+                }}>
+                  🐟 {fishCfg.species}
+                </span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <span style={{
+                    background: 'rgba(15,23,42,0.78)',
+                    border: '1px solid #334155',
+                    borderRadius: '99px',
+                    padding: '3px 8px',
+                    color: '#fbbf24',
+                  }}>
+                    🌿 {Math.round(aq.taninLevel)}%
+                  </span>
+                  <span style={{
+                    background: 'rgba(15,23,42,0.78)',
+                    border: '1px solid #334155',
+                    borderRadius: '99px',
+                    padding: '3px 8px',
+                    color: '#e2e8f0',
+                  }}>
+                    🧂 {Math.round(aq.saltLevel)}%
+                  </span>
+                </div>
+              </div>
+
+              {isFlaring && (
+                <div style={{
+                  position: 'absolute',
+                  top: '42px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'rgba(251, 191, 36, 0.2)',
+                  border: '1px solid #fbbf24',
+                  color: '#fde047',
+                  borderRadius: '99px',
+                  padding: '2px 10px',
+                  fontSize: '10.5px',
+                  fontWeight: 800,
+                  zIndex: 5,
+                }}>
+                  🪞 FLARING MODE!
+                </div>
+              )}
+
+              <div className="ck-aquarium-wrap">
+                <AquariumSVG
+                  level={aq.level}
+                  taninLevel={aq.taninLevel}
+                  waterClarity={aq.waterClarity}
+                  saltLevel={aq.saltLevel}
+                  isFlaring={isFlaring}
+                >
+                  <FishSVG
+                    fishConfig={fishCfg}
+                    fishState={fish}
+                    size="fluid"
+                    animate
+                    isFlaring={isFlaring}
+                    ledBoost={aqCfg.colorBoost}
+                  />
+                </AquariumSVG>
+              </div>
+
+              <div style={{
+                fontSize: '11.5px',
+                color: phIdeal ? '#34d399' : '#f59e0b',
+                marginTop: '4px',
+                fontWeight: 600,
+                textAlign: 'center',
+              }}>
+                pH {aq.waterPH.toFixed(1)} · Ideal {fishCfg.species}: {idealMinPH}–{idealMaxPH}{' '}
+                {phIdeal ? '✓' : '⚠️'}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <HudBar icon="❤️" label="Sehat" value={fish.health} color={healthColor} />
-              <HudBar icon="🔥" label="Mood" value={fish.mood} color={moodColor} />
+
+            {/* ── Dynamic Visual Traits Strip (Modul 4: Body, Sirip, Warna) ── */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <TraitPill icon="💪" label="Body" value={fish.bodySize} color="#f97316" />
+              <TraitPill icon="🪶" label="Sirip" value={fish.finSpread} color="#38bdf8" />
+              <TraitPill icon="🎨" label="Warna" value={fish.colorVibrancy} color="#e879f9" />
             </div>
           </div>
 
-          {/* ── Disease Alert Banner (if sick) ── */}
-          {activeDisease && (
-            <div style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: `1px solid ${activeDisease.color}`,
-              borderRadius: '12px',
-              padding: '9px 12px',
-              fontSize: '11.5px',
-              lineHeight: 1.4,
-            }}>
-              <div style={{ fontWeight: 800, color: activeDisease.color, marginBottom: '2px' }}>
-                {activeDisease.emoji} Ikan terkena {activeDisease.name}!
-              </div>
-              <div style={{ color: '#e2e8f0' }}>
-                <strong>Penanganan:</strong> {activeDisease.cure}
-              </div>
-            </div>
-          )}
+          {/* ── RIGHT / BOTTOM COLUMN: Desktop HUD + Alerts + Care Actions + Desktop Nav ── */}
+          <div className="ck-controls-col">
+            <div className="ck-hud-desktop">{hudContent}</div>
 
-          {/* ── Post Full-Water-Change Conditioning Hint ── */}
-          {!activeDisease && aq.fullChangeUnconditioned && (
-            <div style={{
-              background: 'rgba(245, 158, 11, 0.12)',
-              border: '1px solid rgba(245, 158, 11, 0.45)',
-              borderRadius: '10px',
-              padding: '7px 11px',
-              fontSize: '11px',
-              color: '#fde68a',
-            }}>
-              ⚠️ Baru Kuras Total! Tambahkan <strong>Ketapang</strong> & <strong>Garam Ikan</strong> agar ikan tidak stres/Velvet.
-            </div>
-          )}
-
-          {/* ── Soliter / Aquarium Stage ── */}
-          <div style={{
-            borderRadius: '16px',
-            overflow: 'hidden',
-            border: isFlaring ? '1.5px solid #fbbf24' : '1px solid #1e293b',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: 'radial-gradient(ellipse at center top, #0f2942 0%, #0b1120 75%)',
-            padding: '10px 8px 6px',
-            position: 'relative',
-            transition: 'border-color 0.25s',
-          }}>
-            {/* Top subtle environment badges */}
-            <div style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontSize: '10.5px',
-              marginBottom: '2px',
-              padding: '0 4px',
-            }}>
-              <span style={{
-                background: 'rgba(15,23,42,0.75)',
-                border: '1px solid #334155',
-                borderRadius: '99px',
-                padding: '2px 8px',
-                color: '#e2e8f0',
-                fontWeight: 700,
-              }}>
-                🐟 {fishCfg.species}
-              </span>
-              <div style={{ display: 'flex', gap: '5px' }}>
-                <span style={{
-                  background: 'rgba(15,23,42,0.75)',
-                  border: '1px solid #334155',
-                  borderRadius: '99px',
-                  padding: '2px 7px',
-                  color: '#fbbf24',
-                }}>
-                  🌿 {Math.round(aq.taninLevel)}%
-                </span>
-                <span style={{
-                  background: 'rgba(15,23,42,0.75)',
-                  border: '1px solid #334155',
-                  borderRadius: '99px',
-                  padding: '2px 7px',
-                  color: '#e2e8f0',
-                }}>
-                  🧂 {Math.round(aq.saltLevel)}%
-                </span>
-              </div>
-            </div>
-
-            {isFlaring && (
+            {/* ── Disease Alert Banner (if sick) ── */}
+            {activeDisease && (
               <div style={{
-                position: 'absolute',
-                top: '36px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(251, 191, 36, 0.2)',
-                border: '1px solid #fbbf24',
-                color: '#fde047',
-                borderRadius: '99px',
-                padding: '2px 10px',
-                fontSize: '10.5px',
-                fontWeight: 800,
-                zIndex: 5,
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: `1px solid ${activeDisease.color}`,
+                borderRadius: '12px',
+                padding: '9px 12px',
+                fontSize: '11.5px',
+                lineHeight: 1.4,
               }}>
-                🪞 FLARING MODE!
+                <div style={{ fontWeight: 800, color: activeDisease.color, marginBottom: '2px' }}>
+                  {activeDisease.emoji} Ikan terkena {activeDisease.name}!
+                </div>
+                <div style={{ color: '#e2e8f0' }}>
+                  <strong>Penanganan:</strong> {activeDisease.cure}
+                </div>
               </div>
             )}
 
-            <AquariumSVG
-              level={aq.level}
-              taninLevel={aq.taninLevel}
-              waterClarity={aq.waterClarity}
-              saltLevel={aq.saltLevel}
-              isFlaring={isFlaring}
-              width={310}
-              height={235}
-            >
-              <FishSVG
-                fishConfig={fishCfg}
-                fishState={fish}
-                size={138}
-                animate
-                isFlaring={isFlaring}
-                ledBoost={aqCfg.colorBoost}
-              />
-            </AquariumSVG>
-
-            <div style={{
-              fontSize: '11px',
-              color: phIdeal ? '#34d399' : '#f59e0b',
-              marginTop: '2px',
-              fontWeight: 600,
-            }}>
-              pH {aq.waterPH.toFixed(1)} · Ideal {fishCfg.species}: {idealMinPH}–{idealMaxPH}{' '}
-              {phIdeal ? '✓' : '⚠️'}
-            </div>
-          </div>
-
-          {/* ── Dynamic Visual Traits Strip (Modul 4: Body, Sirip, Warna) ── */}
-          <div style={{ display: 'flex', gap: '7px' }}>
-            <TraitPill icon="💪" label="Body" value={fish.bodySize} color="#f97316" />
-            <TraitPill icon="🪶" label="Sirip" value={fish.finSpread} color="#38bdf8" />
-            <TraitPill icon="🎨" label="Warna" value={fish.colorVibrancy} color="#e879f9" />
-          </div>
-
-          {/* ── Care Action Buttons Row ── */}
-          <div style={{ position: 'relative' }}>
-            {/* Popup Submenu: 5 Jenis Pakan */}
-            {openMenu === 'feed' && (
+            {/* ── Post Full-Water-Change Conditioning Hint ── */}
+            {!activeDisease && aq.fullChangeUnconditioned && (
               <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: 0,
-                right: 0,
-                marginBottom: '8px',
-                background: '#0f172a',
-                border: '1px solid #38bdf8',
-                borderRadius: '14px',
-                padding: '8px',
-                zIndex: 500,
-                boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
+                background: 'rgba(245, 158, 11, 0.12)',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                borderRadius: '10px',
+                padding: '7px 11px',
+                fontSize: '11px',
+                color: '#fde68a',
               }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', padding: '2px 4px', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>🍖 Pilih Pakan (Modul Nutrisi & Visual)</span>
-                  <button onClick={() => { setOpenMenu(null); setModal('shop'); }} style={{ background: 'none', border: 'none', color: '#fbbf24', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                    + Tukar Poin
+                ⚠️ Baru Kuras Total! Tambahkan <strong>Ketapang</strong> & <strong>Garam Ikan</strong> agar ikan tidak stres/Velvet.
+              </div>
+            )}
+
+            {/* ── Care Action Buttons Row ── */}
+            <div style={{ position: 'relative' }}>
+              {/* Popup Submenu: 5 Jenis Pakan */}
+              {openMenu === 'feed' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: '8px',
+                  background: '#0f172a',
+                  border: '1px solid #38bdf8',
+                  borderRadius: '14px',
+                  padding: '8px',
+                  zIndex: 500,
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '5px',
+                }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', padding: '2px 4px', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>🍖 Pilih Pakan (Modul Nutrisi & Visual)</span>
+                    <button onClick={() => { setOpenMenu(null); setModal('shop'); }} style={{ background: 'none', border: 'none', color: '#fbbf24', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                      + Tukar Poin
+                    </button>
+                  </div>
+                  {FOOD_CONFIG.map((food) => {
+                    const count = state.inventory[food.id] || 0;
+                    const isPref = food.preferredSpecies.includes(fishId);
+                    return (
+                      <button
+                        key={food.id}
+                        onClick={() => handleFeed(food.id)}
+                        style={{
+                          padding: '8px 10px',
+                          borderRadius: '9px',
+                          border: isPref ? '1px solid rgba(52,211,153,0.4)' : '1px solid #1e293b',
+                          background: count > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
+                          color: count > 0 ? '#f8fafc' : '#64748b',
+                          cursor: count > 0 ? 'pointer' : 'not-allowed',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: '12.5px', fontWeight: 700 }}>
+                            {food.emoji} {food.shortLabel}{' '}
+                            {isPref && <span style={{ fontSize: '10px', color: '#34d399' }}>★ Cocok</span>}
+                          </div>
+                          <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>{food.tag}</div>
+                        </div>
+                        <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '12px' }}>×{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Popup Submenu: Perawatan Air */}
+              {openMenu === 'water' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: '8px',
+                  background: '#0f172a',
+                  border: '1px solid #38bdf8',
+                  borderRadius: '14px',
+                  padding: '8px',
+                  zIndex: 500,
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '5px',
+                }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', padding: '2px 4px' }}>
+                    💧 Perawatan Air & Suplemen
+                  </div>
+                  <button
+                    onClick={handlePartialWaterChange}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b', background: '#1e293b',
+                      color: '#f8fafc', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>💧 Ganti Air Parsial (30–50%)</div>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Air +38% jernih, pH stabil, ikan tidak stres</div>
+                    </div>
+                    <span style={{ color: '#34d399', fontSize: '11px', fontWeight: 700 }}>Aman</span>
+                  </button>
+                  <button
+                    onClick={handleFullWaterChange}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid rgba(245,158,11,0.35)', background: '#1e293b',
+                      color: '#f8fafc', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🚿 Kuras Total (100%)</div>
+                      <div style={{ fontSize: '10.5px', color: '#fbbf24' }}>Langsung 100% jernih · Wajib tambah Ketapang & Garam</div>
+                    </div>
+                    <span style={{ color: '#f59e0b', fontSize: '11px', fontWeight: 700 }}>100%</span>
+                  </button>
+                  <button
+                    onClick={handleKetapang}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
+                      background: state.inventory.ketapang > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
+                      color: state.inventory.ketapang > 0 ? '#f8fafc' : '#64748b',
+                      cursor: state.inventory.ketapang > 0 ? 'pointer' : 'not-allowed',
+                      textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🌿 Ekstrak / Daun Ketapang</div>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Turunkan pH (-0.25), tanin alami, redakan stres</div>
+                    </div>
+                    <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.ketapang}</span>
+                  </button>
+                  <button
+                    onClick={handleSalt}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
+                      background: state.inventory.aquariumSalt > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
+                      color: state.inventory.aquariumSalt > 0 ? '#f8fafc' : '#64748b',
+                      cursor: state.inventory.aquariumSalt > 0 ? 'pointer' : 'not-allowed',
+                      textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🧂 Garam Ikan (Aquarium Salt)</div>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Cegah jamur/parasit & bantu osmoregulasi</div>
+                    </div>
+                    <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.aquariumSalt}</span>
                   </button>
                 </div>
-                {FOOD_CONFIG.map((food) => {
-                  const count = state.inventory[food.id] || 0;
-                  const isPref = food.preferredSpecies.includes(fishId);
-                  return (
-                    <button
-                      key={food.id}
-                      onClick={() => handleFeed(food.id)}
-                      style={{
-                        padding: '8px 10px',
-                        borderRadius: '9px',
-                        border: isPref ? '1px solid rgba(52,211,153,0.4)' : '1px solid #1e293b',
-                        background: count > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
-                        color: count > 0 ? '#f8fafc' : '#64748b',
-                        cursor: count > 0 ? 'pointer' : 'not-allowed',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        textAlign: 'left',
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontSize: '12.5px', fontWeight: 700 }}>
-                          {food.emoji} {food.shortLabel}{' '}
-                          {isPref && <span style={{ fontSize: '10px', color: '#34d399' }}>★ Cocok</span>}
-                        </div>
-                        <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>{food.tag}</div>
-                      </div>
-                      <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '12px' }}>×{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              )}
 
-            {/* Popup Submenu: Perawatan Air (Parsial, Kuras Total, Ketapang, Garam) */}
-            {openMenu === 'water' && (
-              <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: 0,
-                right: 0,
-                marginBottom: '8px',
-                background: '#0f172a',
-                border: '1px solid #38bdf8',
-                borderRadius: '14px',
-                padding: '8px',
-                zIndex: 500,
-                boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
-              }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', padding: '2px 4px' }}>
-                  💧 Perawatan Air & Suplemen
+              {/* Popup Submenu: Obat Penyakit */}
+              {openMenu === 'medicine' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: '8px',
+                  background: '#0f172a',
+                  border: '1px solid #c084fc',
+                  borderRadius: '14px',
+                  padding: '8px',
+                  zIndex: 500,
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '5px',
+                }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', padding: '2px 4px' }}>
+                    💊 Obat & Penanganan Penyakit
+                  </div>
+                  <button
+                    onClick={() => handleMedicine('medicineYellow')}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
+                      background: state.inventory.medicineYellow > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
+                      color: state.inventory.medicineYellow > 0 ? '#f8fafc' : '#64748b',
+                      cursor: state.inventory.medicineYellow > 0 ? 'pointer' : 'not-allowed',
+                      textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🟡 Obat Kuning (Acriflavine)</div>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Obati Fin Rot (pastikan air bersih & ada Garam)</div>
+                    </div>
+                    <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.medicineYellow}</span>
+                  </button>
+                  <button
+                    onClick={() => handleMedicine('medicineBlue')}
+                    style={{
+                      padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
+                      background: state.inventory.medicineBlue > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
+                      color: state.inventory.medicineBlue > 0 ? '#f8fafc' : '#64748b',
+                      cursor: state.inventory.medicineBlue > 0 ? 'pointer' : 'not-allowed',
+                      textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🔵 Obat Biru (Methylene Blue)</div>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Obati Velvet / White Spot (+ Garam & Ketapang)</div>
+                    </div>
+                    <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.medicineBlue}</span>
+                  </button>
+                  {fish.disease === 'bloated' && (
+                    <div style={{ padding: '7px 10px', borderRadius: '9px', background: 'rgba(251,113,133,0.12)', fontSize: '11px', color: '#fda4af' }}>
+                      🎈 Untuk <strong>Kembung</strong>, tidak pakai obat kimia — puasakan pelet & beri <strong>Kutu Air (Daphnia)</strong> di menu Pakan!
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={handlePartialWaterChange}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b', background: '#1e293b',
-                    color: '#f8fafc', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>💧 Ganti Air Parsial (30–50%)</div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Air +38% jernih, pH stabil, ikan tidak stres</div>
-                  </div>
-                  <span style={{ color: '#34d399', fontSize: '11px', fontWeight: 700 }}>Aman</span>
-                </button>
-                <button
-                  onClick={handleFullWaterChange}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid rgba(245,158,11,0.35)', background: '#1e293b',
-                    color: '#f8fafc', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🚿 Kuras Total (100%)</div>
-                    <div style={{ fontSize: '10.5px', color: '#fbbf24' }}>Langsung 100% jernih · Wajib tambah Ketapang & Garam</div>
-                  </div>
-                  <span style={{ color: '#f59e0b', fontSize: '11px', fontWeight: 700 }}>100%</span>
-                </button>
-                <button
-                  onClick={handleKetapang}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
-                    background: state.inventory.ketapang > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
-                    color: state.inventory.ketapang > 0 ? '#f8fafc' : '#64748b',
-                    cursor: state.inventory.ketapang > 0 ? 'pointer' : 'not-allowed',
-                    textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🌿 Ekstrak / Daun Ketapang</div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Turunkan pH (-0.25), tanin alami, redakan stres</div>
-                  </div>
-                  <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.ketapang}</span>
-                </button>
-                <button
-                  onClick={handleSalt}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
-                    background: state.inventory.aquariumSalt > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
-                    color: state.inventory.aquariumSalt > 0 ? '#f8fafc' : '#64748b',
-                    cursor: state.inventory.aquariumSalt > 0 ? 'pointer' : 'not-allowed',
-                    textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🧂 Garam Ikan (Aquarium Salt)</div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Cegah jamur/parasit & bantu osmoregulasi</div>
-                  </div>
-                  <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.aquariumSalt}</span>
-                </button>
-              </div>
-            )}
+              )}
 
-            {/* Popup Submenu: Obat Penyakit */}
-            {openMenu === 'medicine' && (
-              <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: 0,
-                right: 0,
-                marginBottom: '8px',
-                background: '#0f172a',
-                border: '1px solid #c084fc',
-                borderRadius: '14px',
-                padding: '8px',
-                zIndex: 500,
-                boxShadow: '0 16px 40px rgba(0,0,0,0.75)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px',
-              }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', padding: '2px 4px' }}>
-                  💊 Obat & Penanganan Penyakit
-                </div>
-                <button
-                  onClick={() => handleMedicine('medicineYellow')}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
-                    background: state.inventory.medicineYellow > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
-                    color: state.inventory.medicineYellow > 0 ? '#f8fafc' : '#64748b',
-                    cursor: state.inventory.medicineYellow > 0 ? 'pointer' : 'not-allowed',
-                    textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🟡 Obat Kuning (Acriflavine)</div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Obati Fin Rot (pastikan air bersih & ada Garam)</div>
-                  </div>
-                  <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.medicineYellow}</span>
-                </button>
-                <button
-                  onClick={() => handleMedicine('medicineBlue')}
-                  style={{
-                    padding: '9px 10px', borderRadius: '9px', border: '1px solid #1e293b',
-                    background: state.inventory.medicineBlue > 0 ? '#1e293b' : 'rgba(30,41,59,0.35)',
-                    color: state.inventory.medicineBlue > 0 ? '#f8fafc' : '#64748b',
-                    cursor: state.inventory.medicineBlue > 0 ? 'pointer' : 'not-allowed',
-                    textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700 }}>🔵 Obat Biru (Methylene Blue)</div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8' }}>Obati Velvet / White Spot (+ Garam & Ketapang)</div>
-                  </div>
-                  <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 800 }}>×{state.inventory.medicineBlue}</span>
-                </button>
-                {fish.disease === 'bloated' && (
-                  <div style={{ padding: '7px 10px', borderRadius: '9px', background: 'rgba(251,113,133,0.12)', fontSize: '11px', color: '#fda4af' }}>
-                    🎈 Untuk <strong>Kembung</strong>, tidak pakai obat kimia — puasakan pelet & beri <strong>Kutu Air (Daphnia)</strong> di menu Pakan!
-                  </div>
-                )}
+              {/* Main 4 Care Action Buttons */}
+              <div style={{ display: 'flex', gap: '7px' }}>
+                <ActionBtn
+                  emoji="🍖"
+                  label="Pakan"
+                  active={openMenu === 'feed'}
+                  onClick={() => setOpenMenu((m) => (m === 'feed' ? null : 'feed'))}
+                />
+                <ActionBtn
+                  emoji="🪞"
+                  label={flareCooldown > 0 ? `Flaring ${flareCooldown}s` : 'Flaring'}
+                  disabled={flareCooldown > 0 || isFlaring}
+                  highlightColor={isFlaring ? '#fbbf24' : undefined}
+                  onClick={handleFlaring}
+                />
+                <ActionBtn
+                  emoji="💧"
+                  label="Air & Rawat"
+                  active={openMenu === 'water'}
+                  highlightColor={aq.waterClarity < 45 ? '#f59e0b' : undefined}
+                  onClick={() => setOpenMenu((m) => (m === 'water' ? null : 'water'))}
+                />
+                <ActionBtn
+                  emoji="💊"
+                  label="Obat"
+                  active={openMenu === 'medicine'}
+                  highlightColor={fish.disease ? '#ef4444' : undefined}
+                  badge={fish.disease ? '!' : null}
+                  onClick={() => setOpenMenu((m) => (m === 'medicine' ? null : 'medicine'))}
+                />
               </div>
-            )}
-
-            {/* Main 4 Care Action Buttons */}
-            <div style={{ display: 'flex', gap: '7px' }}>
-              <ActionBtn
-                emoji="🍖"
-                label="Pakan"
-                active={openMenu === 'feed'}
-                onClick={() => setOpenMenu((m) => (m === 'feed' ? null : 'feed'))}
-              />
-              <ActionBtn
-                emoji="🪞"
-                label={flareCooldown > 0 ? `Flaring ${flareCooldown}s` : 'Flaring'}
-                disabled={flareCooldown > 0 || isFlaring}
-                highlightColor={isFlaring ? '#fbbf24' : undefined}
-                onClick={handleFlaring}
-              />
-              <ActionBtn
-                emoji="💧"
-                label="Air & Rawat"
-                active={openMenu === 'water'}
-                highlightColor={aq.waterClarity < 45 ? '#f59e0b' : undefined}
-                onClick={() => setOpenMenu((m) => (m === 'water' ? null : 'water'))}
-              />
-              <ActionBtn
-                emoji="💊"
-                label="Obat"
-                active={openMenu === 'medicine'}
-                highlightColor={fish.disease ? '#ef4444' : undefined}
-                badge={fish.disease ? '!' : null}
-                onClick={() => setOpenMenu((m) => (m === 'medicine' ? null : 'medicine'))}
-              />
             </div>
+
+            {/* ── Desktop Docked Navigation (visible on >= 960px inside Right Control Panel) ── */}
+            <div className="ck-desktop-nav">{navItems}</div>
           </div>
 
           {/* Click-outside backdrop for open action submenu */}
@@ -1426,26 +1424,8 @@ export default function SoliterGame({ embedded = false }) {
           )}
         </main>
 
-        {/* ── Bottom Navigation Bar ── */}
-        <nav style={{
-          position: 'fixed',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100%',
-          maxWidth: '480px',
-          display: 'flex',
-          background: 'rgba(11, 17, 32, 0.98)',
-          borderTop: '1px solid #1e293b',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          zIndex: 200,
-        }}>
-          <NavBtn emoji="📅" label="Check-In" onClick={() => setModal('checkin')} active={modal === 'checkin'} dot={unclaimedToday} />
-          <NavBtn emoji="🎁" label="Tukar Poin" onClick={() => setModal('shop')} active={modal === 'shop'} />
-          <NavBtn emoji="🏠" label="Akuarium" onClick={() => setModal('upgrade')} active={modal === 'upgrade'} />
-          <NavBtn emoji="🐟" label="Koleksi" onClick={() => setModal('collection')} active={modal === 'collection'} />
-          <NavBtn emoji="ℹ️" label="Panduan" onClick={() => setModal('info')} active={modal === 'info'} />
-        </nav>
+        {/* ── Mobile & Tablet Fixed Bottom Navigation Bar (hidden on >= 960px) ── */}
+        <nav className="ck-bottom-nav">{navItems}</nav>
 
         {/* ── Modals ── */}
         {modal === 'checkin' && (
