@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Navbar from '@/components/Navbar';
+import StudioHero from '@/components/StudioHero';
 import ProductStrip from '@/components/ProductStrip';
 import SoliterGame from '@/app/game/SoliterGame';
 
@@ -12,11 +13,16 @@ export default function Home() {
     <div style={{ minHeight: '100vh', background: '#090a0d', color: '#f3f4f6' }}>
       <Navbar />
 
-      {/* ZONA ATAS: Strip Etalase Produk 1 Baris Horizontal Scroll (Modul 1.2) */}
+      {/* Bagian Awal: Profil Galeri Cupang Klaten & Foto Asli Piala + Rak Soliter */}
+      <StudioHero />
+
+      {/* ZONA ATAS: Strip Etalase Produk 1 Baris Horizontal Scroll */}
       <ProductStrip />
 
-      {/* ZONA BAWAH: Arena Game Soliter Virtual Cupang Klaten (Modul 1.2–5) */}
-      <SoliterGame embedded />
+      {/* ZONA BAWAH: Arena Game Soliter Virtual Cupang Klaten */}
+      <div id="soliter-virtual">
+        <SoliterGame embedded />
+      </div>
     </div>
   );
 }
