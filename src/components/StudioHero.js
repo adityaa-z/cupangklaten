@@ -34,12 +34,12 @@ export default function StudioHero() {
             </div>
 
             <h1 className="ck-hero-title">
-              Cupang Klaten — Koleksi Ikan <span>Grade A</span> & Form Rapi
+              Cupang Klaten — Koleksi Ikan <span>Kelas Kompetisi</span> & Form Rapi
             </h1>
 
             <p className="ck-hero-desc">
               Berdiri sejak <strong>Desember 2022</strong>, <strong>cans.betta cupangklaten</strong> menghadirkan ikan cupang hias pilihan
-              berkualitas <strong>Grade A</strong> dengan form simetris, warna tegas, sirip rapi, dan mental kuat. Setiap ikan dirawat terpisah di
+              <strong> Kelas Kompetisi</strong> dengan form simetris, warna tegas, sirip rapi, dan mental kuat. Setiap ikan dirawat terpisah di
               soliter kaca dengan air ketapang terjaga — kisaran harga mulai dari <strong>Rp 35.000</strong>.
             </p>
 
@@ -55,7 +55,7 @@ export default function StudioHero() {
               </div>
               <div className="ck-hero-metric">
                 <span className="ck-hero-metric-label">Kualitas</span>
-                <strong className="ck-hero-metric-val">Grade A</strong>
+                <strong className="ck-hero-metric-val">Kelas Kompetisi</strong>
               </div>
             </div>
 
