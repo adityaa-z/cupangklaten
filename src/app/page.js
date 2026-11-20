@@ -347,8 +347,8 @@ async function fetchFeatured() {
         </div>
       </section>}
 
-      {/* Artikel Terbaru Section */}
-      <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
+      {/* Artikel Terbaru Section - HIDDEN */}
+      {false && <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
             Artikel <span style={{ background: 'linear-gradient(to right, #00d2ff, #007bff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Terbaru</span>
@@ -404,7 +404,7 @@ async function fetchFeatured() {
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>
-      </section>
+      </section>}
 
       {/* Reviews Section */}
       <section className="reviews-section" id="reviews">
