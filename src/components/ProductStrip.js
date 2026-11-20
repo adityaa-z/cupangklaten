@@ -19,6 +19,24 @@ function formatFullRupiah(num) {
   }).format(Number(num) || 0);
 }
 
+function formatPriceRangeShort(minPrice, maxPrice) {
+  const min = Number(minPrice) || 0;
+  const max = Number(maxPrice) || 0;
+  if (max > min) {
+    return `${formatShortRupiah(min)} – ${formatShortRupiah(max).replace(/^Rp\s*/, '')}`;
+  }
+  return formatShortRupiah(min);
+}
+
+function formatPriceRangeFull(minPrice, maxPrice) {
+  const min = Number(minPrice) || 0;
+  const max = Number(maxPrice) || 0;
+  if (max > min) {
+    return `${formatFullRupiah(min)} – ${formatFullRupiah(max)}`;
+  }
+  return formatFullRupiah(min);
+}
+
 export default function ProductStrip() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -165,7 +183,7 @@ export default function ProductStrip() {
                         {title}
                       </div>
                       <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ck-text-2)' }}>
-                        {formatShortRupiah(item.price)}
+                        {formatPriceRangeShort(item.price, item.price_max)}
                       </div>
                     </div>
                   </button>
@@ -264,7 +282,7 @@ export default function ProductStrip() {
               </h3>
               <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Kisaran Harga</div>
               <div style={{ fontSize: '19px', fontWeight: 800, color: 'var(--ck-text)', marginBottom: '12px' }}>
-                {formatFullRupiah(selected.price)}
+                {formatPriceRangeFull(selected.price, selected.price_max)}
               </div>
 
               <div style={{

@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS products (
     size VARCHAR(10) DEFAULT 'M',
     stock INT DEFAULT 1,
     price INT DEFAULT 0,
+    price_max INT DEFAULT NULL,
     shopee TEXT DEFAULT NULL,
     img TEXT DEFAULT NULL,
     img2 TEXT DEFAULT NULL,

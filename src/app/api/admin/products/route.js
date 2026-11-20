@@ -4,6 +4,20 @@ import { isValidSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+let priceMaxEnsured = false;
+async function ensurePriceMaxColumn() {
+    if (priceMaxEnsured) return;
+    try {
+        await execute('ALTER TABLE products ADD COLUMN price_max INT DEFAULT NULL AFTER price');
+    } catch (err) {
+        // Ignore if column already exists (ER_DUP_FIELDNAME / errno 1060)
+        if (err?.errno !== 1060 && err?.code !== 'ER_DUP_FIELDNAME') {
+            console.warn('ensurePriceMaxColumn notice:', err.message);
+        }
+    }
+    priceMaxEnsured = true;
+}
+
 export async function GET(request) {
     try {
         if (!isValidSession(request)) {
@@ -34,12 +48,14 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        await ensurePriceMaxColumn();
+
         const body = await request.json();
         const { id, ...inputData } = body;
 
         const allowedFields = [
             'code', 'category', 'variant', 'gender', 'age', 'size',
-            'stock', 'price', 'shopee', 'img', 'img2', 'img3', 'img4', 'is_video',
+            'stock', 'price', 'price_max', 'shopee', 'img', 'img2', 'img3', 'img4', 'is_video',
             'is_available', 'is_pinned', 'is_archived', 'archived_at', 'sold_at'
         ];
 
@@ -47,6 +63,13 @@ export async function POST(request) {
         allowedFields.forEach(field => {
             if (inputData[field] !== undefined) data[field] = inputData[field];
         });
+
+        // Normalize price_max: store NULL if empty, 0, or <= price
+        if (data.price_max !== undefined) {
+            const parsedMax = parseInt(data.price_max, 10);
+            const parsedMin = parseInt(data.price, 10) || 0;
+            data.price_max = !isNaN(parsedMax) && parsedMax > parsedMin ? parsedMax : null;
+        }
 
         // Convert booleans to 0/1 for MySQL
         ['is_video', 'is_available', 'is_pinned', 'is_archived'].forEach(field => {

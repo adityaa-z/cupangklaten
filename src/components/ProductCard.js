@@ -22,7 +22,16 @@ const ProductCard = ({ product }) => {
         : `${product.category}${variantDisplay}`;
 
     const formatRupiah = (number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(number) || 0);
+    };
+
+    const formatPriceDisplay = () => {
+        const min = Number(product.price) || 0;
+        const max = Number(product.price_max) || 0;
+        if (max > min) {
+            return `${formatRupiah(min)} – ${formatRupiah(max)}`;
+        }
+        return formatRupiah(min);
     };
 
     const waText = encodeURIComponent(`Halo Admin Cupang Klaten, saya ingin tanya ketersediaan stok: ${titleDisplay} (Kode: ${product.code}). Apakah masih tersedia?`);
@@ -78,7 +87,7 @@ const ProductCard = ({ product }) => {
                 <div className="product-info">
                     <span className="product-code">{titleDisplay}</span>
                     <div className="product-price-row">
-                        <div className="product-price">{formatRupiah(product.price)}</div>
+                        <div className="product-price">{formatPriceDisplay()}</div>
                         {!isStokHabis && <span className="ready-badge-inline">Stok: {product.stock}</span>}
                     </div>
 
@@ -120,7 +129,7 @@ const ProductCard = ({ product }) => {
                             <div className="modal-info-section">
                                 <h3 className="modal-title">{titleDisplay}</h3>
                                 <div className="modal-price" style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Kisaran Harga</div>
-                                <div className="modal-price">{formatRupiah(product.price)}</div>
+                                <div className="modal-price">{formatPriceDisplay()}</div>
                                 
                                 <div className="modal-details">
                                     <div className="detail-item">

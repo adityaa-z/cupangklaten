@@ -110,7 +110,7 @@ export default function AdminPage() {
     // Form States (Product)
     const [formData, setFormData] = useState({
         code: '', category: '', variant: '', gender: 'Jantan',
-        age: '', size: 'M', stock: 1, price: 0, shopee: '',
+        age: '', size: 'M', stock: 1, price: 0, price_max: '', shopee: '',
         img: '', img2: '', img3: '', img4: '', is_video: false,
         title: '', description: '', image_url: '', image2_url: '', image3_url: '', image4_url: '', start_price: 0, min_bid_increment: 0, start_time: '', end_time: '', status: 'draft'
     });
@@ -558,7 +558,7 @@ export default function AdminPage() {
                     {activeTab === 'Produk' && (
                         <div className="tab-view">
                             <div className="dashboard-controls">
-                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setModalType('product'); setIsModalOpen(true); }}>
+                                <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => { setEditingItem(null); setFormData({ code: '', category: '', variant: '', gender: 'Jantan', age: '', size: 'M', stock: 1, price: 35000, price_max: '', shopee: 'https://wa.me/628992020444', img: '', img2: '', img3: '', img4: '', is_video: false }); setModalType('product'); setIsModalOpen(true); }}>
                                     <i className="fas fa-plus"></i> Tambah Ikan
                                 </button>
                             </div>
@@ -597,7 +597,12 @@ export default function AdminPage() {
                                                 </td>
                                                 <td data-label="Kode">{p.code}</td>
                                                 <td data-label="Kategori">{p.category}</td>
-                                                <td data-label="Harga">Rp {p.price.toLocaleString()}</td>
+                                                <td data-label="Harga">
+                                                    Rp {Number(p.price || 0).toLocaleString('id-ID')}
+                                                    {p.price_max && Number(p.price_max) > Number(p.price) && (
+                                                        <span> – Rp {Number(p.price_max).toLocaleString('id-ID')}</span>
+                                                    )}
+                                                </td>
                                                 <td data-label="Status">
                                                     <div className="status-control" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -621,7 +626,7 @@ export default function AdminPage() {
                                                     </div>
                                                 </td>
                                                 <td className="action-btns" data-label="Aksi">
-                                                    <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData(p); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
+                                                    <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData({ ...p, price_max: p.price_max || '' }); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
@@ -1705,13 +1710,39 @@ export default function AdminPage() {
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Harga (Rp)</label>
-                                            <input type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })} required />
+                                            <label>Harga Mulai Dari (Rp)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={formData.price}
+                                                onChange={e => setFormData({ ...formData, price: parseInt(e.target.value, 10) || 0 })}
+                                                placeholder="Contoh: 35000"
+                                                required
+                                            />
                                         </div>
                                         <div className="form-group">
-                                            <label>Stok</label>
-                                            <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })} required />
+                                            <label>Sampai Harga (Rp) <span style={{ fontWeight: 'normal', opacity: 0.7 }}>(Opsional)</span></label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={formData.price_max ?? ''}
+                                                onChange={e => setFormData({ ...formData, price_max: e.target.value === '' ? '' : (parseInt(e.target.value, 10) || 0) })}
+                                                placeholder="Kosongkan jika 1 harga"
+                                            />
                                         </div>
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '-0.5rem', marginBottom: '0.9rem' }}>
+                                        Preview kisaran harga:{' '}
+                                        <strong style={{ color: 'var(--text-dark)' }}>
+                                            Rp {Number(formData.price || 0).toLocaleString('id-ID')}
+                                            {Number(formData.price_max) > Number(formData.price)
+                                                ? ` – Rp ${Number(formData.price_max).toLocaleString('id-ID')}`
+                                                : ''}
+                                        </strong>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Stok</label>
+                                        <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })} required />
                                     </div>
                                     <div className="form-group">
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
