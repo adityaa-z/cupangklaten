@@ -6,26 +6,19 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import FAB from '@/components/FAB';
-import PromoPopup from '@/components/PromoPopup';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const [fishProducts, setFishProducts] = useState([]);
-  const [auctions, setAuctions] = useState([]);
   const [suppliesProducts, setSuppliesProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [promoActive, setPromoActive] = useState('false');
-  const [promoLimitRemaining, setPromoLimitRemaining] = useState(0);
-  const [generalPromos, setGeneralPromos] = useState([]);
 
   // User Review States
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [userRating, setUserRating] = useState(5);
@@ -39,14 +32,12 @@ export default function Home() {
   const fishSliderRef = React.useRef(null);
   const suppliesSliderRef = React.useRef(null);
   const reviewsSliderRef = React.useRef(null);
-  const auctionsSliderRef = React.useRef(null);
   const articlesSliderRef = React.useRef(null);
 
   // Scroll states
   const [scrollFish, setScrollFish] = useState({ left: false, right: true });
   const [scrollSupp, setScrollSupp] = useState({ left: false, right: true });
   const [scrollReviews, setScrollReviews] = useState({ left: false, right: true });
-  const [scrollAuctions, setScrollAuctions] = useState({ left: false, right: true });
   const [scrollArticles, setScrollArticles] = useState({ left: false, right: true });
 
 
@@ -133,21 +124,6 @@ export default function Home() {
     }
     fetchAuctions();
 
-    async function fetchPromoSettings() {
-      try {
-        const res = await fetch('/api/promo/');
-        if (res.ok) {
-          const data = await res.json();
-          setPromoActive(data.promoActive);
-          setGeneralPromos(data.generalPromos || []);
-          setPromoLimitRemaining(data.limitRemaining || 0);
-        }
-      } catch (err) {
-        console.error('Error fetching promo settings', err);
-      }
-    }
-    fetchPromoSettings();
-
     async function fetchArticles() {
       try {
         const res = await fetch('/api/blog/');
@@ -220,14 +196,11 @@ async function fetchFeatured() {
     const onFishScroll = () => handleScroll(fishSliderRef, setScrollFish);
     const onSuppScroll = () => handleScroll(suppliesSliderRef, setScrollSupp);
     const onReviewsScroll = () => handleScroll(reviewsSliderRef, setScrollReviews);
-    const onAuctionsScroll = () => handleScroll(auctionsSliderRef, setScrollAuctions);
     const onArticlesScroll = () => handleScroll(articlesSliderRef, setScrollArticles);
 
     if (fSlider) fSlider.addEventListener('scroll', onFishScroll);
     if (sSlider) sSlider.addEventListener('scroll', onSuppScroll);
     if (rSlider) rSlider.addEventListener('scroll', onReviewsScroll);
-    const aSlider = auctionsSliderRef.current;
-    if (aSlider) aSlider.addEventListener('scroll', onAuctionsScroll);
     const artSlider = articlesSliderRef.current;
     if (artSlider) artSlider.addEventListener('scroll', onArticlesScroll);
     
@@ -236,7 +209,6 @@ async function fetchFeatured() {
       onFishScroll();
       onSuppScroll();
       onReviewsScroll();
-      onAuctionsScroll();
       onArticlesScroll();
     }, 500);
 
@@ -244,7 +216,6 @@ async function fetchFeatured() {
       if (fSlider) fSlider.removeEventListener('scroll', onFishScroll);
       if (sSlider) sSlider.removeEventListener('scroll', onSuppScroll);
       if (rSlider) rSlider.removeEventListener('scroll', onReviewsScroll);
-      if (aSlider) aSlider.removeEventListener('scroll', onAuctionsScroll);
       if (artSlider) artSlider.removeEventListener('scroll', onArticlesScroll);
     };
   }, [loading, fishProducts, suppliesProducts, reviews, articles]);
@@ -265,21 +236,20 @@ async function fetchFeatured() {
   return (
     <>
       <Navbar />
-      <PromoPopup isActive={promoActive} generalPromos={generalPromos} limitRemaining={promoLimitRemaining} />
       
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
-            <h1>Pusat Ikan <span>Cupang Klaten</span> Terbaik & Bergaransi</h1>
-            <p>Beli Ikan Cupang Klaten berkualitas tinggi langsung dari pembudidaya. Koleksi genetik stabil, warna tajam, dan pengiriman aman ke seluruh Indonesia.</p>
+            <h1>Informasi Stok & Harga <span>Ikan Cupang Klaten</span></h1>
+            <p>Cek ketersediaan dan kisaran harga ikan cupang langsung dari pembudidaya Klaten. Koleksi genetik stabil, warna tajam. Hubungi kami untuk informasi lebih lanjut.</p>
             <div className="hero-btns" style={{ display: 'flex', gap: '1rem' }}>
               <Link href="#products" className="filter-btn active" style={{ textDecoration: 'none' }}>
-                Lihat Koleksi
+                Lihat Stok & Harga
               </Link>
-              <a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20konsultasi"
+              <a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20tanya%20stok%20dan%20harga%20ikan"
                 className="filter-btn" style={{ textDecoration: 'none' }}>
-                Konsultasi Gratis
+                <i className="fab fa-whatsapp"></i> Tanya via WA
               </a>
             </div>
           </div>
@@ -293,9 +263,9 @@ async function fetchFeatured() {
       <section className="products-section" id="products" style={{ paddingBottom: '2rem' }}>
         <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Koleksi <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Pilihan</span>
+            Stok <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Tersedia</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Ikan Cupang hias kualitas kontes & genetik mantap</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Kisaran harga & ketersediaan ikan cupang — tanya WA untuk info terbaru</p>
           <div style={{ width: '60px', height: '4px', background: 'var(--primary-cyan)', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
 
@@ -328,10 +298,9 @@ async function fetchFeatured() {
 
 
       <div style={{ textAlign: 'center', marginTop: '3rem', marginBottom: '1rem' }}>
-        <Link href="/cara-order" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
-          Cara Order
-          <i className="fas fa-arrow-right"></i>
-        </Link>
+        <a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20tanya%20stok%20ikan" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: '#25D366', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(37,211,102,0.3)' }}>
+          <i className="fab fa-whatsapp"></i> Tanya Stok via WA
+        </a>
       </div>
 
       {/* Supplies Collection Section */}
@@ -343,7 +312,6 @@ async function fetchFeatured() {
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Pakan, obat, dan perlengkapan ikan cupang terbaik</p>
           <div style={{ width: '60px', height: '4px', background: '#ff7043', borderRadius: '10px', marginTop: '1rem' }}></div>
         </div>
-
 
         <div className="slider-container">
           <button className="slider-nav-btn prev" onClick={() => scroll(suppliesSliderRef, 'left')} disabled={!scrollSupp.left} aria-label="Previous supplies">
@@ -373,90 +341,11 @@ async function fetchFeatured() {
 
         <div style={{ textAlign: 'center', marginTop: '4rem' }}>
           <Link href="/stok" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 188, 212, 0.3)' }}>
-            Lihat Semua Produk
+            Lihat Semua Stok & Harga
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>
       </section>
-
-      {/* Lelang Ikan Section */}
-      {(loading || auctions.length > 0) && (
-      <section className="products-section" id="lelang-home" style={{ paddingBottom: '4rem', paddingTop: '4rem' }}>
-        <div className="section-header" style={{ justifyContent: 'center', textAlign: 'center', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Lelang <span style={{ background: 'linear-gradient(to right, #facc15, #ca8a04)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ikan Pilihan</span>
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Menangkan ikan cupang kontes dengan penawaran terbaik</p>
-          <div style={{ width: '60px', height: '4px', background: '#facc15', borderRadius: '10px', marginTop: '1rem' }}></div>
-        </div>
-
-        <div className="slider-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <button className="slider-nav-btn prev" onClick={() => scroll(auctionsSliderRef, 'left')} disabled={!scrollAuctions.left} aria-label="Previous auction">
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          
-          <div className="product-slider" ref={auctionsSliderRef}>
-            {loading ? (
-              [...Array(3)].map((_, i) => <div key={i} className="skeleton-card"><div className="skeleton-img skeleton"></div><div className="skeleton-text skeleton"></div></div>)
-            ) : (
-              auctions.map(auction => (
-                <div key={auction.id} style={{ 
-                    minWidth: '280px', maxWidth: '300px', background: '#1e293b', borderRadius: '20px', 
-                    overflow: 'hidden', border: '1px solid #334155', display: 'flex', flexDirection: 'column',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
-                }}>
-                    <div style={{ position: 'relative', width: '100%', height: '220px', background: '#0f172a' }}>
-                        <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: 'white', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', zIndex: 1, boxShadow: '0 2px 10px rgba(239, 68, 68, 0.5)' }}>
-                            <i className="fas fa-circle" style={{ fontSize: '0.5rem', verticalAlign: 'middle', marginRight: '4px', animation: 'pulse 1.5s infinite' }}></i> Live Bidding
-                        </span>
-                        {auction.is_video ? (
-                            <video src={auction.image_url} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                            <img src={auction.image_url || '/logo.png'} alt={auction.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        )}
-                    </div>
-                    <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <h3 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '1rem', fontWeight: '700', lineHeight: 1.3 }}>{auction.title}</h3>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', padding: '0.8rem', background: '#0f172a', borderRadius: '12px' }}>
-                            <div>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.2rem' }}>Open Bid</div>
-                                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '1rem' }}>Rp {auction.start_price.toLocaleString('id-ID')}</div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.2rem' }}>Kelipatan</div>
-                                <div style={{ color: '#38bdf8', fontWeight: 'bold', fontSize: '0.9rem' }}>Rp {auction.min_bid_increment.toLocaleString('id-ID')}</div>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => {
-                                if (!session) {
-                                    router.push('/login');
-                                } else {
-                                    router.push('/lelang/' + auction.id);
-                                }
-                            }}
-                            style={{ 
-                                width: '100%', padding: '0.8rem', marginTop: 'auto', background: 'linear-gradient(135deg, #facc15, #ca8a04)', 
-                                color: '#000', border: 'none', borderRadius: '50px', fontWeight: '700', cursor: 'pointer',
-                                transition: 'transform 0.2s', boxShadow: '0 4px 15px rgba(250, 204, 21, 0.3)'
-                            }}
-                            onMouseOver={e => e.target.style.transform = 'translateY(-2px)'}
-                            onMouseOut={e => e.target.style.transform = 'translateY(0)'}
-                        >
-                            Ikut Lelang
-                        </button>
-                    </div>
-                </div>
-              ))
-            )}
-          </div>
-          <button className="slider-nav-btn next" onClick={() => scroll(auctionsSliderRef, 'right')} disabled={!scrollAuctions.right} aria-label="Next auction">
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </section>
-      )}
-
 
       {/* Artikel Terbaru Section */}
       <section className="products-section" style={{ background: 'var(--bg-white)', paddingTop: '4rem', paddingBottom: '4rem' }}>

@@ -12,15 +12,14 @@ const Footer = () => {
                         <span className="logo-text"
                             style={{ filter: 'grayscale(100%) brightness(200%)', color: '#94a3b8', marginTop: '1rem' }}>CUPANGKLATEN</span>
                     </Link>
-                    <p style={{ color: '#94a3b8', marginTop: '1rem' }}>Dedikasi kami adalah menghadirkan keindahan ikan cupang
-                        Klaten ke seluruh penjuru Asia dengan kualitas premium.</p>
+                    <p style={{ color: '#94a3b8', marginTop: '1rem' }}>Informasi stok dan kisaran harga ikan cupang terbaik dari pembudidaya Klaten. Hubungi kami untuk ketersediaan terkini.</p>
                 </div>
                 <div className="footer-links">
-                    <h4>Bantuan</h4>
+                    <h4>Informasi</h4>
                     <ul>
-                        <li><a href="https://wa.me/628992020444?text=Halo%20Admin%20Cupang%20Klaten%2C%20saya%20ingin%20mengonfirmasi%20pembayaran%20atas%20pesanan%20saya%20di%20Shopee.%20Nomor%20pesanan%2Fresi%20saya%20adalah%3A%20"
-                                target="_blank" rel="noopener noreferrer">Konfirmasi Pembayaran</a></li>
-                        <li><Link href="/cara-order">Cara Order</Link></li>
+                        <li><a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20tanya%20stok%20dan%20harga%20ikan"
+                                target="_blank" rel="noopener noreferrer">Tanya Stok & Harga</a></li>
+                        <li><Link href="/stok">Lihat Semua Stok</Link></li>
                         <li><Link href="/faq">FAQ</Link></li>
                     </ul>
                 </div>

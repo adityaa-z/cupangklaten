@@ -72,15 +72,14 @@ const StokContent = () => {
             {/* Page Header */}
             <div style={{ background: 'var(--bg-light)', padding: '3rem 2rem', textAlign: 'center', borderBottom: '1px solid var(--border-color)' }}>
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-                    Stok Ikan <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ready</span>
+                    Informasi Stok & <span style={{ background: 'linear-gradient(to right, var(--primary-dark), var(--primary-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Kisaran Harga</span>
                 </h1>
-                <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>Pilih ikan favoritmu dari berbagai kategori dan amankan sebelum terjual!</p>
+                <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>Lihat ketersediaan dan kisaran harga ikan cupang kami. Hubungi WhatsApp untuk informasi stok terbaru.</p>
                 
                 <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                    <Link href="/cara-order" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '0.8rem 2rem', fontSize: '1rem', borderRadius: '50px', background: 'var(--primary-cyan)', color: 'white', fontWeight: '600', boxShadow: '0 8px 15px -3px rgba(0, 188, 212, 0.3)' }}>
-                        Cara Order
-                        <i className="fas fa-arrow-right"></i>
-                    </Link>
+                    <a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20tanya%20stok%20dan%20harga%20ikan" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '0.8rem 2rem', fontSize: '1rem', borderRadius: '50px', background: '#25D366', color: 'white', fontWeight: '600', boxShadow: '0 8px 15px -3px rgba(37,211,102,0.3)' }}>
+                        <i className="fab fa-whatsapp"></i> Tanya via WhatsApp
+                    </a>
                 </div>
                 
                 <div className="search-bar" style={{ maxWidth: '500px', margin: '2rem auto 0', display: 'block' }}>

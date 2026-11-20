@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { useCart } from './CartProvider';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
-    const { cartCount, setIsCartOpen } = useCart();
     const [menuOpen, setMenuOpen] = useState(false);
     const [theme, setTheme] = useState('light');
 
@@ -43,15 +41,6 @@ const Navbar = () => {
                 </Link>
 
                 <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
-                    <button className="cart-btn" onClick={() => setIsCartOpen(true)} aria-label="Keranjang Belanja" style={{ background: 'none', border: 'none', position: 'relative', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--text-dark)' }}>
-                        <i className="fas fa-shopping-cart"></i>
-                        {cartCount > 0 && (
-                            <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#ef4444', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
-                                {cartCount}
-                            </span>
-                        )}
-                    </button>
-
                     <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle Theme">
                         <i className={theme === 'light' ? "fas fa-moon" : "fas fa-sun"}></i>
                     </button>
@@ -61,11 +50,8 @@ const Navbar = () => {
                     </button>
                     
                     <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
-                        <Link href="/lelang" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-gavel"></i> Area Lelang
-                        </Link>
                         <Link href="/stok" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-fish"></i> Semua Stok
+                            <i className="fas fa-fish"></i> Stok & Harga Ikan
                         </Link>
                         <Link href="/tips-perawatan" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-book-open"></i> Tips & Edukasi
@@ -91,8 +77,8 @@ const Navbar = () => {
                                     <i className="fas fa-user-circle"></i> Halo, {session.user.name?.split(' ')[0] || 'Member'}
                                 </Link>
                                 {session.user?.email !== 'zidanp13794@gmail.com' && (
-                                    <Link href="/pesanan-saya" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: '#2563eb', fontWeight: 'bold' }}>
-                                        <i className="fas fa-box-open" style={{ color: '#2563eb' }}></i> Pesanan Saya
+                                    <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)}>
+                                        <i className="fas fa-user-circle"></i> Profil Saya
                                     </Link>
                                 )}
                                 {session.user?.email === 'zidanp13794@gmail.com' && (

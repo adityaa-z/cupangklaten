@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useCart } from './CartProvider';
-import { useRouter } from 'next/navigation';
 
 const ProductCard = ({ product }) => {
-    const { addToCart } = useCart();
-    const router = useRouter();
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [imgLoaded, setImgLoaded] = useState(false);
@@ -13,8 +9,8 @@ const ProductCard = ({ product }) => {
     // Filter available images
     const images = [product.img, product.img2, product.img3, product.img4].filter(img => img && img.trim() !== '');
 
-    const isSoldOut = (!product.is_available || product.stock <= 0);
-    const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
+    const isStokHabis = (!product.is_available || product.stock <= 0);
+    const cardClass = isStokHabis ? 'product-card sold-out' : 'product-card';
     
     const isKebutuhanIkan = product.category?.toLowerCase() === 'kebutuhan ikan';
     const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
@@ -28,6 +24,9 @@ const ProductCard = ({ product }) => {
     const formatRupiah = (number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
     };
+
+    const waText = encodeURIComponent(`Halo Admin Cupang Klaten, saya ingin tanya ketersediaan stok: ${titleDisplay} (Kode: ${product.code}). Apakah masih tersedia?`);
+    const waLink = `https://wa.me/628992020444?text=${waText}`;
 
     // Body scroll lock
     useEffect(() => {
@@ -51,19 +50,6 @@ const ProductCard = ({ product }) => {
         setCurrentImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
-    const handleAddToCart = (e) => {
-        e.stopPropagation();
-        addToCart(product);
-        setIsLightboxOpen(false);
-    };
-
-    const handleBuyNow = (e) => {
-        e.stopPropagation();
-        addToCart(product);
-        setIsLightboxOpen(false);
-        router.push('/checkout');
-    };
-
     useEffect(() => {
         setLightboxImgLoaded(false);
     }, [currentImgIndex]);
@@ -71,7 +57,7 @@ const ProductCard = ({ product }) => {
     return (
         <>
             <div className={cardClass}>
-                {isSoldOut && <div className="sold-ribbon">SOLD OUT</div>}
+                {isStokHabis && <div className="sold-ribbon">STOK HABIS</div>}
                 <div className="product-img-container" onClick={() => { setIsLightboxOpen(true); setCurrentImgIndex(0); }}>
                     {product.is_video ? (
                         <video src={product.img} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -93,16 +79,16 @@ const ProductCard = ({ product }) => {
                     <span className="product-code">{titleDisplay}</span>
                     <div className="product-price-row">
                         <div className="product-price">{formatRupiah(product.price)}</div>
-                        {!isSoldOut && <span className="ready-badge-inline">Stock: {product.stock}</span>}
+                        {!isStokHabis && <span className="ready-badge-inline">Stok: {product.stock}</span>}
                     </div>
 
                     <button className="buy-btn" onClick={() => setIsLightboxOpen(true)}>
-                        {isSoldOut ? 'Detail Produk' : 'Beli Sekarang'} <i className="fas fa-shopping-cart" style={{ marginLeft: '0.5rem' }}></i>
+                        {isStokHabis ? 'Lihat Detail' : 'Tanya via WA'} <i className="fab fa-whatsapp" style={{ marginLeft: '0.5rem' }}></i>
                     </button>
                 </div>
             </div>
 
-            {/* Detail Modal (Enhanced Lightbox) */}
+            {/* Detail Modal (Lightbox) */}
             {isLightboxOpen && (
                 <div className="lightbox-overlay" onClick={() => setIsLightboxOpen(false)}>
                     <button className="lightbox-close" onClick={() => setIsLightboxOpen(false)}><i className="fas fa-times"></i></button>
@@ -133,12 +119,13 @@ const ProductCard = ({ product }) => {
 
                             <div className="modal-info-section">
                                 <h3 className="modal-title">{titleDisplay}</h3>
+                                <div className="modal-price" style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.3rem' }}>Kisaran Harga</div>
                                 <div className="modal-price">{formatRupiah(product.price)}</div>
                                 
                                 <div className="modal-details">
                                     <div className="detail-item">
                                         <i className="fas fa-fingerprint"></i>
-                                        <span>Kode Produk: <strong>{product.code}</strong></span>
+                                        <span>Kode: <strong>{product.code}</strong></span>
                                     </div>
                                     <div className="detail-item">
                                         <i className={`fas fa-${product.gender === 'Jantan' ? 'mars' : 'venus'}`}></i>
@@ -160,20 +147,26 @@ const ProductCard = ({ product }) => {
                                     </div>
                                     <div className="detail-item">
                                         <i className="fas fa-check-circle"></i>
-                                        <span>Status: <strong style={{ color: isSoldOut ? 'var(--secondary-coral)' : '#10b981' }}>{isSoldOut ? 'Sudah Terjual' : 'Sangat Terbatas (Ready)'}</strong></span>
+                                        <span>Status: <strong style={{ color: isStokHabis ? 'var(--secondary-coral)' : '#10b981' }}>{isStokHabis ? 'Stok Habis' : `Tersedia (${product.stock} ekor)`}</strong></span>
                                     </div>
                                 </div>
 
-                                {!isSoldOut && (
-                                    <div className="checkout-bar" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                                        <button onClick={handleAddToCart} style={{ flex: 1, padding: '0.8rem', background: '#e5e7eb', color: '#111827', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                            <i className="fas fa-cart-plus"></i> Tambah Keranjang
-                                        </button>
-                                        <button onClick={handleBuyNow} style={{ flex: 1, padding: '0.8rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                            <i className="fas fa-bolt"></i> Beli Sekarang
-                                        </button>
-                                    </div>
-                                )}
+                                <div style={{ marginTop: '1.5rem' }}>
+                                    {!isStokHabis ? (
+                                        <a
+                                            href={waLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', padding: '0.9rem', background: '#25D366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', textDecoration: 'none' }}
+                                        >
+                                            <i className="fab fa-whatsapp"></i> Tanya Ketersediaan via WA
+                                        </a>
+                                    ) : (
+                                        <div style={{ textAlign: 'center', color: 'var(--secondary-coral)', fontWeight: 'bold', padding: '0.8rem', background: 'rgba(239,68,68,0.08)', borderRadius: '8px' }}>
+                                            <i className="fas fa-times-circle"></i> Stok sedang habis
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
