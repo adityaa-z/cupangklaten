@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { loadState, saveState, createDefaultFish, getLocalDateString } from './gameState';
 import { FISH_CATALOG, MUTATION_STAGES, getFishById, getMutationStage } from './fishConfig';
 import {
@@ -226,6 +227,11 @@ function InfoModal({ gameState, onClose }) {
 
 /* ─── Main Soliter Virtual Game Component ─────────────────────────────────── */
 export default function SoliterGame({ embedded = false }) {
+  const { data: session, status } = useSession();
+  const userKey = session?.user?.email || null;
+  const isLoggedIn = status === 'authenticated' && Boolean(session);
+  const isLocked = !isLoggedIn;
+
   const [state, setState] = useState(null);
   const [modal, setModal] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
@@ -241,12 +247,12 @@ export default function SoliterGame({ embedded = false }) {
   }, []);
 
   useEffect(() => {
-    setState(loadState());
-  }, []);
+    setState(loadState(userKey));
+  }, [userKey]);
 
   useEffect(() => {
-    if (state) saveState(state);
-  }, [state]);
+    if (state && isLoggedIn) saveState(state, userKey);
+  }, [state, isLoggedIn, userKey]);
 
   useEffect(() => {
     if (flareCooldown <= 0) return;
@@ -262,9 +268,9 @@ export default function SoliterGame({ embedded = false }) {
     };
   }, []);
 
-  // ─── Simulation Tick (every 20s) ──────────────────────────────────────────
+  // ─── Simulation Tick (every 20s, only active when logged in) ──────────────
   useEffect(() => {
-    if (!state) return;
+    if (!state || !isLoggedIn) return;
     decayRef.current = setInterval(() => {
       setState((prev) => {
         if (!prev) return prev;
@@ -348,7 +354,7 @@ export default function SoliterGame({ embedded = false }) {
       });
     }, 20000);
     return () => clearInterval(decayRef.current);
-  }, [state !== null]);
+  }, [state !== null, isLoggedIn]);
 
   // ─── Action Handlers ──────────────────────────────────────────────────────
 
@@ -889,7 +895,7 @@ export default function SoliterGame({ embedded = false }) {
                 Soliter Virtual
               </div>
               <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
-                {unclaimedToday && (
+                {isLoggedIn && unclaimedToday && (
                   <button
                     type="button"
                     onClick={() => setModal('checkin')}
@@ -911,9 +917,9 @@ export default function SoliterGame({ embedded = false }) {
                     <span>Klaim Poin Harian</span>
                   </button>
                 )}
-                <span>{aqCfg.shortName}</span>
+                <span>{isLocked ? 'Khusus Member' : aqCfg.shortName}</span>
                 <span>·</span>
-                <span>{fishCfg.species}</span>
+                <span>{isLocked ? 'Login untuk Bermain' : fishCfg.species}</span>
                 {!embedded && (
                   <>
                     <span>·</span>
@@ -926,25 +932,37 @@ export default function SoliterGame({ embedded = false }) {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="ck-points-pill"
-            onClick={() => setModal('checkin')}
-            title="Poin Check-In Harian"
-          >
-            <i className="fas fa-coins" style={{ color: '#d9a441', fontSize: '12px' }} />
-            <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#f3f4f6' }}>
-              {state.points.toLocaleString()}
-            </span>
-            <span style={{ fontSize: '10.5px', color: '#6b7280', fontWeight: 600 }}>pts</span>
-            {unclaimedToday && (
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d9a441' }} />
-            )}
-          </button>
+          {isLoggedIn ? (
+            <button
+              type="button"
+              className="ck-points-pill"
+              onClick={() => setModal('checkin')}
+              title="Poin Check-In Harian"
+            >
+              <i className="fas fa-coins" style={{ color: '#d9a441', fontSize: '12px' }} />
+              <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#f3f4f6' }}>
+                {state.points.toLocaleString()}
+              </span>
+              <span style={{ fontSize: '10.5px', color: '#6b7280', fontWeight: 600 }}>pts</span>
+              {unclaimedToday && (
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d9a441' }} />
+              )}
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="ck-points-pill"
+              style={{ textDecoration: 'none', fontSize: '12px', fontWeight: 700, color: '#d9a441' }}
+            >
+              <i className="fas fa-lock" style={{ fontSize: '11px' }} />
+              <span>Masuk</span>
+            </Link>
+          )}
         </div>
 
-        {/* ── Main Responsive Grid ── */}
-        <main className="ck-game-grid">
+        {/* ── Main Responsive Grid (Blurred & Locked when not logged in) ── */}
+        <div className="ck-lock-stage-wrap">
+          <main className={`ck-game-grid ${isLocked ? 'ck-locked-blur' : ''}`} aria-hidden={isLocked}>
 
           {/* ── LEFT / TOP COLUMN: Viewing Tank + Mutation Timeline + Visual Traits ── */}
           <div className="ck-stage-col">
@@ -1287,16 +1305,49 @@ export default function SoliterGame({ embedded = false }) {
           {openMenu && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 400 }} onClick={() => setOpenMenu(null)} />
           )}
-        </main>
+          </main>
 
-        {/* Mobile & Tablet Fixed Bottom Nav */}
-        <nav className="ck-bottom-nav">{navItems}</nav>
+          {/* ── Auth Lock Overlay (shown when guest hasn't logged in) ── */}
+          {isLocked && (
+            <div className="ck-lock-overlay">
+              <div className="ck-lock-card">
+                <div className="ck-lock-icon">
+                  <i className={`fas ${status === 'loading' ? 'fa-spinner fa-spin' : 'fa-lock'}`} />
+                </div>
+                <h3 style={{ margin: '0 0 6px', fontSize: '17px', fontWeight: 700, color: '#f9fafb' }}>
+                  {status === 'loading' ? 'Memeriksa Akun...' : 'Soliter Virtual Terkunci'}
+                </h3>
+                <p style={{ margin: 0, fontSize: '12.5px', lineHeight: 1.55, color: '#9ca3af' }}>
+                  {status === 'loading'
+                    ? 'Menyiapkan data akuarium dan koleksi ikan Anda.'
+                    : 'Masuk atau daftar member gratis terlebih dahulu untuk memelihara cupang virtual, klaim poin harian, dan mengoleksi 9 jenis ikan.'}
+                </p>
 
-        {modal === 'checkin' && <CheckinModal gameState={state} onClaim={handleCheckin} onClose={() => setModal(null)} />}
-        {modal === 'shop' && <ShopModal gameState={state} onBuyItem={handleBuyShopItem} onClose={() => setModal(null)} />}
-        {modal === 'upgrade' && <UpgradeModal gameState={state} onUpgrade={handleUpgrade} onClose={() => setModal(null)} />}
-        {modal === 'collection' && <FishCollectionModal gameState={state} onUnlock={handleUnlock} onActivate={handleActivate} onClose={() => setModal(null)} />}
-        {modal === 'info' && <InfoModal gameState={state} onClose={() => setModal(null)} />}
+                {status !== 'loading' && (
+                  <div className="ck-lock-actions">
+                    <Link href="/login" className="ck-hero-btn-gold">
+                      <i className="fas fa-sign-in-alt" />
+                      <span>Masuk</span>
+                    </Link>
+                    <Link href="/register" className="ck-hero-btn-ghost">
+                      <i className="fas fa-user-plus" />
+                      <span>Daftar Gratis</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile & Tablet Fixed Bottom Nav (only shown when logged in) */}
+        {isLoggedIn && <nav className="ck-bottom-nav">{navItems}</nav>}
+
+        {isLoggedIn && modal === 'checkin' && <CheckinModal gameState={state} onClaim={handleCheckin} onClose={() => setModal(null)} />}
+        {isLoggedIn && modal === 'shop' && <ShopModal gameState={state} onBuyItem={handleBuyShopItem} onClose={() => setModal(null)} />}
+        {isLoggedIn && modal === 'upgrade' && <UpgradeModal gameState={state} onUpgrade={handleUpgrade} onClose={() => setModal(null)} />}
+        {isLoggedIn && modal === 'collection' && <FishCollectionModal gameState={state} onUnlock={handleUnlock} onActivate={handleActivate} onClose={() => setModal(null)} />}
+        {isLoggedIn && modal === 'info' && <InfoModal gameState={state} onClose={() => setModal(null)} />}
         {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       </div>
     </div>

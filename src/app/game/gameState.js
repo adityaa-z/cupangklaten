@@ -134,10 +134,16 @@ function sanitizeAndApplyOfflineDecay(state) {
   };
 }
 
-export function loadState() {
+function getStorageKey(userKey) {
+  if (!userKey) return STORAGE_KEY;
+  return `${STORAGE_KEY}_${String(userKey).toLowerCase().trim()}`;
+}
+
+export function loadState(userKey) {
   if (typeof window === 'undefined') return { ...DEFAULT_STATE };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(userKey);
+    const raw = localStorage.getItem(key) || (userKey ? localStorage.getItem(STORAGE_KEY) : null);
     if (!raw) return { ...DEFAULT_STATE };
     const parsed = JSON.parse(raw);
     const merged = deepMerge(DEFAULT_STATE, parsed);
@@ -147,10 +153,11 @@ export function loadState() {
   }
 }
 
-export function saveState(state) {
+export function saveState(state, userKey) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const key = getStorageKey(userKey);
+    localStorage.setItem(key, JSON.stringify(state));
   } catch {
     // Silent fail
   }
