@@ -3,54 +3,32 @@
 import React from 'react';
 import { AQUARIUM_LEVELS } from './gameConfig';
 
-const overlayStyle = {
-  position: 'fixed',
-  inset: 0,
-  backgroundColor: 'rgba(2, 6, 23, 0.82)',
-  backdropFilter: 'blur(4px)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 9999,
-  padding: '14px',
-};
-
-const modalStyle = {
-  background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)',
-  border: '1px solid #334155',
-  borderRadius: '18px',
-  padding: '20px 18px',
-  maxWidth: '460px',
-  width: '100%',
-  color: '#f1f5f9',
-  boxShadow: '0 24px 60px rgba(0,0,0,0.65)',
-  maxHeight: '90vh',
-  overflowY: 'auto',
-};
-
 export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
   const currentLevel = gameState.aquarium.level;
   const points = gameState.points;
 
   return (
-    <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={modalStyle}>
+    <div className="ck-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="ck-modal-card" style={{ maxWidth: '460px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>🏠 Upgrade Akuarium</h2>
-            <div style={{ fontSize: '11px', color: '#94a3b8' }}>Gunakan poin check-in (gratis, non-transaksi)</div>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Upgrade Soliter & Akuarium</h2>
+            <div style={{ fontSize: '11.5px', color: '#6b7280', marginTop: '2px' }}>
+              Berbasis poin check-in gratis, tanpa transaksi uang
+            </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer', lineHeight: 1 }}
+            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
+            aria-label="Tutup"
           >
-            ✕
+            <i className="fas fa-times" />
           </button>
         </div>
 
         <div style={{
-          background: '#0b1120',
-          border: '1px solid #1e293b',
+          background: '#171a22',
+          border: '1px solid rgba(255,255,255,0.07)',
           borderRadius: '10px',
           padding: '10px 14px',
           marginBottom: '14px',
@@ -58,8 +36,11 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <span style={{ color: '#94a3b8', fontSize: '13px' }}>Poin Check-In kamu</span>
-          <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '16px' }}>⭐ {points.toLocaleString()}</span>
+          <span style={{ color: '#9ca3af', fontSize: '12.5px' }}>Saldo Poin</span>
+          <span style={{ color: '#d9a441', fontWeight: 700, fontSize: '15px' }}>
+            <i className="fas fa-coins" style={{ marginRight: '6px', fontSize: '13px' }} />
+            {points.toLocaleString()}
+          </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -73,70 +54,74 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
             let statusLabel;
             let statusColor;
             if (isOwned) {
-              statusLabel = '✓ Dimiliki';
-              statusColor = '#22c55e';
+              statusLabel = 'Dimiliki';
+              statusColor = '#34c77b';
             } else if (isCurrent) {
-              statusLabel = '● Aktif';
-              statusColor = '#38bdf8';
+              statusLabel = 'Aktif';
+              statusColor = '#d9a441';
             } else if (isLocked) {
-              statusLabel = `🔒 Lv.${item.level - 1} dulu`;
-              statusColor = '#64748b';
+              statusLabel = `Butuh Lv.${item.level - 1}`;
+              statusColor = '#6b7280';
             } else {
-              statusLabel = `⭐ ${item.cost.toLocaleString()}`;
-              statusColor = canAfford ? '#fbbf24' : '#f87171';
+              statusLabel = `${item.cost.toLocaleString()} poin`;
+              statusColor = canAfford ? '#d9a441' : '#e05252';
             }
 
             return (
               <div
                 key={item.level}
                 style={{
-                  borderRadius: '12px',
+                  borderRadius: '11px',
                   padding: '13px',
-                  border: isCurrent ? '2px solid #38bdf8' : '1px solid #334155',
-                  background: isCurrent ? 'rgba(56,189,248,0.08)' : 'rgba(15,23,42,0.65)',
-                  opacity: isLocked ? 0.55 : 1,
+                  border: isCurrent ? '1px solid rgba(217, 164, 65, 0.55)' : '1px solid rgba(255,255,255,0.07)',
+                  background: isCurrent ? 'rgba(217, 164, 65, 0.06)' : '#171a22',
+                  opacity: isLocked ? 0.5 : 1,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '11px' }}>
-                  <span style={{ fontSize: '26px', flexShrink: 0 }}>{item.emoji}</span>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '9px',
+                    background: '#111318',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isCurrent ? '#d9a441' : '#9ca3af',
+                    flexShrink: 0,
+                  }}>
+                    <i className={`fas ${item.icon}`} />
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                      <span style={{ fontWeight: 700, fontSize: '13px' }}>Lv.{item.level} {item.name}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 700, fontSize: '13px' }}>Level {item.level} · {item.name}</span>
                       <span style={{ fontSize: '11px', color: statusColor, fontWeight: 700, whiteSpace: 'nowrap' }}>{statusLabel}</span>
                     </div>
-                    <p style={{ fontSize: '11.5px', color: '#94a3b8', margin: '0 0 6px', lineHeight: 1.4 }}>
+                    <p style={{ fontSize: '11.5px', color: '#9ca3af', margin: '0 0 7px', lineHeight: 1.45 }}>
                       {item.description}
                     </p>
                     <div style={{
                       display: 'inline-block',
                       fontSize: '10.5px',
-                      color: '#34d399',
-                      background: 'rgba(16,185,129,0.1)',
-                      border: '1px solid rgba(16,185,129,0.25)',
+                      color: '#34c77b',
+                      background: 'rgba(52, 199, 123, 0.08)',
+                      border: '1px solid rgba(52, 199, 123, 0.22)',
                       borderRadius: '6px',
-                      padding: '2px 7px',
-                      marginBottom: isNext ? '9px' : '0',
+                      padding: '2px 8px',
+                      marginBottom: isNext ? '10px' : '0',
                     }}>
-                      ✨ {item.perk}
+                      {item.perk}
                     </div>
                     {isNext && (
                       <button
                         onClick={() => canAfford && onUpgrade(item.level)}
                         disabled={!canAfford}
-                        style={{
-                          width: '100%',
-                          padding: '9px',
-                          borderRadius: '8px',
-                          border: canAfford ? 'none' : '1px solid #334155',
-                          background: canAfford ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : '#1e293b',
-                          color: canAfford ? '#0f172a' : '#64748b',
-                          fontWeight: 800,
-                          fontSize: '12.5px',
-                          cursor: canAfford ? 'pointer' : 'not-allowed',
-                        }}
+                        className="ck-btn-primary"
+                        style={{ padding: '9px 12px', fontSize: '12.5px' }}
                       >
                         {canAfford
-                          ? `Upgrade ke Level ${item.level} (${item.cost} Poin)`
+                          ? `Upgrade ke Level ${item.level} (${item.cost.toLocaleString()} Poin)`
                           : `Kurang ${(item.cost - points).toLocaleString()} Poin`}
                       </button>
                     )}

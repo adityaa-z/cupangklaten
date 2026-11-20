@@ -13,13 +13,15 @@ export function getLocalDateString(date = new Date()) {
 export function createDefaultFish(species = 'Plakat') {
   return {
     species,
+    ageMonth: 1, // 1..5 bulan (fase perpecahan / mutasi warna)
+    growthExp: 0, // 0..100 progres menuju bulan berikutnya
     hunger: 80,
     health: 95,
     mood: 85,
     disease: null, // null | 'finRot' | 'velvet' | 'bloated'
-    bodySize: 60,
-    finSpread: 65,
-    colorVibrancy: 70,
+    bodySize: 55,
+    finSpread: 60,
+    colorVibrancy: 65,
     overfeedCount: 0,
     lastFedAt: Date.now(),
   };
@@ -88,32 +90,28 @@ function deepMerge(defaults, target) {
   return result;
 }
 
-/**
- * Migrate legacy disease names (e.g. 'ich' -> 'velvet') and apply gentle offline decay
- * capped at 6 hours so fish never dies permanently (soft decay).
- */
 function sanitizeAndApplyOfflineDecay(state) {
   const now = Date.now();
   const lastUpdated = state.aquarium?.lastUpdatedAt || now;
-  const elapsedMinutes = Math.min(Math.max(0, (now - lastUpdated) / 60000), 360); // cap 6h
+  const elapsedMinutes = Math.min(Math.max(0, (now - lastUpdated) / 60000), 360);
 
   const activeId = state.activeFishId || 'plakat';
-  const fish = { ...(state.fishes?.[activeId] || createDefaultFish('Plakat')) };
+  const baseFish = createDefaultFish(state.fishes?.[activeId]?.species || 'Plakat');
+  const fish = { ...baseFish, ...(state.fishes?.[activeId] || {}) };
 
-  // Migrate old 'ich' key if present
   if (fish.disease === 'ich') fish.disease = 'velvet';
+  if (!fish.ageMonth || fish.ageMonth < 1) fish.ageMonth = 1;
+  if (fish.ageMonth > 5) fish.ageMonth = 5;
 
-  // Gentle offline decay (only if away >= 5 mins)
   if (elapsedMinutes >= 5) {
     const waterDecayFactor = state.aquarium.level >= 4 ? 0.6 : state.aquarium.level === 3 ? 0.8 : 1.0;
-    const hungerDrop = elapsedMinutes * 0.12; // ~43 over 6h
-    const waterDrop = elapsedMinutes * 0.08 * waterDecayFactor; // ~28 over 6h
+    const hungerDrop = elapsedMinutes * 0.12;
+    const waterDrop = elapsedMinutes * 0.08 * waterDecayFactor;
 
     fish.hunger = clamp(fish.hunger - hungerDrop, 15, 100);
     if (fish.hunger < 30) {
       fish.mood = clamp(fish.mood - 10, 20, 100);
     }
-    // Overfeed counter naturally resets after fasting
     if (elapsedMinutes >= 30) {
       fish.overfeedCount = 0;
     }
@@ -154,6 +152,6 @@ export function saveState(state) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
-    // Quota exceeded or private mode — silent fail
+    // Silent fail
   }
 }

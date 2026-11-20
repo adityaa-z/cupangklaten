@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default function Home() {
   return (
-    <div style={{ minHeight: '100vh', background: '#0b1120', color: '#f1f5f9' }}>
+    <div style={{ minHeight: '100vh', background: '#090a0d', color: '#f3f4f6' }}>
       <Navbar />
 
       {/* ZONA ATAS: Strip Etalase Produk 1 Baris Horizontal Scroll (Modul 1.2) */}

@@ -12,30 +12,6 @@ function calcCheckinPoints(streakDays) {
   return base;
 }
 
-const overlayStyle = {
-  position: 'fixed',
-  inset: 0,
-  backgroundColor: 'rgba(2, 6, 23, 0.8)',
-  backdropFilter: 'blur(4px)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 9999,
-  padding: '16px',
-};
-
-const modalStyle = {
-  background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)',
-  border: '1px solid #334155',
-  borderRadius: '18px',
-  padding: '24px 20px',
-  maxWidth: '350px',
-  width: '100%',
-  textAlign: 'center',
-  color: '#f1f5f9',
-  boxShadow: '0 24px 60px rgba(0,0,0,0.65)',
-};
-
 export default function CheckinModal({ gameState, onClaim, onClose }) {
   const [justClaimed, setJustClaimed] = useState(false);
 
@@ -55,97 +31,100 @@ export default function CheckinModal({ gameState, onClaim, onClose }) {
     setJustClaimed(true);
     setTimeout(() => {
       onClaim(pts, displayStreak);
-    }, 900);
+    }, 750);
   }
 
-  const streakEmoji =
-    displayStreak >= 30 ? '🏆' : displayStreak >= 14 ? '💎' : displayStreak >= 7 ? '🔥' : displayStreak >= 3 ? '✨' : '📅';
   const bonusText =
     displayStreak >= 30
-      ? 'Termasuk +120 bonus Streak 30 Hari!'
+      ? 'Termasuk bonus Streak 30 Hari (+120)'
       : displayStreak >= 14
-        ? 'Termasuk +60 bonus Streak 14 Hari!'
+        ? 'Termasuk bonus Streak 14 Hari (+60)'
         : displayStreak >= 7
-          ? 'Termasuk +30 bonus Streak 7 Hari!'
+          ? 'Termasuk bonus Streak 7 Hari (+30)'
           : displayStreak >= 3
-            ? 'Termasuk +15 bonus Streak 3 Hari!'
-            : 'Check-in rutin 3 hari berturut-turut untuk bonus!';
+            ? 'Termasuk bonus Streak 3 Hari (+15)'
+            : 'Pertahankan check-in hingga hari ke-3 untuk bonus streak';
 
   return (
-    <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}>
-      <div style={modalStyle}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+    <div className="ck-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}>
+      <div className="ck-modal-card" style={{ maxWidth: '380px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <i className="fas fa-calendar-check" style={{ color: '#d9a441', fontSize: '15px' }} />
+            <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
+              {justClaimed ? 'Check-In Berhasil' : alreadyClaimedToday ? 'Check-In Harian' : 'Klaim Check-In Harian'}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '18px', cursor: 'pointer', lineHeight: 1 }}
+            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
             aria-label="Tutup"
           >
-            ✕
+            <i className="fas fa-times" />
           </button>
         </div>
 
-        <div style={{ fontSize: '46px', marginBottom: '6px' }}>{justClaimed ? '🎉' : streakEmoji}</div>
-        <h2 style={{ fontSize: '19px', fontWeight: 800, marginBottom: '4px', color: '#fbbf24' }}>
-          {justClaimed ? 'Check-In Berhasil!' : alreadyClaimedToday ? 'Sudah Check-In Hari Ini' : 'Check-In Harian Gratis'}
-        </h2>
-
-        <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '14px' }}>
+        <p style={{ color: '#9ca3af', fontSize: '12.5px', margin: '0 0 14px', lineHeight: 1.5 }}>
           {alreadyClaimedToday
-            ? 'Kembali besok untuk melanjutkan streak & kumpulkan lebih banyak poin gratis!'
-            : 'Klaim poin gratis untuk buka jenis ikan, upgrade akuarium, & tukar pakan.'}
+            ? 'Poin harian hari ini sudah diklaim. Kembali besok untuk melanjutkan streak.'
+            : 'Klaim poin gratis setiap hari untuk membuka jenis ikan, upgrade soliter, dan menukar pakan.'}
         </p>
 
-        {/* Streak box */}
         <div style={{
-          background: 'rgba(30, 58, 95, 0.55)',
-          border: '1px solid rgba(56, 189, 248, 0.25)',
+          background: '#171a22',
+          border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '12px',
-          padding: '12px',
+          padding: '14px',
           marginBottom: '14px',
+          textAlign: 'center',
         }}>
           {!alreadyClaimedToday && (
-            <div style={{ fontSize: '26px', fontWeight: 800, color: '#fbbf24' }}>+{pts} Poin</div>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#d9a441', letterSpacing: '-0.02em' }}>
+              +{pts} Poin
+            </div>
           )}
-          <div style={{ fontSize: '12px', color: '#34d399', marginTop: '2px' }}>{bonusText}</div>
-          <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '12px', color: '#cbd5e1' }}>Streak aktif:</span>
-            <span style={{
-              background: '#fbbf24',
-              color: '#0f172a',
-              borderRadius: '20px',
-              padding: '2px 10px',
-              fontWeight: 800,
-              fontSize: '13px',
-            }}>
-              Hari ke-{displayStreak}
-            </span>
+          <div style={{ fontSize: '11.5px', color: '#34c77b', marginTop: '3px' }}>{bonusText}</div>
+          <div style={{
+            marginTop: '10px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(217, 164, 65, 0.14)',
+            border: '1px solid rgba(217, 164, 65, 0.35)',
+            borderRadius: '99px',
+            padding: '3px 12px',
+            fontSize: '12px',
+            color: '#d9a441',
+            fontWeight: 700,
+          }}>
+            <i className="fas fa-fire" style={{ fontSize: '11px' }} />
+            Streak Hari ke-{displayStreak}
           </div>
         </div>
 
-        {/* Streak milestone hints */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '18px' }}>
+        {/* Streak Milestones */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '16px' }}>
           {[
-            [3, 15, '✨'],
-            [7, 30, '🔥'],
-            [14, 60, '💎'],
-            [30, 120, '🏆'],
-          ].map(([day, bonus, emoji]) => {
+            [3, 15],
+            [7, 30],
+            [14, 60],
+            [30, 120],
+          ].map(([day, bonus]) => {
             const reached = displayStreak >= day;
             return (
               <div
                 key={day}
                 style={{
-                  background: reached ? 'rgba(251,191,36,0.12)' : 'rgba(15,23,42,0.6)',
-                  border: reached ? '1px solid rgba(251,191,36,0.5)' : '1px solid #334155',
-                  borderRadius: '10px',
-                  padding: '6px 4px',
+                  background: reached ? 'rgba(217, 164, 65, 0.12)' : '#171a22',
+                  border: reached ? '1px solid rgba(217, 164, 65, 0.45)' : '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: '9px',
+                  padding: '8px 4px',
                   textAlign: 'center',
-                  opacity: reached ? 1 : 0.55,
+                  opacity: reached ? 1 : 0.6,
                 }}
               >
-                <div style={{ fontSize: '16px' }}>{emoji}</div>
-                <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 700 }}>+{bonus}</div>
-                <div style={{ fontSize: '10px', color: '#94a3b8' }}>Hr {day}</div>
+                <div style={{ fontSize: '12px', color: reached ? '#d9a441' : '#9ca3af', fontWeight: 700 }}>+{bonus}</div>
+                <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '2px' }}>Hari {day}</div>
               </div>
             );
           })}
@@ -156,37 +135,25 @@ export default function CheckinModal({ gameState, onClaim, onClose }) {
             onClick={onClose}
             style={{
               width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              border: '1px solid #334155',
-              background: '#1e293b',
-              color: '#f1f5f9',
-              fontWeight: 700,
-              fontSize: '14px',
+              padding: '11px',
+              borderRadius: '9px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: '#171a22',
+              color: '#f3f4f6',
+              fontWeight: 600,
+              fontSize: '13px',
               cursor: 'pointer',
             }}
           >
-            ✓ Tutup
+            Tutup
           </button>
         ) : (
           <button
             onClick={handleClaim}
             disabled={justClaimed}
-            style={{
-              width: '100%',
-              padding: '13px',
-              borderRadius: '10px',
-              border: 'none',
-              background: justClaimed
-                ? '#22c55e'
-                : 'linear-gradient(90deg, #fbbf24, #f59e0b)',
-              color: '#0f172a',
-              fontWeight: 800,
-              fontSize: '15px',
-              cursor: justClaimed ? 'default' : 'pointer',
-            }}
+            className="ck-btn-primary"
           >
-            {justClaimed ? `✓ +${pts} Poin Diterima!` : `🎁 Klaim +${pts} Poin Gratis`}
+            {justClaimed ? `+${pts} Poin Ditambahkan` : `Klaim +${pts} Poin`}
           </button>
         )}
       </div>

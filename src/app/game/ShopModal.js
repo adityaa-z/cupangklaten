@@ -3,31 +3,6 @@
 import React, { useState } from 'react';
 import { SHOP_ITEMS } from './gameConfig';
 
-const overlayStyle = {
-  position: 'fixed',
-  inset: 0,
-  backgroundColor: 'rgba(2, 6, 23, 0.82)',
-  backdropFilter: 'blur(4px)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 9999,
-  padding: '14px',
-};
-
-const modalStyle = {
-  background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)',
-  border: '1px solid #334155',
-  borderRadius: '18px',
-  padding: '20px 18px',
-  maxWidth: '460px',
-  width: '100%',
-  color: '#f1f5f9',
-  boxShadow: '0 24px 60px rgba(0,0,0,0.65)',
-  maxHeight: '90vh',
-  overflowY: 'auto',
-};
-
 const CATEGORIES = ['Semua', 'Pakan', 'Air', 'Obat'];
 
 export default function ShopModal({ gameState, onBuyItem, onClose }) {
@@ -37,24 +12,27 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
   const filtered = cat === 'Semua' ? SHOP_ITEMS : SHOP_ITEMS.filter((item) => item.category === cat);
 
   return (
-    <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={modalStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+    <div className="ck-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="ck-modal-card" style={{ maxWidth: '460px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>🎁 Tukar Poin Perawatan</h2>
-            <div style={{ fontSize: '11px', color: '#94a3b8' }}>100% pakai poin check-in gratis (bukan uang)</div>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Tukar Poin Perawatan</h2>
+            <div style={{ fontSize: '11.5px', color: '#6b7280', marginTop: '2px' }}>
+              Penukaran stok menggunakan poin check-in gratis
+            </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer', lineHeight: 1 }}
+            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
+            aria-label="Tutup"
           >
-            ✕
+            <i className="fas fa-times" />
           </button>
         </div>
 
         <div style={{
-          background: '#0b1120',
-          border: '1px solid #1e293b',
+          background: '#171a22',
+          border: '1px solid rgba(255,255,255,0.07)',
           borderRadius: '10px',
           padding: '10px 14px',
           marginBottom: '12px',
@@ -62,34 +40,37 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <span style={{ color: '#94a3b8', fontSize: '13px' }}>Poin tersedia</span>
-          <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '16px' }}>⭐ {points.toLocaleString()}</span>
+          <span style={{ color: '#9ca3af', fontSize: '12.5px' }}>Poin Tersedia</span>
+          <span style={{ color: '#d9a441', fontWeight: 700, fontSize: '15px' }}>
+            <i className="fas fa-coins" style={{ marginRight: '6px', fontSize: '13px' }} />
+            {points.toLocaleString()}
+          </span>
         </div>
 
-        {/* Category Filter Tabs */}
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              style={{
-                flex: 1,
-                padding: '6px 4px',
-                borderRadius: '8px',
-                border: cat === c ? '1px solid #38bdf8' : '1px solid #334155',
-                background: cat === c ? 'rgba(56,189,248,0.16)' : '#0f172a',
-                color: cat === c ? '#38bdf8' : '#94a3b8',
-                fontSize: '11.5px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              {c}
-            </button>
-          ))}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '12px' }}>
+          {CATEGORIES.map((c) => {
+            const active = cat === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setCat(c)}
+                style={{
+                  padding: '7px 4px',
+                  borderRadius: '8px',
+                  border: active ? '1px solid rgba(217,164,65,0.55)' : '1px solid rgba(255,255,255,0.08)',
+                  background: active ? 'rgba(217,164,65,0.12)' : '#171a22',
+                  color: active ? '#d9a441' : '#9ca3af',
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {c}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Items list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {filtered.map((item) => {
             const canAfford = points >= item.cost;
@@ -100,39 +81,51 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  background: 'rgba(15,23,42,0.75)',
-                  border: '1px solid #334155',
-                  borderRadius: '12px',
+                  gap: '11px',
+                  background: '#171a22',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: '10px',
                   padding: '10px 12px',
                 }}
               >
-                <span style={{ fontSize: '24px', flexShrink: 0 }}>{item.emoji}</span>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  background: '#111318',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#9ca3af',
+                  flexShrink: 0,
+                  fontSize: '13px',
+                }}>
+                  <i className={`fas ${item.icon}`} />
+                </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '13px' }}>{item.name}</span>
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>{item.desc}</div>
-                  <div style={{ fontSize: '10.5px', color: '#38bdf8', marginTop: '2px' }}>
-                    Stok kamu: <strong>{owned}</strong>
+                  <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#f3f4f6' }}>{item.name}</div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>{item.desc}</div>
+                  <div style={{ fontSize: '10.5px', color: '#6b7280', marginTop: '2px' }}>
+                    Stok saat ini: <strong style={{ color: '#e5e7eb' }}>{owned}</strong>
                   </div>
                 </div>
                 <button
                   onClick={() => canAfford && onBuyItem(item)}
                   disabled={!canAfford}
                   style={{
-                    padding: '7px 11px',
+                    padding: '7px 12px',
                     borderRadius: '8px',
-                    border: canAfford ? 'none' : '1px solid #334155',
-                    background: canAfford ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : '#1e293b',
-                    color: canAfford ? '#0f172a' : '#64748b',
-                    fontWeight: 800,
+                    border: canAfford ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                    background: canAfford ? '#d9a441' : '#111318',
+                    color: canAfford ? '#0b0d11' : '#6b7280',
+                    fontWeight: 700,
                     fontSize: '12px',
                     cursor: canAfford ? 'pointer' : 'not-allowed',
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  ⭐ {item.cost}
+                  {item.cost} pts
                 </button>
               </div>
             );
