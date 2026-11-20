@@ -10,26 +10,26 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "Cupang Klaten | Soliter Virtual, Informasi Stok & Edukasi Ikan Cupang",
-  description: "Media promosi, etalase informasi stok & kisaran harga ikan cupang Klaten, serta simulasi edukatif Soliter Virtual Cupang Klaten.",
-  keywords: "cupang klaten, info stok cupang klaten, ikan cupang klaten, soliter virtual cupang, cupang hmpk klaten, giant betta klaten, edukasi cupang",
+  title: "cans.betta cupangklaten | Soliter Virtual, Informasi Stok & Edukasi Ikan Cupang",
+  description: "Galeri ikan cupang hias Grade A di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 35rb, dan simulasi edukatif Soliter Virtual.",
+  keywords: "cans.betta, cupang klaten, info stok cupang klaten, ikan cupang klaten, soliter virtual cupang, cupang grade a klaten",
   verification: {
     google: "Cm3Ij7HVbOgV1-1DpBXwz4qqYm9Yjgftqt8HN5m0qsM",
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo-cansbetta.jpg",
+    apple: "/logo-cansbetta.jpg",
   },
   openGraph: {
-    title: "Cupang Klaten | Soliter Virtual & Informasi Koleksi Ikan Cupang",
-    description: "Mainkan Soliter Virtual Cupang Klaten sambil melihat etalase stok, kisaran harga, dan edukasi perawatan ikan cupang terbaik dari Klaten.",
+    title: "cans.betta cupangklaten | Soliter Virtual & Informasi Koleksi Ikan Cupang",
+    description: "Galeri ikan cupang Grade A Klaten sejak Desember 2022. Harga mulai Rp 35rb & mainkan Soliter Virtual.",
     url: "https://www.cupangklaten.my.id",
-    siteName: "Cupang Klaten",
+    siteName: "cans.betta cupangklaten",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo-cansbetta.jpg",
         width: 800,
-        height: 600,
+        height: 800,
       },
     ],
     locale: "id_ID",

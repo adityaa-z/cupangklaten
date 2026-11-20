@@ -1,59 +1,128 @@
 import React from 'react';
 import Link from 'next/link';
+import '@/app/game/soliter.css';
 
 const Footer = () => {
     return (
-        <footer>
-            <div className="footer-content">
-                <div className="footer-brand">
-                    <Link href="/" className="logo">
-                        <img src="/logo.png" alt="cupangklaten"
-                            style={{ filter: 'grayscale(100%) brightness(200%)', height: '40px' }} />
-                        <span className="logo-text"
-                            style={{ filter: 'grayscale(100%) brightness(200%)', color: '#94a3b8', marginTop: '1rem' }}>CUPANGKLATEN</span>
-                    </Link>
-                    <p style={{ color: '#94a3b8', marginTop: '1rem' }}>Informasi stok dan kisaran harga ikan cupang terbaik dari pembudidaya Klaten. Hubungi kami untuk ketersediaan terkini.</p>
+        <footer className="ck-footer-section">
+            <div className="ck-footer-inner">
+                <div className="ck-footer-grid">
+                    {/* Brand Info */}
+                    <div>
+                        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '12px' }}>
+                            <img
+                                src="/logo-cansbetta.jpg"
+                                alt="cans.betta cupangklaten"
+                                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--ck-border-strong)' }}
+                            />
+                            <span
+                                className="ck-brand-gradient"
+                                style={{ fontSize: '1.15rem', fontWeight: 800, letterSpacing: '-0.3px' }}
+                            >
+                                cans.betta cupangklaten
+                            </span>
+                        </Link>
+                        <p style={{ color: 'var(--ck-text-2)', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
+                            Galeri ikan cupang hias Grade A di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 35rb, dan simulasi edukatif Soliter Virtual.
+                        </p>
+                    </div>
+
+                    {/* WhatsApp & Lokasi Google Maps */}
+                    <div>
+                        <h4 className="ck-footer-heading">Kontak & Lokasi</h4>
+                        <div className="ck-footer-list">
+                            <a
+                                href="https://wa.me/628992020444"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fab fa-whatsapp" style={{ color: '#22c55e' }} />
+                                <span>WhatsApp: 08992020444</span>
+                            </a>
+                            <a
+                                href="https://maps.app.goo.gl/TscpLknP1zpLHmod7"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fas fa-map-marker-alt" style={{ color: '#ef4444' }} />
+                                <span>Cupang Klaten - Ikan Cupang Depo (Google Maps)</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Instagram & TikTok */}
+                    <div>
+                        <h4 className="ck-footer-heading">Sosial Media</h4>
+                        <div className="ck-footer-list">
+                            <a
+                                href="https://www.instagram.com/cans.betta"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fab fa-instagram" />
+                                <span>Instagram: @cans.betta</span>
+                            </a>
+                            <a
+                                href="https://www.instagram.com/cupangklaten"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fab fa-instagram" />
+                                <span>Instagram: @cupangklaten</span>
+                            </a>
+                            <a
+                                href="https://www.tiktok.com/@cans.betta"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fab fa-tiktok" />
+                                <span>TikTok: @cans.betta</span>
+                            </a>
+                            <a
+                                href="https://www.tiktok.com/@cupangklaten"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ck-footer-link"
+                            >
+                                <i className="fab fa-tiktok" />
+                                <span>TikTok: @cupangklaten</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Menu Cepat */}
+                    <div>
+                        <h4 className="ck-footer-heading">Navigasi</h4>
+                        <div className="ck-footer-list">
+                            <Link href="/stok" className="ck-footer-link">
+                                <i className="fas fa-fish" />
+                                <span>Informasi Stok & Harga</span>
+                            </Link>
+                            <Link href="/game" className="ck-footer-link">
+                                <i className="fas fa-gamepad" />
+                                <span>Soliter Virtual</span>
+                            </Link>
+                            <Link href="/tips-perawatan" className="ck-footer-link">
+                                <i className="fas fa-book-open" />
+                                <span>Tips & Edukasi</span>
+                            </Link>
+                            <Link href="/faq" className="ck-footer-link">
+                                <i className="fas fa-question-circle" />
+                                <span>FAQ</span>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                <div className="footer-links">
-                    <h4>Informasi</h4>
-                    <ul>
-                        <li><a href="https://wa.me/628992020444?text=Halo%20Cupang%20Klaten,%20saya%20ingin%20tanya%20stok%20dan%20harga%20ikan"
-                                target="_blank" rel="noopener noreferrer">Tanya Stok & Harga</a></li>
-                        <li><Link href="/stok">Lihat Semua Stok</Link></li>
-                        <li><Link href="/faq">FAQ</Link></li>
-                    </ul>
+
+                <div className="ck-footer-bottom">
+                    <span>&copy; {new Date().getFullYear()} cans.betta cupangklaten — All Rights Reserved.</span>
+                    <span>Est. Desember 2022 · Klaten, Jawa Tengah</span>
                 </div>
-                <div className="footer-links">
-                    <h4>Temukan Kami</h4>
-                    <a href="https://maps.app.goo.gl/mkFP6BYoa9MmM4UM8" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
-                        <i className="fas fa-map-marker-alt" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        Klaten, Jawa Tengah, Indonesia
-                    </a>
-                    <a href="https://wa.me/628992020444" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
-                        <i className="fab fa-whatsapp" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        +62 899-2020-444
-                    </a>
-                    <a href="https://www.instagram.com/cupangklaten?igsh=b284dWl3eGdxdTA5" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
-                        <i className="fab fa-instagram" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        @cupangklaten
-                    </a>
-                    <a href="https://www.tiktok.com/@cupangklaten" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
-                        <i className="fab fa-tiktok" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        @cupangklaten
-                    </a>
-                    <a href="https://youtube.com/@cupangklaten?si=man02VByXAAVcjIf" target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#94a3b8', fontSize: '0.9rem', textDecoration: 'none', display: 'block', marginBottom: '0.8rem', transition: 'color 0.3s' }}>
-                        <i className="fab fa-youtube" style={{ marginRight: '0.5rem', width: '15px', textAlign: 'center' }}></i>
-                        @cupangklaten
-                    </a>
-                </div>
-            </div>
-            <div className="copyright">
-                &copy; {new Date().getFullYear()} CupangKlaten - All Rights Reserved.
             </div>
         </footer>
     );

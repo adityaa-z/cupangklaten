@@ -81,7 +81,7 @@ function TankEffects({ dirtRatio, saltLevel, isFlaring }) {
             height={VB_H * 0.62}
             rx="2"
             fill="rgba(229, 231, 235, 0.85)"
-            stroke="#d9a441"
+            stroke="#ffffff"
             strokeWidth="1.5"
           />
           <line x1={VB_W * 0.08 + 2} y1={VB_H * 0.24} x2={VB_W * 0.08 + 6} y2={VB_H * 0.36} stroke="#ffffff" strokeWidth="1.2" />

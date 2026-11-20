@@ -40,7 +40,7 @@ function HudBar({ label, value, displayText, max = 100, color }) {
           fontWeight: 700,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: '#6b7280',
+          color: 'var(--ck-text-muted)',
         }}>
           {label}
         </span>
@@ -51,7 +51,7 @@ function HudBar({ label, value, displayText, max = 100, color }) {
       <div style={{
         height: '4px',
         borderRadius: '99px',
-        background: 'rgba(255,255,255,0.07)',
+        background: 'var(--ck-border)',
         overflow: 'hidden',
       }}>
         <div style={{
@@ -71,18 +71,18 @@ function TraitPill({ label, value, color }) {
   return (
     <div style={{
       flex: 1,
-      background: '#111318',
-      border: '1px solid rgba(255,255,255,0.07)',
+      background: 'var(--ck-surface)',
+      border: '1px solid var(--ck-border)',
       borderRadius: '10px',
       padding: '8px 10px',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
-        <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6b7280' }}>
+        <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ck-text-muted)' }}>
           {label}
         </span>
-        <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#e5e7eb' }}>{Math.round(value)}%</span>
+        <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--ck-text)' }}>{Math.round(value)}%</span>
       </div>
-      <div style={{ height: '3px', borderRadius: '99px', background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+      <div style={{ height: '3px', borderRadius: '99px', background: 'var(--ck-border)', overflow: 'hidden' }}>
         <div style={{ width: `${clamp(value, 0, 100)}%`, height: '100%', background: color, borderRadius: '99px', transition: 'width 0.4s ease' }} />
       </div>
     </div>
@@ -133,7 +133,7 @@ function NavBtn({ icon, label, onClick, active, dot }) {
           width: '6px',
           height: '6px',
           borderRadius: '50%',
-          background: '#d9a441',
+          background: 'var(--ck-accent)',
         }} />
       )}
     </button>
@@ -153,16 +153,16 @@ function Toast({ message, onDone }) {
       top: '70px',
       left: '50%',
       transform: 'translateX(-50%)',
-      background: '#171a22',
-      border: '1px solid rgba(255,255,255,0.16)',
+      background: 'var(--ck-surface-2)',
+      border: '1px solid var(--ck-border-strong)',
       borderRadius: '10px',
       padding: '9px 16px',
-      color: '#f3f4f6',
+      color: 'var(--ck-text)',
       fontSize: '12.5px',
       fontWeight: 600,
       zIndex: 9998,
       pointerEvents: 'none',
-      boxShadow: '0 14px 36px rgba(0,0,0,0.72)',
+      boxShadow: '0 14px 36px rgba(0,0,0,0.35)',
       maxWidth: '90vw',
       textAlign: 'center',
     }}>
@@ -182,41 +182,41 @@ function InfoModal({ gameState, onClose }) {
           <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>Panduan Perawatan Cupang</h2>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', color: 'var(--ck-text-muted)', fontSize: '17px', cursor: 'pointer' }}
             aria-label="Tutup"
           >
             <i className="fas fa-times" />
           </button>
         </div>
 
-        <div style={{ fontSize: '12px', color: '#9ca3af', lineHeight: 1.55, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ background: '#171a22', borderRadius: '10px', padding: '11px 12px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ color: '#f3f4f6', fontWeight: 700, marginBottom: '4px' }}>Kualitas Air & pH</div>
-            pH ideal umum <strong style={{ color: '#e5e7eb' }}>6.5–7.0</strong> (Wild Betta <strong style={{ color: '#e5e7eb' }}>6.0–6.6</strong>). Gunakan <strong style={{ color: '#e5e7eb' }}>Ganti Air Parsial</strong> agar pH stabil. Jika melakukan <strong style={{ color: '#e5e7eb' }}>Kuras Total</strong>, wajib tambahkan Ketapang & Garam Ikan untuk mencegah stres dan Velvet.
+        <div style={{ fontSize: '12px', color: 'var(--ck-text-2)', lineHeight: 1.55, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ background: 'var(--ck-surface-2)', borderRadius: '10px', padding: '11px 12px', border: '1px solid var(--ck-border)' }}>
+            <div style={{ color: 'var(--ck-text)', fontWeight: 700, marginBottom: '4px' }}>Kualitas Air & pH</div>
+            pH ideal umum <strong style={{ color: 'var(--ck-text)' }}>6.5–7.0</strong> (Wild Betta <strong style={{ color: 'var(--ck-text)' }}>6.0–6.6</strong>). Gunakan <strong style={{ color: 'var(--ck-text)' }}>Ganti Air Parsial</strong> agar pH stabil. Jika melakukan <strong style={{ color: 'var(--ck-text)' }}>Kuras Total</strong>, wajib tambahkan Ketapang & Garam Ikan untuk mencegah stres dan Velvet.
           </div>
 
-          <div style={{ background: '#171a22', borderRadius: '10px', padding: '11px 12px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ color: '#f3f4f6', fontWeight: 700, marginBottom: '4px' }}>Nutrisi 5 Jenis Pakan & Mutasi 1–5 Bulan</div>
+          <div style={{ background: 'var(--ck-surface-2)', borderRadius: '10px', padding: '11px 12px', border: '1px solid var(--ck-border)' }}>
+            <div style={{ color: 'var(--ck-text)', fontWeight: 700, marginBottom: '4px' }}>Nutrisi 5 Jenis Pakan & Mutasi 1–5 Bulan</div>
             <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <li><strong style={{ color: '#e5e7eb' }}>Pelet Harian</strong> — nutrisi dasar seimbang.</li>
-              <li><strong style={{ color: '#e5e7eb' }}>Cacing Sutra</strong> — protein tinggi untuk massa body & tulang sirip.</li>
-              <li><strong style={{ color: '#e5e7eb' }}>Kutu Air (Daphnia)</strong> — serat alami, melancarkan pencernaan & menyembuhkan kembung.</li>
-              <li><strong style={{ color: '#e5e7eb' }}>Jentik / Artemia</strong> — memicu insting berburu, flaring & bukaan ekor.</li>
-              <li><strong style={{ color: '#e5e7eb' }}>Pakan Pencerah</strong> — Astaxanthin untuk mempertajam saturasi warna.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Pelet Harian</strong> — nutrisi dasar seimbang.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Cacing Sutra</strong> — protein tinggi untuk massa body & tulang sirip.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Kutu Air (Daphnia)</strong> — serat alami, melancarkan pencernaan & menyembuhkan kembung.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Jentik / Artemia</strong> — memicu insting berburu, flaring & bukaan ekor.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Pakan Pencerah</strong> — Astaxanthin untuk mempertajam saturasi warna.</li>
             </ul>
           </div>
 
-          <div style={{ background: '#171a22', borderRadius: '10px', padding: '11px 12px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ color: '#f3f4f6', fontWeight: 700, marginBottom: '4px' }}>Penanganan 3 Penyakit (Soft Decay)</div>
+          <div style={{ background: 'var(--ck-surface-2)', borderRadius: '10px', padding: '11px 12px', border: '1px solid var(--ck-border)' }}>
+            <div style={{ color: 'var(--ck-text)', fontWeight: 700, marginBottom: '4px' }}>Penanganan 3 Penyakit (Soft Decay)</div>
             <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <li><strong style={{ color: '#e5a93c' }}>Fin Rot</strong> — Ganti Air + Obat Kuning (Acriflavine) + Garam Ikan.</li>
-              <li><strong style={{ color: '#4eb8d4' }}>Velvet / White Spot</strong> — Obat Biru (Methylene Blue) + Garam + Ketapang.</li>
-              <li><strong style={{ color: '#e05252' }}>Kembung</strong> — Puasakan pakan biasa, lalu beri Kutu Air (Daphnia).</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Fin Rot</strong> — Ganti Air + Obat Kuning (Acriflavine) + Garam Ikan.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Velvet / White Spot</strong> — Obat Biru (Methylene Blue) + Garam + Ketapang.</li>
+              <li><strong style={{ color: 'var(--ck-text)' }}>Kembung</strong> — Puasakan pakan biasa, lalu beri Kutu Air (Daphnia).</li>
             </ul>
           </div>
 
-          <div style={{ fontSize: '11.5px', color: '#6b7280', display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-            <span>Ikan aktif: <strong style={{ color: '#f3f4f6' }}>{fishCfg.species}</strong></span>
+          <div style={{ fontSize: '11.5px', color: 'var(--ck-text-muted)', display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
+            <span>Ikan aktif: <strong style={{ color: 'var(--ck-text)' }}>{fishCfg.species}</strong></span>
             <span>pH {aq.waterPH.toFixed(1)} · Tanin {Math.round(aq.taninLevel)}%</span>
           </div>
         </div>
@@ -835,11 +835,11 @@ export default function SoliterGame({ embedded = false }) {
   const currentStage = getMutationStage(displayAge);
   const displayFishState = previewMonth ? { ...fish, ageMonth: previewMonth } : fish;
 
-  const hungerColor = fish.hunger > 50 ? '#34c77b' : fish.hunger > 25 ? '#e5a93c' : '#e05252';
-  const waterColor = aq.waterClarity > 60 ? '#4eb8d4' : aq.waterClarity > 35 ? '#e5a93c' : '#e05252';
-  const phColor = phIdeal ? '#34c77b' : phExtreme ? '#e05252' : '#e5a93c';
-  const healthColor = fish.health > 60 ? '#34c77b' : fish.health > 30 ? '#e5a93c' : '#e05252';
-  const moodColor = fish.mood > 55 ? '#d9a441' : '#9ca3af';
+  const hungerColor = fish.hunger > 50 ? 'var(--ck-ok)' : fish.hunger > 25 ? 'var(--ck-warn)' : 'var(--ck-err)';
+  const waterColor = aq.waterClarity > 60 ? 'var(--ck-water)' : aq.waterClarity > 35 ? 'var(--ck-warn)' : 'var(--ck-err)';
+  const phColor = phIdeal ? 'var(--ck-ok)' : phExtreme ? 'var(--ck-err)' : 'var(--ck-warn)';
+  const healthColor = fish.health > 60 ? 'var(--ck-ok)' : fish.health > 30 ? 'var(--ck-warn)' : 'var(--ck-err)';
+  const moodColor = fish.mood > 55 ? 'var(--ck-text)' : 'var(--ck-text-muted)';
   const phPct = clamp(((aq.waterPH - 5.0) / (8.5 - 5.0)) * 100, 0, 100);
 
   const hudContent = (
@@ -880,29 +880,29 @@ export default function SoliterGame({ embedded = false }) {
               width: '34px',
               height: '34px',
               borderRadius: '9px',
-              background: '#171a22',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--ck-surface-2)',
+              border: '1px solid var(--ck-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#d9a441',
+              color: 'var(--ck-text)',
               fontSize: '14px',
             }}>
               <i className="fas fa-fish" />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '14.5px', lineHeight: 1.2, color: '#f3f4f6' }}>
+              <div style={{ fontWeight: 700, fontSize: '14.5px', lineHeight: 1.2, color: 'var(--ck-text)' }}>
                 Soliter Virtual
               </div>
-              <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--ck-text-muted)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
                 {isLoggedIn && unclaimedToday && (
                   <button
                     type="button"
                     onClick={() => setModal('checkin')}
                     style={{
-                      background: 'rgba(217, 164, 65, 0.14)',
-                      border: '1px solid rgba(217, 164, 65, 0.4)',
-                      color: '#d9a441',
+                      background: 'var(--ck-accent-soft)',
+                      border: '1px solid var(--ck-accent-border)',
+                      color: 'var(--ck-text)',
                       borderRadius: '5px',
                       padding: '1px 7px',
                       fontSize: '10.5px',
@@ -923,7 +923,7 @@ export default function SoliterGame({ embedded = false }) {
                 {!embedded && (
                   <>
                     <span>·</span>
-                    <Link href="/" style={{ color: '#d9a441', textDecoration: 'none', fontWeight: 600 }}>
+                    <Link href="/" style={{ color: 'var(--ck-text)', textDecoration: 'none', fontWeight: 600 }}>
                       Beranda
                     </Link>
                   </>
@@ -939,20 +939,20 @@ export default function SoliterGame({ embedded = false }) {
               onClick={() => setModal('checkin')}
               title="Poin Check-In Harian"
             >
-              <i className="fas fa-coins" style={{ color: '#d9a441', fontSize: '12px' }} />
-              <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#f3f4f6' }}>
+              <i className="fas fa-coins" style={{ color: 'var(--ck-text)', fontSize: '12px' }} />
+              <span style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--ck-text)' }}>
                 {state.points.toLocaleString()}
               </span>
-              <span style={{ fontSize: '10.5px', color: '#6b7280', fontWeight: 600 }}>pts</span>
+              <span style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)', fontWeight: 600 }}>pts</span>
               {unclaimedToday && (
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d9a441' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--ck-text)' }} />
               )}
             </button>
           ) : (
             <Link
               href="/login"
               className="ck-points-pill"
-              style={{ textDecoration: 'none', fontSize: '12px', fontWeight: 700, color: '#d9a441' }}
+              style={{ textDecoration: 'none', fontSize: '12px', fontWeight: 700, color: 'var(--ck-text)' }}
             >
               <i className="fas fa-lock" style={{ fontSize: '11px' }} />
               <span>Masuk</span>
@@ -982,31 +982,31 @@ export default function SoliterGame({ embedded = false }) {
               }}>
                 <span style={{
                   background: 'rgba(17,19,24,0.85)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.14)',
                   borderRadius: '6px',
                   padding: '3px 9px',
-                  color: '#f3f4f6',
+                  color: '#ffffff',
                   fontWeight: 600,
                 }}>
                   {fishCfg.species} · Bulan {displayAge}
                 </span>
 
-                <div style={{ display: 'flex', gap: '6px', color: '#9ca3af' }}>
+                <div style={{ display: 'flex', gap: '6px', color: '#d1d5db' }}>
                   <span style={{
                     background: 'rgba(17,19,24,0.85)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.14)',
                     borderRadius: '6px',
                     padding: '3px 8px',
                   }}>
-                    Tanin <strong style={{ color: '#d9a441' }}>{Math.round(aq.taninLevel)}%</strong>
+                    Tanin <strong style={{ color: '#ffffff' }}>{Math.round(aq.taninLevel)}%</strong>
                   </span>
                   <span style={{
                     background: 'rgba(17,19,24,0.85)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.14)',
                     borderRadius: '6px',
                     padding: '3px 8px',
                   }}>
-                    Garam <strong style={{ color: '#e5e7eb' }}>{Math.round(aq.saltLevel)}%</strong>
+                    Garam <strong style={{ color: '#ffffff' }}>{Math.round(aq.saltLevel)}%</strong>
                   </span>
                 </div>
               </div>
@@ -1017,9 +1017,9 @@ export default function SoliterGame({ embedded = false }) {
                   top: '44px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  background: 'rgba(217, 164, 65, 0.16)',
-                  border: '1px solid rgba(217, 164, 65, 0.5)',
-                  color: '#d9a441',
+                  background: 'rgba(255, 255, 255, 0.16)',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
+                  color: '#ffffff',
                   borderRadius: '6px',
                   padding: '2px 10px',
                   fontSize: '10px',
@@ -1052,7 +1052,7 @@ export default function SoliterGame({ embedded = false }) {
 
               <div style={{
                 fontSize: '11px',
-                color: phIdeal ? '#9ca3af' : '#e5a93c',
+                color: phIdeal ? '#d1d5db' : '#f59e0b',
                 marginTop: '6px',
                 display: 'flex',
                 alignItems: 'center',
@@ -1061,10 +1061,10 @@ export default function SoliterGame({ embedded = false }) {
                 justifyContent: 'center',
               }}>
                 <span>pH {aq.waterPH.toFixed(1)}</span>
-                <span style={{ color: '#4b5563' }}>·</span>
+                <span style={{ color: '#6b7280' }}>·</span>
                 <span>Rentang ideal {idealMinPH}–{idealMaxPH}</span>
                 <span style={{
-                  color: phIdeal ? '#34c77b' : '#e5a93c',
+                  color: phIdeal ? '#34c77b' : '#f59e0b',
                   fontWeight: 700,
                 }}>
                   {phIdeal ? 'Stabil' : 'Perlu Penyesuaian'}
@@ -1076,22 +1076,22 @@ export default function SoliterGame({ embedded = false }) {
             <div className="ck-mutation-bar">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6b7280' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ck-text-muted)' }}>
                     Fase Mutasi Warna ({displayAge}/5 Bulan)
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#f3f4f6', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ck-text)', marginTop: '2px' }}>
                     {currentStage.title}
                   </div>
                 </div>
-                <div style={{ textAlign: 'right', fontSize: '11px', color: '#9ca3af' }}>
+                <div style={{ textAlign: 'right', fontSize: '11px', color: 'var(--ck-text-muted)' }}>
                   {fish.ageMonth < 5 ? (
-                    <span>Progres <strong style={{ color: '#d9a441' }}>{Math.round(fish.growthExp || 0)}%</strong></span>
+                    <span>Progres <strong style={{ color: 'var(--ck-text)' }}>{Math.round(fish.growthExp || 0)}%</strong></span>
                   ) : (
-                    <span style={{ color: '#34c77b', fontWeight: 600 }}>Dewasa Penuh</span>
+                    <span style={{ color: 'var(--ck-ok)', fontWeight: 600 }}>Dewasa Penuh</span>
                   )}
                 </div>
               </div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--ck-text-2)', marginTop: '3px' }}>
                 {currentStage.note}
               </div>
 
@@ -1116,9 +1116,9 @@ export default function SoliterGame({ embedded = false }) {
 
             {/* ── Dynamic Visual Traits (Body, Sirip, Warna) ── */}
             <div style={{ display: 'flex', gap: '8px' }}>
-              <TraitPill label="Body" value={fish.bodySize} color="#d9a441" />
-              <TraitPill label="Sirip" value={fish.finSpread} color="#4eb8d4" />
-              <TraitPill label="Warna" value={fish.colorVibrancy} color="#d4728c" />
+              <TraitPill label="Body" value={fish.bodySize} color="var(--ck-text)" />
+              <TraitPill label="Sirip" value={fish.finSpread} color="var(--ck-water)" />
+              <TraitPill label="Warna" value={fish.colorVibrancy} color="#d926ff" />
             </div>
           </div>
 
@@ -1139,20 +1139,20 @@ export default function SoliterGame({ embedded = false }) {
                   <i className={`fas ${activeDisease.icon}`} />
                   <span>{activeDisease.name}</span>
                 </div>
-                <div style={{ color: '#d1d5db' }}>
-                  <strong style={{ color: '#f3f4f6' }}>Penanganan:</strong> {activeDisease.cure}
+                <div style={{ color: 'var(--ck-text-2)' }}>
+                  <strong style={{ color: 'var(--ck-text)' }}>Penanganan:</strong> {activeDisease.cure}
                 </div>
               </div>
             )}
 
             {!activeDisease && aq.fullChangeUnconditioned && (
               <div style={{
-                background: 'rgba(229, 169, 60, 0.09)',
-                border: '1px solid rgba(229, 169, 60, 0.35)',
+                background: 'var(--ck-surface-2)',
+                border: '1px solid var(--ck-border-strong)',
                 borderRadius: '10px',
                 padding: '9px 12px',
                 fontSize: '11.5px',
-                color: '#e5a93c',
+                color: 'var(--ck-text)',
                 lineHeight: 1.45,
               }}>
                 <i className="fas fa-circle-info" style={{ marginRight: '6px' }} />
@@ -1165,13 +1165,13 @@ export default function SoliterGame({ embedded = false }) {
               {openMenu === 'feed' && (
                 <div className="ck-popover">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 6px' }}>
-                    <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9ca3af' }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--ck-text-muted)' }}>
                       Pilih Pakan
                     </span>
                     <button
                       type="button"
                       onClick={() => { setOpenMenu(null); setModal('shop'); }}
-                      style={{ background: 'none', border: 'none', color: '#d9a441', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
+                      style={{ background: 'none', border: 'none', color: 'var(--ck-text)', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
                     >
                       + Tukar Poin
                     </button>
@@ -1188,16 +1188,16 @@ export default function SoliterGame({ embedded = false }) {
                         className="ck-popover-item"
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                          <i className={`fas ${food.icon}`} style={{ color: '#9ca3af', width: '16px', textAlign: 'center', fontSize: '12px' }} />
+                          <i className={`fas ${food.icon}`} style={{ color: 'var(--ck-text-muted)', width: '16px', textAlign: 'center', fontSize: '12px' }} />
                           <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#f3f4f6' }}>
+                            <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--ck-text)' }}>
                               {food.shortLabel}
-                              {isPref && <span style={{ fontSize: '10px', color: '#34c77b', marginLeft: '6px' }}>Optimal</span>}
+                              {isPref && <span style={{ fontSize: '10px', color: 'var(--ck-ok)', marginLeft: '6px' }}>Optimal</span>}
                             </div>
-                            <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>{food.tag}</div>
+                            <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>{food.tag}</div>
                           </div>
                         </div>
-                        <span style={{ color: '#d9a441', fontWeight: 700, fontSize: '12px' }}>×{count}</span>
+                        <span style={{ color: 'var(--ck-text)', fontWeight: 700, fontSize: '12px' }}>×{count}</span>
                       </button>
                     );
                   })}
@@ -1206,61 +1206,61 @@ export default function SoliterGame({ embedded = false }) {
 
               {openMenu === 'water' && (
                 <div className="ck-popover">
-                  <div style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9ca3af', padding: '4px 6px' }}>
+                  <div style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--ck-text-muted)', padding: '4px 6px' }}>
                     Perawatan Air & Suplemen
                   </div>
                   <button type="button" onClick={handlePartialWaterChange} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Ganti Air Parsial (30–50%)</div>
-                      <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>Air +38% jernih, pH stabil tanpa stres</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Air +38% jernih, pH stabil tanpa stres</div>
                     </div>
-                    <span style={{ color: '#34c77b', fontSize: '11px', fontWeight: 700 }}>Aman</span>
+                    <span style={{ color: 'var(--ck-ok)', fontSize: '11px', fontWeight: 700 }}>Aman</span>
                   </button>
                   <button type="button" onClick={handleFullWaterChange} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Kuras Total (100%)</div>
-                      <div style={{ fontSize: '10.5px', color: '#e5a93c' }}>Instan 100% jernih · perlu Ketapang & Garam</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-2)' }}>Instan 100% jernih · perlu Ketapang & Garam</div>
                     </div>
-                    <span style={{ color: '#e5a93c', fontSize: '11px', fontWeight: 700 }}>100%</span>
+                    <span style={{ color: 'var(--ck-text)', fontSize: '11px', fontWeight: 700 }}>100%</span>
                   </button>
                   <button type="button" disabled={state.inventory.ketapang <= 0} onClick={handleKetapang} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Ekstrak / Daun Ketapang</div>
-                      <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>Turunkan pH (-0.25), tanin alami, redakan stres</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Turunkan pH (-0.25), tanin alami, redakan stres</div>
                     </div>
-                    <span style={{ color: '#d9a441', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.ketapang}</span>
+                    <span style={{ color: 'var(--ck-text)', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.ketapang}</span>
                   </button>
                   <button type="button" disabled={state.inventory.aquariumSalt <= 0} onClick={handleSalt} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Garam Ikan (Aquarium Salt)</div>
-                      <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>Cegah jamur & bantu osmoregulasi</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Cegah jamur & bantu osmoregulasi</div>
                     </div>
-                    <span style={{ color: '#d9a441', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.aquariumSalt}</span>
+                    <span style={{ color: 'var(--ck-text)', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.aquariumSalt}</span>
                   </button>
                 </div>
               )}
 
               {openMenu === 'medicine' && (
                 <div className="ck-popover">
-                  <div style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9ca3af', padding: '4px 6px' }}>
+                  <div style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--ck-text-muted)', padding: '4px 6px' }}>
                     Pengobatan Ikan
                   </div>
                   <button type="button" disabled={state.inventory.medicineYellow <= 0} onClick={() => handleMedicine('medicineYellow')} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Obat Kuning (Acriflavine)</div>
-                      <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>Untuk Fin Rot — pastikan air jernih & ada garam</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Untuk Fin Rot — pastikan air jernih & ada garam</div>
                     </div>
-                    <span style={{ color: '#d9a441', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.medicineYellow}</span>
+                    <span style={{ color: 'var(--ck-text)', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.medicineYellow}</span>
                   </button>
                   <button type="button" disabled={state.inventory.medicineBlue <= 0} onClick={() => handleMedicine('medicineBlue')} className="ck-popover-item">
                     <div>
                       <div style={{ fontSize: '12.5px', fontWeight: 600 }}>Obat Biru (Methylene Blue)</div>
-                      <div style={{ fontSize: '10.5px', color: '#9ca3af' }}>Untuk Velvet / White Spot (+ Garam & Ketapang)</div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)' }}>Untuk Velvet / White Spot (+ Garam & Ketapang)</div>
                     </div>
-                    <span style={{ color: '#d9a441', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.medicineBlue}</span>
+                    <span style={{ color: 'var(--ck-text)', fontSize: '12px', fontWeight: 700 }}>×{state.inventory.medicineBlue}</span>
                   </button>
                   {fish.disease === 'bloated' && (
-                    <div style={{ padding: '8px 10px', borderRadius: '8px', background: 'rgba(224,82,82,0.1)', fontSize: '11px', color: '#f3f4f6' }}>
+                    <div style={{ padding: '8px 10px', borderRadius: '8px', background: 'rgba(224,82,82,0.1)', fontSize: '11px', color: 'var(--ck-text)' }}>
                       Penanganan kembung tidak menggunakan obat kimia — puasakan pelet dan beri <strong>Kutu Air (Daphnia)</strong> di menu Pakan.
                     </div>
                   )}
@@ -1314,10 +1314,10 @@ export default function SoliterGame({ embedded = false }) {
                 <div className="ck-lock-icon">
                   <i className={`fas ${status === 'loading' ? 'fa-spinner fa-spin' : 'fa-lock'}`} />
                 </div>
-                <h3 style={{ margin: '0 0 6px', fontSize: '17px', fontWeight: 700, color: '#f9fafb' }}>
+                <h3 style={{ margin: '0 0 6px', fontSize: '17px', fontWeight: 700, color: 'var(--ck-text)' }}>
                   {status === 'loading' ? 'Memeriksa Akun...' : 'Soliter Virtual Terkunci'}
                 </h3>
-                <p style={{ margin: 0, fontSize: '12.5px', lineHeight: 1.55, color: '#9ca3af' }}>
+                <p style={{ margin: 0, fontSize: '12.5px', lineHeight: 1.55, color: 'var(--ck-text-2)' }}>
                   {status === 'loading'
                     ? 'Menyiapkan data akuarium dan koleksi ikan Anda.'
                     : 'Masuk atau daftar member gratis terlebih dahulu untuk memelihara cupang virtual, klaim poin harian, dan mengoleksi 9 jenis ikan.'}
@@ -1325,7 +1325,7 @@ export default function SoliterGame({ embedded = false }) {
 
                 {status !== 'loading' && (
                   <div className="ck-lock-actions">
-                    <Link href="/login" className="ck-hero-btn-gold">
+                    <Link href="/login" className="ck-hero-btn-primary">
                       <i className="fas fa-sign-in-alt" />
                       <span>Masuk</span>
                     </Link>

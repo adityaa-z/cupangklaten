@@ -17,13 +17,13 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
             <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Tukar Poin Perawatan</h2>
-            <div style={{ fontSize: '11.5px', color: '#6b7280', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--ck-text-muted)', marginTop: '2px' }}>
               Penukaran stok menggunakan poin check-in gratis
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', color: 'var(--ck-text-muted)', fontSize: '17px', cursor: 'pointer' }}
             aria-label="Tutup"
           >
             <i className="fas fa-times" />
@@ -31,8 +31,8 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
         </div>
 
         <div style={{
-          background: '#171a22',
-          border: '1px solid rgba(255,255,255,0.07)',
+          background: 'var(--ck-surface-2)',
+          border: '1px solid var(--ck-border)',
           borderRadius: '10px',
           padding: '10px 14px',
           marginBottom: '12px',
@@ -40,8 +40,8 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <span style={{ color: '#9ca3af', fontSize: '12.5px' }}>Poin Tersedia</span>
-          <span style={{ color: '#d9a441', fontWeight: 700, fontSize: '15px' }}>
+          <span style={{ color: 'var(--ck-text-2)', fontSize: '12.5px' }}>Poin Tersedia</span>
+          <span style={{ color: 'var(--ck-text)', fontWeight: 700, fontSize: '15px' }}>
             <i className="fas fa-coins" style={{ marginRight: '6px', fontSize: '13px' }} />
             {points.toLocaleString()}
           </span>
@@ -57,11 +57,11 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
                 style={{
                   padding: '7px 4px',
                   borderRadius: '8px',
-                  border: active ? '1px solid rgba(217,164,65,0.55)' : '1px solid rgba(255,255,255,0.08)',
-                  background: active ? 'rgba(217,164,65,0.12)' : '#171a22',
-                  color: active ? '#d9a441' : '#9ca3af',
+                  border: active ? '1px solid var(--ck-accent-border)' : '1px solid var(--ck-border)',
+                  background: active ? 'var(--ck-accent-soft)' : 'var(--ck-surface-2)',
+                  color: active ? 'var(--ck-text)' : 'var(--ck-text-muted)',
                   fontSize: '11.5px',
-                  fontWeight: 600,
+                  fontWeight: active ? 700 : 600,
                   cursor: 'pointer',
                 }}
               >
@@ -82,8 +82,8 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '11px',
-                  background: '#171a22',
-                  border: '1px solid rgba(255,255,255,0.07)',
+                  background: 'var(--ck-surface-2)',
+                  border: '1px solid var(--ck-border)',
                   borderRadius: '10px',
                   padding: '10px 12px',
                 }}
@@ -92,22 +92,22 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
                   width: '34px',
                   height: '34px',
                   borderRadius: '8px',
-                  background: '#111318',
-                  border: '1px solid rgba(255,255,255,0.07)',
+                  background: 'var(--ck-surface)',
+                  border: '1px solid var(--ck-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#9ca3af',
+                  color: 'var(--ck-text-2)',
                   flexShrink: 0,
                   fontSize: '13px',
                 }}>
                   <i className={`fas ${item.icon}`} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#f3f4f6' }}>{item.name}</div>
-                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>{item.desc}</div>
-                  <div style={{ fontSize: '10.5px', color: '#6b7280', marginTop: '2px' }}>
-                    Stok saat ini: <strong style={{ color: '#e5e7eb' }}>{owned}</strong>
+                  <div style={{ fontWeight: 700, fontSize: '12.5px', color: 'var(--ck-text)' }}>{item.name}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--ck-text-2)', marginTop: '1px' }}>{item.desc}</div>
+                  <div style={{ fontSize: '10.5px', color: 'var(--ck-text-muted)', marginTop: '2px' }}>
+                    Stok saat ini: <strong style={{ color: 'var(--ck-text)' }}>{owned}</strong>
                   </div>
                 </div>
                 <button
@@ -116,9 +116,9 @@ export default function ShopModal({ gameState, onBuyItem, onClose }) {
                   style={{
                     padding: '7px 12px',
                     borderRadius: '8px',
-                    border: canAfford ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                    background: canAfford ? '#d9a441' : '#111318',
-                    color: canAfford ? '#0b0d11' : '#6b7280',
+                    border: canAfford ? 'none' : '1px solid var(--ck-border)',
+                    background: canAfford ? 'var(--ck-btn-bg)' : 'var(--ck-surface)',
+                    color: canAfford ? 'var(--ck-btn-text)' : 'var(--ck-text-muted)',
                     fontWeight: 700,
                     fontSize: '12px',
                     cursor: canAfford ? 'pointer' : 'not-allowed',

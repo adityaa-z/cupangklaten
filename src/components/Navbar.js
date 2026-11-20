@@ -13,6 +13,7 @@ const Navbar = () => {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         setTheme(savedTheme);
         document.documentElement.setAttribute('data-theme', savedTheme);
+        document.body.setAttribute('data-theme', savedTheme);
 
         const handleClickOutside = () => setMenuOpen(false);
         window.addEventListener('click', handleClickOutside);
@@ -30,25 +31,55 @@ const Navbar = () => {
         setTheme(newTheme);
         localStorage.setItem('theme', newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
+        document.body.setAttribute('data-theme', newTheme);
     };
 
     return (
         <header>
             <div className="nav-container">
-                <Link href="/" className="logo">
-                    <img src="/logo.png" alt="cupangklaten" />
-                    <span className="logo-text">CUPANGKLATEN</span>
+                <Link href="/" className="logo" style={{ gap: '0.65rem' }}>
+                    <img
+                        src="/logo-cansbetta.jpg"
+                        alt="cans.betta cupangklaten"
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '1px solid rgba(255,255,255,0.18)',
+                        }}
+                    />
+                    <span
+                        className="logo-text"
+                        style={{
+                            fontSize: 'clamp(1rem, 2.8vw, 1.3rem)',
+                            fontWeight: 800,
+                            letterSpacing: '-0.3px',
+                            background: 'linear-gradient(90deg, #ff2e55 0%, #d926ff 48%, #00c8ff 100%)',
+                            WebkitBackgroundClip: 'text',
+                            backgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            lineHeight: 1.1,
+                        }}
+                    >
+                        cans.betta cupangklaten
+                    </span>
                 </Link>
 
                 <div className="nav-menu-container" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
-                    <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle Theme">
+                    <button
+                        className="theme-toggle-btn"
+                        onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? 'Ubah ke Tema Terang' : 'Ubah ke Tema Gelap'}
+                        title={theme === 'dark' ? 'Tema Terang' : 'Tema Gelap'}
+                    >
                         <i className={theme === 'light' ? "fas fa-moon" : "fas fa-sun"}></i>
                     </button>
 
                     <button className="hamburger-btn" onClick={toggleMenu} aria-label="Toggle Menu">
                         <i className={menuOpen ? "fas fa-times" : "fas fa-bars"}></i>
                     </button>
-                    
+
                     <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
                         <Link href="/game" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-gamepad"></i> Soliter Virtual
@@ -62,9 +93,6 @@ const Navbar = () => {
                         <Link href="/artikel" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-newspaper"></i> Artikel Cupang
                         </Link>
-                        <Link href="/#reviews" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-star"></i> Testimoni
-                        </Link>
                         <Link href="/claim-garansi" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-shield-alt"></i> Claim Garansi
                         </Link>
@@ -76,21 +104,16 @@ const Navbar = () => {
                             <div className="menu-item" style={{ color: 'var(--text-muted)' }}><i className="fas fa-spinner fa-spin"></i> Memuat...</div>
                         ) : session ? (
                             <>
-                                <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
+                                <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)} style={{ fontWeight: 'bold' }}>
                                     <i className="fas fa-user-circle"></i> Halo, {session.user.name?.split(' ')[0] || 'Member'}
                                 </Link>
-                                {session.user?.email !== 'zidanp13794@gmail.com' && (
-                                    <Link href="/profil" className="menu-item" onClick={() => setMenuOpen(false)}>
-                                        <i className="fas fa-user-circle"></i> Profil Saya
-                                    </Link>
-                                )}
                                 {session.user?.email === 'zidanp13794@gmail.com' && (
                                     <>
                                         <Link href="/keuangan" className="menu-item" onClick={() => setMenuOpen(false)}>
-                                            <i className="fas fa-wallet" style={{ color: '#D4AF37' }}></i> Menu Keuangan
+                                            <i className="fas fa-wallet"></i> Menu Keuangan
                                         </Link>
                                         <Link href="/admin" className="menu-item" onClick={() => setMenuOpen(false)}>
-                                            <i className="fas fa-user-shield" style={{ color: '#3b82f6' }}></i> Admin Panel
+                                            <i className="fas fa-user-shield"></i> Admin Panel
                                         </Link>
                                     </>
                                 )}
@@ -100,7 +123,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/login" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
+                                <Link href="/login" className="menu-item" onClick={() => setMenuOpen(false)} style={{ fontWeight: 'bold' }}>
                                     <i className="fas fa-sign-in-alt"></i> Login
                                 </Link>
                                 <Link href="/register" className="menu-item" onClick={() => setMenuOpen(false)} style={{ color: '#10b981', fontWeight: 'bold' }}>

@@ -13,13 +13,13 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
             <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Upgrade Soliter & Akuarium</h2>
-            <div style={{ fontSize: '11.5px', color: '#6b7280', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--ck-text-muted)', marginTop: '2px' }}>
               Berbasis poin check-in gratis, tanpa transaksi uang
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '17px', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', color: 'var(--ck-text-muted)', fontSize: '17px', cursor: 'pointer' }}
             aria-label="Tutup"
           >
             <i className="fas fa-times" />
@@ -27,8 +27,8 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
         </div>
 
         <div style={{
-          background: '#171a22',
-          border: '1px solid rgba(255,255,255,0.07)',
+          background: 'var(--ck-surface-2)',
+          border: '1px solid var(--ck-border)',
           borderRadius: '10px',
           padding: '10px 14px',
           marginBottom: '14px',
@@ -36,8 +36,8 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <span style={{ color: '#9ca3af', fontSize: '12.5px' }}>Saldo Poin</span>
-          <span style={{ color: '#d9a441', fontWeight: 700, fontSize: '15px' }}>
+          <span style={{ color: 'var(--ck-text-2)', fontSize: '12.5px' }}>Saldo Poin</span>
+          <span style={{ color: 'var(--ck-text)', fontWeight: 700, fontSize: '15px' }}>
             <i className="fas fa-coins" style={{ marginRight: '6px', fontSize: '13px' }} />
             {points.toLocaleString()}
           </span>
@@ -55,16 +55,16 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
             let statusColor;
             if (isOwned) {
               statusLabel = 'Dimiliki';
-              statusColor = '#34c77b';
+              statusColor = 'var(--ck-ok)';
             } else if (isCurrent) {
               statusLabel = 'Aktif';
-              statusColor = '#d9a441';
+              statusColor = 'var(--ck-text)';
             } else if (isLocked) {
               statusLabel = `Butuh Lv.${item.level - 1}`;
-              statusColor = '#6b7280';
+              statusColor = 'var(--ck-text-muted)';
             } else {
               statusLabel = `${item.cost.toLocaleString()} poin`;
-              statusColor = canAfford ? '#d9a441' : '#e05252';
+              statusColor = canAfford ? 'var(--ck-text)' : 'var(--ck-err)';
             }
 
             return (
@@ -73,8 +73,8 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
                 style={{
                   borderRadius: '11px',
                   padding: '13px',
-                  border: isCurrent ? '1px solid rgba(217, 164, 65, 0.55)' : '1px solid rgba(255,255,255,0.07)',
-                  background: isCurrent ? 'rgba(217, 164, 65, 0.06)' : '#171a22',
+                  border: isCurrent ? '1.5px solid var(--ck-accent-border)' : '1px solid var(--ck-border)',
+                  background: isCurrent ? 'var(--ck-accent-soft)' : 'var(--ck-surface-2)',
                   opacity: isLocked ? 0.5 : 1,
                 }}
               >
@@ -83,12 +83,12 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
                     width: '36px',
                     height: '36px',
                     borderRadius: '9px',
-                    background: '#111318',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'var(--ck-surface)',
+                    border: '1px solid var(--ck-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: isCurrent ? '#d9a441' : '#9ca3af',
+                    color: isCurrent ? 'var(--ck-text)' : 'var(--ck-text-muted)',
                     flexShrink: 0,
                   }}>
                     <i className={`fas ${item.icon}`} />
@@ -98,15 +98,15 @@ export default function UpgradeModal({ gameState, onUpgrade, onClose }) {
                       <span style={{ fontWeight: 700, fontSize: '13px' }}>Level {item.level} · {item.name}</span>
                       <span style={{ fontSize: '11px', color: statusColor, fontWeight: 700, whiteSpace: 'nowrap' }}>{statusLabel}</span>
                     </div>
-                    <p style={{ fontSize: '11.5px', color: '#9ca3af', margin: '0 0 7px', lineHeight: 1.45 }}>
+                    <p style={{ fontSize: '11.5px', color: 'var(--ck-text-2)', margin: '0 0 7px', lineHeight: 1.45 }}>
                       {item.description}
                     </p>
                     <div style={{
                       display: 'inline-block',
                       fontSize: '10.5px',
-                      color: '#34c77b',
+                      color: 'var(--ck-ok)',
                       background: 'rgba(52, 199, 123, 0.08)',
-                      border: '1px solid rgba(52, 199, 123, 0.22)',
+                      border: '1px solid rgba(52, 199, 123, 0.25)',
                       borderRadius: '6px',
                       padding: '2px 8px',
                       marginBottom: isNext ? '10px' : '0',
