@@ -5,11 +5,11 @@ import Link from 'next/link';
 import '@/app/game/soliter.css';
 
 export const ETALASE_CATEGORIES = [
-  { id: 'Grade A',    label: 'Grade A',    icon: 'fa-award',   subtitle: 'Kualitas pilihan kelas kompetisi' },
-  { id: 'Grade B',    label: 'Grade B',    icon: 'fa-star',    subtitle: 'Form rapi & warna seimbang' },
-  { id: 'Kolektor',   label: 'Kolektor',   icon: 'fa-gem',     subtitle: 'Line eksklusif & simpanan' },
-  { id: 'Uniq Form',  label: 'Uniq Form',  icon: 'fa-shapes',  subtitle: 'Bentuk sirip & tubuh unik' },
-  { id: 'Uniq Color', label: 'Uniq Color', icon: 'fa-palette', subtitle: 'Corak & perpecahan warna langka' },
+  { id: 'Grade A',    label: 'Grade A',    icon: 'fa-award' },
+  { id: 'Grade B',    label: 'Grade B',    icon: 'fa-star' },
+  { id: 'Kolektor',   label: 'Kolektor',   icon: 'fa-gem' },
+  { id: 'Uniq Form',  label: 'Uniq Form',  icon: 'fa-shapes' },
+  { id: 'Uniq Color', label: 'Uniq Color', icon: 'fa-palette' },
 ];
 
 function formatShortRupiah(num) {
@@ -64,18 +64,13 @@ function CategoryRow({ category, items, loading, onSelect, viewAllHref }) {
     <section aria-label={`Etalase ${category.label}`} className="ck-strip-section">
       <div className="ck-strip-inner">
         <div className="ck-strip-header">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <div className="ck-strip-title">
-              <i className={`fas ${category.icon}`} style={{ fontSize: '11.5px', color: 'var(--ck-accent)' }} />
-              <span>Etalase {category.label}</span>
-              {!loading && items.length > 0 && (
-                <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--ck-text-muted)', textTransform: 'none', letterSpacing: 0 }}>
-                  ({items.length})
-                </span>
-              )}
-            </div>
-            {category.subtitle && (
-              <span style={{ fontSize: '11px', color: 'var(--ck-text-muted)' }}>{category.subtitle}</span>
+          <div className="ck-strip-title">
+            <i className={`fas ${category.icon}`} style={{ fontSize: '11.5px', color: 'var(--ck-accent)' }} />
+            <span>Etalase {category.label}</span>
+            {!loading && items.length > 0 && (
+              <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--ck-text-muted)', textTransform: 'none', letterSpacing: 0 }}>
+                ({items.length})
+              </span>
             )}
           </div>
           <Link href={viewAllHref} className="ck-strip-link">
@@ -284,7 +279,7 @@ export default function ProductStrip() {
           {/* Tampilkan ikan kategori lama jika masih ada yang stoknya ready */}
           {legacyHasStock && (
             <CategoryRow
-              category={{ id: 'lainnya', label: 'Koleksi Lainnya', icon: 'fa-layer-group', subtitle: 'Koleksi ikan cupang lainnya' }}
+              category={{ id: 'lainnya', label: 'Koleksi Lainnya', icon: 'fa-layer-group' }}
               items={legacyItems}
               loading={false}
               viewAllHref="/stok"
