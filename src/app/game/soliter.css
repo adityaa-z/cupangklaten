@@ -345,11 +345,11 @@
 }
 
 .ck-strip-card {
-  flex: 0 0 126px;
+  flex: 0 0 152px;
   scroll-snap-align: start;
   background: var(--ck-surface);
   border: 1px solid var(--ck-border);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   padding: 0;
   text-align: left;
@@ -369,15 +369,15 @@
 .ck-strip-thumb {
   position: relative;
   width: 100%;
-  height: 78px;
+  height: 104px;
   background: #050608;
   overflow: hidden;
 }
 
 .ck-strip-skeleton {
-  flex: 0 0 126px;
-  height: 130px;
-  border-radius: 10px;
+  flex: 0 0 152px;
+  height: 164px;
+  border-radius: 12px;
   background: var(--ck-surface-2);
   border: 1px solid var(--ck-border);
   scroll-snap-align: start;
@@ -834,12 +834,12 @@
   .ck-hero-title { font-size: 26px; }
   .ck-hero-photo-frame { aspect-ratio: 16 / 9; }
 
-  .ck-strip-inner { padding: 12px 24px 14px; }
-  .ck-strip-header { padding: 0 0 8px; }
-  .ck-strip-scroll { gap: 12px; padding: 2px 0 4px; }
-  .ck-strip-card { flex: 0 0 150px; }
-  .ck-strip-thumb { height: 92px; }
-  .ck-strip-skeleton { flex: 0 0 150px; height: 148px; }
+  .ck-strip-inner { padding: 14px 24px 16px; }
+  .ck-strip-header { padding: 0 0 10px; }
+  .ck-strip-scroll { gap: 14px; padding: 2px 0 6px; }
+  .ck-strip-card { flex: 0 0 182px; }
+  .ck-strip-thumb { height: 126px; }
+  .ck-strip-skeleton { flex: 0 0 182px; height: 188px; }
 
   .ck-strip-arrow {
     display: flex;
@@ -898,10 +898,10 @@
   .ck-hero-desc { font-size: 14px; }
   .ck-hero-photo-frame { aspect-ratio: 4 / 3; border-radius: 14px; }
 
-  .ck-strip-inner { padding: 14px 32px 16px; }
-  .ck-strip-card { flex: 0 0 166px; }
-  .ck-strip-thumb { height: 102px; }
-  .ck-strip-skeleton { flex: 0 0 166px; height: 160px; }
+  .ck-strip-inner { padding: 16px 32px 18px; }
+  .ck-strip-card { flex: 0 0 206px; }
+  .ck-strip-thumb { height: 148px; }
+  .ck-strip-skeleton { flex: 0 0 206px; height: 214px; }
 
   .ck-game-container { max-width: 1200px; padding: 18px 32px 44px; }
   .ck-game-topbar { margin-bottom: 16px; padding: 14px 20px; }

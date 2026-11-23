@@ -170,19 +170,19 @@ export default function ProductStrip() {
                         {isHabis ? 'Habis' : `Stok ${item.stock}`}
                       </span>
                     </div>
-                    <div style={{ padding: '7px 9px 8px' }}>
+                    <div style={{ padding: '9px 10px 10px' }}>
                       <div style={{
-                        fontSize: '11.5px',
-                        fontWeight: 600,
+                        fontSize: '12.5px',
+                        fontWeight: 700,
                         color: 'var(--ck-text)',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        marginBottom: '2px',
+                        marginBottom: '3px',
                       }}>
                         {title}
                       </div>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ck-text-2)' }}>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ck-text-2)' }}>
                         {formatPriceRangeShort(item.price, item.price_max)}
                       </div>
                     </div>
