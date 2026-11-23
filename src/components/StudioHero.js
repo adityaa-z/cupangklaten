@@ -39,7 +39,7 @@ export default function StudioHero() {
             <p className="ck-hero-desc">
               Berdiri sejak <strong>Desember 2022</strong>, <strong>cans.betta x cupangklaten</strong> menghadirkan ikan cupang hias pilihan
               <strong> Kelas Kompetisi</strong> dengan form proporsional, warna seimbang, sirip rapi, dan mental yang bagus. Setiap ikan dirawat
-              secara khusus di soliter kaca berukuran besar dengan setting air berkualitas — kisaran harga mulai dari <strong>Rp 50.000</strong>.
+              secara khusus di soliter kaca berukuran besar dengan setting air berkualitas.
             </p>
 
             {/* Key Breeder Highlights */}
@@ -47,10 +47,6 @@ export default function StudioHero() {
               <div className="ck-hero-metric">
                 <span className="ck-hero-metric-label">Berdiri Sejak</span>
                 <strong className="ck-hero-metric-val">Des 2022</strong>
-              </div>
-              <div className="ck-hero-metric">
-                <span className="ck-hero-metric-label">Kisaran Harga</span>
-                <strong className="ck-hero-metric-val">Mulai Rp 50rb</strong>
               </div>
               <div className="ck-hero-metric">
                 <span className="ck-hero-metric-label">Kualitas</span>
