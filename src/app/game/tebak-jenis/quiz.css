@@ -1,0 +1,142 @@
+/* ─── GAME 2: TEBAK JENIS (QUIZ) ────────────────────────────────────────── */
+.qz-wrap {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.qz-top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 13px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.qz-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ck-surface-2);
+  overflow: hidden;
+}
+
+.qz-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+  transition: width 0.3s ease;
+}
+
+.qz-photo-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto 14px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000000;
+  border: 1.5px solid var(--ck-border-strong);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
+}
+
+.qz-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qz-question-prompt {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ck-text);
+  margin: 0 0 12px;
+}
+
+.qz-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 440px) {
+  .qz-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qz-option-btn {
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ck-border-strong);
+  background: var(--ck-surface);
+  color: var(--ck-text);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  transition: transform 0.14s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.qz-option-btn:hover:not(:disabled) {
+  background: var(--ck-surface-2);
+  border-color: var(--ck-text-muted);
+  transform: translateY(-1px);
+}
+
+.qz-option-btn:disabled {
+  cursor: default;
+}
+
+.qz-option-btn.correct {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+[data-theme='light'] .qz-option-btn.correct {
+  color: #15803d;
+}
+
+.qz-option-btn.wrong {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+[data-theme='light'] .qz-option-btn.wrong {
+  color: #b91c1c;
+}
+
+.qz-feedback-box {
+  margin-top: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ck-border);
+  background: var(--ck-surface);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ck-text-2);
+  animation: mmBannerPop 0.24s ease;
+}
+
+.qz-feedback-box.correct {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.qz-feedback-box.wrong {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.08);
+}

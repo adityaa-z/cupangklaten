@@ -1,0 +1,107 @@
+/* ─── GAME 8: BERSIHKAN KACA AKUARIUM (QUICK SWIPE CLEAN) ───────────────── */
+.cln-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.cln-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.cln-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid var(--ck-border-strong);
+  background: #000000;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
+}
+
+.cln-stage.sparkle {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35), 0 16px 40px rgba(34, 197, 94, 0.25);
+}
+
+.cln-fish-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+}
+
+.cln-algae-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.cln-soap-bubble {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(186, 230, 253, 0.3));
+  pointer-events: none;
+  z-index: 3;
+  animation: clnBubbleFloat 0.7s ease-out forwards;
+}
+
+@keyframes clnBubbleFloat {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.95; }
+  100% { transform: translate(-50%, -180%) scale(1.2); opacity: 0; }
+}
+
+.cln-start-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(8, 12, 18, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  text-align: center;
+  max-width: 85%;
+}
+
+.cln-clean-banner {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.92);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  animation: mmBannerPop 0.3s ease;
+}

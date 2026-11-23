@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BETTA_CARDS } from './memoryFishData';
-import { GameHeader, ArenaWinModal, playArenaTone } from './ArenaShared';
+import { BETTA_CARDS } from '../shared/bettaData';
+import { GameHeader, ArenaWinModal, playArenaTone } from '../shared/ArenaShared';
+import './quiz.css';
 
 function shuffleArray(arr) {
   const copy = [...arr];

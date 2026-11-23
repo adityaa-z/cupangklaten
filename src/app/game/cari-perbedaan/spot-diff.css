@@ -1,0 +1,151 @@
+/* ─── GAME 3: CARI PERBEDAAN (SPOT THE DIFFERENCE) ──────────────────────── */
+.sd-hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.sd-dots-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sd-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--ck-border-strong);
+  background: var(--ck-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: transparent;
+  transition: all 0.25s ease;
+}
+
+.sd-dot.found {
+  border-color: #22c55e;
+  background: #22c55e;
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
+.sd-boards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  .sd-boards-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+.sd-canvas-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000000;
+  border: 1.5px solid var(--ck-border-strong);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.sd-canvas-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(8, 10, 15, 0.8);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.sd-canvas-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sd-canvas-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sd-found-ring {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px solid #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35), inset 0 0 12px rgba(34, 197, 94, 0.25);
+  pointer-events: none;
+  z-index: 5;
+  animation: sdRingPop 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sd-hint-ring {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px dashed #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+  pointer-events: none;
+  z-index: 5;
+  animation: sdHintPulse 1s ease-in-out infinite;
+}
+
+@keyframes sdRingPop {
+  0% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes sdHintPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+}
+
+.sd-miss-mark {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 6;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+  animation: sdMissPop 0.65s ease forwards;
+}
+
+@keyframes sdMissPop {
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+  30% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+}

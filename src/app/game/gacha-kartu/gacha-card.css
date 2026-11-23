@@ -1,0 +1,447 @@
+/* ─── GAME 7: GACHA KARTU KOLEKSI (MYSTERY PACK TCG) ────────────────────── */
+.gc-wrap {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.gc-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.gc-rates-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ck-text-2);
+}
+
+.gc-pack-stage {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 24px;
+}
+
+.gc-booster-pack {
+  width: 100%;
+  max-width: 310px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 46, 85, 0.25), transparent 52%),
+    radial-gradient(circle at 80% 80%, rgba(0, 200, 255, 0.25), transparent 55%),
+    linear-gradient(155deg, #1b2030 0%, #090c14 100%);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+}
+
+.gc-tear-strip {
+  position: relative;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+  cursor: ew-resize;
+  overflow: hidden;
+}
+
+.gc-tear-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 55%, #00c8ff 100%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.gc-tear-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #090c14;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.gc-tear-text {
+  position: relative;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
+.gc-pack-body {
+  padding: 28px 20px 26px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.gc-pack-edition {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gc-pack-logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(217, 38, 255, 0.32);
+}
+
+.gc-pack-title {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(90deg, #ff5e7e 0%, #e06bff 50%, #5ee0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gc-pack-sub {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.45;
+}
+
+.gc-quick-open-btn {
+  margin-top: 8px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gc-quick-open-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Flash Effect by Rarity */
+.gc-flash-stage {
+  height: 360px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  animation: gcFlashBurst 0.52s ease forwards;
+}
+
+.gc-flash-stage.rarity-C { background: radial-gradient(circle, rgba(203, 213, 225, 0.45), transparent 70%); }
+.gc-flash-stage.rarity-R { background: radial-gradient(circle, rgba(59, 130, 246, 0.55), transparent 70%); }
+.gc-flash-stage.rarity-SR { background: radial-gradient(circle, rgba(245, 158, 11, 0.65), transparent 70%); }
+.gc-flash-stage.rarity-UR { background: radial-gradient(circle, rgba(217, 38, 255, 0.7), rgba(0, 200, 255, 0.4), transparent 75%); }
+
+.gc-flash-orb {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 60px 24px rgba(255, 255, 255, 0.85);
+}
+
+.gc-flash-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ck-text);
+}
+
+@keyframes gcFlashBurst {
+  0% { transform: scale(0.8); opacity: 0.4; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* TCG Card Display */
+.gc-reveal-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.gc-tcg-card {
+  position: relative;
+  width: 100%;
+  max-width: 330px;
+  border-radius: 18px;
+  padding: 14px;
+  background: #10141f;
+  color: #ffffff;
+  overflow: hidden;
+  transition: transform 0.14s ease-out;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.45);
+  animation: mmModalPop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gc-tcg-card.rarity-C {
+  border: 3px solid #94a3b8;
+  box-shadow: 0 14px 36px rgba(148, 163, 184, 0.25);
+}
+
+.gc-tcg-card.rarity-R {
+  border: 3px solid #3b82f6;
+  box-shadow: 0 16px 40px rgba(59, 130, 246, 0.38);
+}
+
+.gc-tcg-card.rarity-SR {
+  border: 3px solid #f59e0b;
+  box-shadow: 0 18px 44px rgba(245, 158, 11, 0.45);
+}
+
+.gc-tcg-card.rarity-UR {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#10141f, #10141f) padding-box,
+    linear-gradient(135deg, #ff2e55, #f59e0b, #22c55e, #00c8ff, #d926ff) border-box;
+  box-shadow: 0 18px 50px rgba(217, 38, 255, 0.48);
+}
+
+.gc-holo-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.gc-tcg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.gc-rarity-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.gc-rarity-pill.rarity-C { background: rgba(148, 163, 184, 0.25); color: #e2e8f0; }
+.gc-rarity-pill.rarity-R { background: rgba(59, 130, 246, 0.28); color: #93c5fd; }
+.gc-rarity-pill.rarity-SR { background: rgba(245, 158, 11, 0.28); color: #fde68a; }
+.gc-rarity-pill.rarity-UR {
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 50%, #00c8ff 100%);
+  color: #ffffff;
+}
+
+.gc-new-pill {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #22c55e;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.gc-tcg-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: #000000;
+  margin-bottom: 11px;
+}
+
+.gc-tcg-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gc-tcg-name {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+}
+
+.gc-tcg-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gc-tcg-stats > div {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  padding: 7px 8px;
+  text-align: center;
+}
+
+.gc-tcg-stats span {
+  display: block;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.gc-tcg-stats strong {
+  font-size: 11.5px;
+  color: #ffffff;
+}
+
+.gc-tcg-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+}
+
+.gc-reveal-actions {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Album Dex Binder */
+.gc-album-box {
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.gc-album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .gc-album-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.gc-dex-item {
+  border-radius: 12px;
+  border: 1.5px solid var(--ck-border);
+  background: var(--ck-surface-2);
+  padding: 6px;
+  cursor: pointer;
+  text-align: center;
+  color: var(--ck-text);
+  transition: transform 0.15s ease;
+}
+
+.gc-dex-item.owned:hover {
+  transform: translateY(-2px);
+}
+
+.gc-dex-item.locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.gc-dex-item.owned.rarity-R { border-color: #3b82f6; }
+.gc-dex-item.owned.rarity-SR { border-color: #f59e0b; }
+.gc-dex-item.owned.rarity-UR { border-color: #d926ff; }
+
+.gc-dex-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0a0d14;
+  margin-bottom: 5px;
+}
+
+.gc-dex-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gc-dex-silhouette {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.gc-rarity-tag {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.gc-rarity-tag.rarity-R { background: #2563eb; }
+.gc-rarity-tag.rarity-SR { background: #d97706; }
+.gc-rarity-tag.rarity-UR { background: linear-gradient(90deg, #ff2e55, #d926ff, #00c8ff); }
+
+.gc-dex-name {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

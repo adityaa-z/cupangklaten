@@ -1,9 +1,10 @@
 /* ==========================================================================
-   MEMORY MATCH GAME — cans.betta x cupangklaten
-   3D Card Flip, Studio Dark & Light Theme Adaptive
+
+   BETTA MINI-GAME ARENA — Shared Base, Lobby, Header, HUD & Win Modal
+
    ========================================================================== */
 
-.mm-page {
+.arena-page {
   min-height: 100vh;
   background: var(--ck-bg);
   color: var(--ck-text);
@@ -11,21 +12,21 @@
   flex-direction: column;
 }
 
-.mm-main {
+.arena-shell {
   flex: 1;
   width: 100%;
-  max-width: 960px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 20px 16px 52px;
+  padding: 20px 16px 56px;
 }
 
-/* ─── Hero / Title Bar ──────────────────────────────────────────────────── */
-.mm-hero {
+/* ─── Lobby Hero ────────────────────────────────────────────────────────── */
+.arena-lobby-hero {
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
-.mm-eyebrow {
+.arena-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -34,25 +35,316 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ck-text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.mm-title {
-  margin: 0 0 6px;
-  font-size: clamp(1.5rem, 4vw, 2.15rem);
+.arena-title {
+  margin: 0 0 8px;
+  font-size: clamp(1.65rem, 4.4vw, 2.4rem);
   font-weight: 800;
   letter-spacing: -0.025em;
+  color: var(--ck-text);
+  line-height: 1.12;
+}
+
+.arena-subtitle {
+  margin: 0 auto;
+  max-width: 580px;
+  font-size: 13.5px;
+  color: var(--ck-text-2);
+  line-height: 1.55;
+}
+
+/* ─── Lobby 2x2 Grid ────────────────────────────────────────────────────── */
+.arena-lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 560px) {
+  .arena-lobby-grid {
+    gap: 10px;
+  }
+}
+
+.arena-game-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ck-text);
+  box-shadow: var(--ck-shadow);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.arena-game-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--ck-border-strong);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
+}
+
+.arena-game-card:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.arena-card-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #080a0f;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ck-border);
+}
+
+.arena-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.arena-game-card:hover .arena-card-preview img {
+  transform: scale(1.06);
+}
+
+.arena-card-preview-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 9, 14, 0.85) 0%, rgba(7, 9, 14, 0.15) 55%, transparent 100%);
+  pointer-events: none;
+}
+
+.arena-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(9, 11, 16, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.arena-card-icon-circle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(9, 11, 16, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.arena-card-body {
+  padding: 13px 14px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.arena-card-title {
+  margin: 0;
+  font-size: clamp(14px, 2.8vw, 17px);
+  font-weight: 800;
+  color: var(--ck-text);
+  line-height: 1.2;
+}
+
+.arena-card-desc {
+  margin: 0;
+  font-size: clamp(11.5px, 2.2vw, 12.5px);
+  color: var(--ck-text-2);
+  line-height: 1.4;
+}
+
+.arena-card-play {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--ck-text);
+}
+
+.arena-game-card:hover .arena-card-play i {
+  transform: translateX(3px);
+}
+
+.arena-card-play i {
+  transition: transform 0.18s ease;
+  font-size: 10px;
+}
+
+/* ─── Lobby Promo Footer Bar ────────────────────────────────────────────── */
+.arena-lobby-promo {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.arena-lobby-promo-text {
+  font-size: 12.5px;
+  color: var(--ck-text-2);
+}
+
+.arena-lobby-promo-text strong {
+  color: var(--ck-text);
+}
+
+.arena-lobby-promo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ─── In-Game Standard Header Bar ───────────────────────────────────────── */
+.arena-game-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  box-shadow: var(--ck-shadow);
+}
+
+.arena-back-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--ck-border-strong);
+  background: var(--ck-surface-2);
+  color: var(--ck-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.14s ease;
+}
+
+.arena-back-btn:hover {
+  background: var(--ck-surface-3);
+}
+
+.arena-back-btn:active {
+  transform: scale(0.97);
+}
+
+.arena-header-center {
+  text-align: center;
+  min-width: 0;
+}
+
+.arena-header-title {
+  margin: 0;
+  font-size: clamp(14px, 3vw, 17px);
+  font-weight: 800;
   color: var(--ck-text);
   line-height: 1.15;
 }
 
-.mm-subtitle {
-  margin: 0 auto;
-  max-width: 560px;
-  font-size: 13px;
-  color: var(--ck-text-2);
-  line-height: 1.55;
+.arena-header-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ck-text-muted);
 }
+
+.arena-header-right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arena-restart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: none;
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.14s ease;
+}
+
+.arena-restart-btn:hover {
+  filter: brightness(1.08);
+}
+
+.arena-restart-btn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 560px) {
+  .arena-game-header {
+    grid-template-columns: auto 1fr auto;
+    padding: 8px 10px;
+  }
+  .arena-back-label-long {
+    display: none;
+  }
+}
+
+
+/* Shared Progress Bar */
+
+.qz-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ck-surface-2);
+  overflow: hidden;
+}
+
+.qz-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+  transition: width 0.3s ease;
+}
+
+
+/* Shared HUD, Mode Switch, Banner & Win Modal */
 
 /* ─── Control & HUD Header Panel ────────────────────────────────────────── */
 .mm-hud-panel {
@@ -279,294 +571,6 @@
 @keyframes mmBannerPop {
   0% { transform: scale(0.97); opacity: 0.65; }
   100% { transform: scale(1); opacity: 1; }
-}
-
-/* ─── Card Board Grid ───────────────────────────────────────────────────── */
-.mm-board {
-  display: grid;
-  gap: 10px;
-  margin: 0 auto;
-  width: 100%;
-  perspective: 1100px;
-}
-
-.mm-board.mode-quick {
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 540px;
-}
-
-.mm-board.mode-standard {
-  grid-template-columns: repeat(4, 1fr);
-  max-width: 680px;
-}
-
-@media (min-width: 680px) {
-  .mm-board {
-    gap: 14px;
-  }
-  .mm-board.mode-quick {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 680px;
-  }
-}
-
-/* ─── Individual 3D Flip Card ───────────────────────────────────────────── */
-.mm-card-btn {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  perspective: 1000px;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-
-.mm-card-btn:disabled {
-  cursor: default;
-}
-
-.mm-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-  border-radius: 14px;
-}
-
-.mm-card-btn.flipped .mm-card-inner,
-.mm-card-btn.matched .mm-card-inner {
-  transform: rotateY(180deg);
-}
-
-.mm-card-btn.mismatch .mm-card-front {
-  border-color: #f43f5e;
-  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.35), 0 10px 22px rgba(244, 63, 94, 0.2);
-}
-
-.mm-card-face {
-  position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  overflow: hidden;
-}
-
-/* ─── Card Back (Closed State) ──────────────────────────────────────────── */
-.mm-card-back {
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255, 46, 85, 0.2), transparent 52%),
-    radial-gradient(circle at 82% 84%, rgba(0, 200, 255, 0.2), transparent 52%),
-    linear-gradient(145deg, #151821 0%, #0b0d13 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.13);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  transition: border-color 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
-}
-
-[data-theme='light'] .mm-card-back {
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255, 46, 85, 0.14), transparent 54%),
-    radial-gradient(circle at 82% 84%, rgba(0, 200, 255, 0.16), transparent 54%),
-    linear-gradient(145deg, #1c2230 0%, #10141f 100%);
-  border-color: rgba(15, 23, 42, 0.22);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
-}
-
-.mm-card-btn:not(.flipped):not(.matched):hover .mm-card-back {
-  border-color: rgba(217, 38, 255, 0.65);
-  box-shadow: 0 12px 26px rgba(217, 38, 255, 0.18);
-  transform: translateY(-2px);
-}
-
-.mm-card-back::before {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border-radius: 10px;
-  border: 1px dashed rgba(255, 255, 255, 0.14);
-  pointer-events: none;
-}
-
-.mm-back-logo {
-  width: 44%;
-  max-width: 56px;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.24);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-}
-
-.mm-back-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, #ff5e7e 0%, #e06bff 50%, #5ee0ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ─── Card Front (Revealed Fish Photo) ──────────────────────────────────── */
-.mm-card-front {
-  transform: rotateY(180deg);
-  background: #000000;
-  border: 2px solid var(--ck-border-strong);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
-}
-
-.mm-card-btn.matched .mm-card-front {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.28), 0 10px 22px rgba(34, 197, 94, 0.18);
-  animation: mmMatchPulse 0.45s ease;
-}
-
-@keyframes mmMatchPulse {
-  0% { transform: rotateY(180deg) scale(1); }
-  45% { transform: rotateY(180deg) scale(1.045); }
-  100% { transform: rotateY(180deg) scale(1); }
-}
-
-.mm-fish-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.mm-card-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 18px 6px 6px;
-  background: linear-gradient(to top, rgba(5, 7, 11, 0.92) 35%, rgba(5, 7, 11, 0.4) 72%, transparent);
-  color: #ffffff;
-  font-size: clamp(9.5px, 2.2vw, 11.5px);
-  font-weight: 700;
-  text-align: center;
-  line-height: 1.15;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
-}
-
-.mm-matched-check {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #22c55e;
-  color: #ffffff;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-}
-
-/* ─── Discovered Fish Gallery Strip (Educational) ───────────────────────── */
-.mm-guide-section {
-  margin-top: 26px;
-  background: var(--ck-surface);
-  border: 1px solid var(--ck-border);
-  border-radius: 16px;
-  padding: 16px;
-}
-
-.mm-guide-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.mm-guide-title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ck-text);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mm-guide-count {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--ck-text-muted);
-}
-
-.mm-guide-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-@media (min-width: 680px) {
-  .mm-guide-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.mm-guide-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 11px;
-  border: 1px solid var(--ck-border);
-  background: var(--ck-surface-2);
-  transition: opacity 0.2s ease, border-color 0.2s ease;
-}
-
-.mm-guide-item.locked {
-  opacity: 0.48;
-}
-
-.mm-guide-item.found {
-  border-color: rgba(34, 197, 94, 0.45);
-}
-
-.mm-guide-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: #000000;
-}
-
-.mm-guide-item.locked .mm-guide-thumb {
-  filter: grayscale(100%) brightness(0.45);
-}
-
-.mm-guide-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ck-text);
-  line-height: 1.2;
-}
-
-.mm-guide-cat {
-  font-size: 10.5px;
-  color: var(--ck-text-muted);
-  margin-top: 2px;
 }
 
 /* ─── Victory Modal Overlay ─────────────────────────────────────────────── */

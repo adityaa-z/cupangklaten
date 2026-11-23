@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BETTA_CARDS, GAME_MODES } from './memoryFishData';
-import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from './ArenaShared';
+import { BETTA_CARDS, GAME_MODES } from '../shared/bettaData';
+import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from '../shared/ArenaShared';
+import './memory-match.css';
 
 function shuffleArray(arr) {
   const copy = [...arr];

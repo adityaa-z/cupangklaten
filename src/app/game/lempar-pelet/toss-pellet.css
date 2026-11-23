@@ -1,0 +1,40 @@
+/* ─── GAME 6: LEMPAR PELET KE TOPLES (TOSS & AIM) ───────────────────────── */
+.toss-wrap {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.toss-canvas-shell {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--ck-border-strong);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+  background: #0d1321;
+}
+
+.toss-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.toss-canvas:active {
+  cursor: grabbing;
+}
+
+.toss-hint-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+  white-space: nowrap;
+}

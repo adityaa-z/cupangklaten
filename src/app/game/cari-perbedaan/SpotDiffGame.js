@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from './ArenaShared';
+import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from '../shared/ArenaShared';
+import './spot-diff.css';
 
 /**
  * 3 Level Cari Perbedaan (Spot the Difference)

@@ -4,17 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import MemoryMatchGame from './MemoryMatchGame';
-import QuizGame from './QuizGame';
-import SpotDiffGame from './SpotDiffGame';
-import SlidePuzzleGame from './SlidePuzzleGame';
-import SerokTimingGame from './SerokTimingGame';
-import TossPelletGame from './TossPelletGame';
-import GachaCardGame from './GachaCardGame';
-import CleanTankGame from './CleanTankGame';
+import MemoryMatchGame from './memory-match/MemoryMatchGame';
+import QuizGame from './tebak-jenis/QuizGame';
+import SpotDiffGame from './cari-perbedaan/SpotDiffGame';
+import SlidePuzzleGame from './slide-puzzle/SlidePuzzleGame';
+import SerokTimingGame from './tarik-ulur-serok/SerokTimingGame';
+import TossPelletGame from './lempar-pelet/TossPelletGame';
+import GachaCardGame from './gacha-kartu/GachaCardGame';
+import CleanTankGame from './bersihkan-kaca/CleanTankGame';
 import '@/app/game/soliter.css';
-import './memory-game.css';
-import './arena.css';
+import './shared/arena-base.css';
 
 const ARENA_GAMES = [
   {

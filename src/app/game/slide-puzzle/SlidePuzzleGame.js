@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { BETTA_CARDS } from './memoryFishData';
-import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from './ArenaShared';
+import { BETTA_CARDS } from '../shared/bettaData';
+import { GameHeader, ArenaWinModal, formatTime, playArenaTone } from '../shared/ArenaShared';
+import './slide-puzzle.css';
 
 const SOLVED_BOARD = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const EMPTY_TILE = 8;

@@ -18,7 +18,7 @@ import CheckinModal from './CheckinModal';
 import UpgradeModal from './UpgradeModal';
 import FishCollectionModal from './FishCollectionModal';
 import ShopModal from './ShopModal';
-import './soliter.css';
+import '../soliter.css';
 
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));

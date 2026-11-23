@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { GameHeader, playArenaTone } from './ArenaShared';
+import { GameHeader, playArenaTone } from '../shared/ArenaShared';
+import './gacha-card.css';
 
 /**
  * 12 Kartu Koleksi TCG Ikan Cupang — 4 Tier Kelangkaan
