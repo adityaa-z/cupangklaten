@@ -131,15 +131,15 @@ function CategoryRow({ category, items, loading, onSelect, viewAllHref }) {
                     className="ck-strip-card"
                     onClick={() => onSelect(item)}
                   >
-                    <div className="ck-strip-thumb">
+                    <div className="ck-strip-thumb" style={{ background: '#000000' }}>
                       {item.is_video ? (
-                        <video src={item.img} muted loop autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <video src={item.img} muted loop autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                       ) : (
                         <img
                           src={item.img || '/logo-cansbetta.jpg'}
                           alt={title}
                           loading="lazy"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: isHabis ? 0.72 : 1 }}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', opacity: isHabis ? 0.72 : 1 }}
                         />
                       )}
                       <span style={{
@@ -301,7 +301,7 @@ export default function ProductStrip() {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: '400px',
+              maxWidth: '440px',
               background: 'var(--ck-modal-bg)',
               border: '1px solid var(--ck-border-strong)',
               borderRadius: '14px',
@@ -312,14 +312,14 @@ export default function ProductStrip() {
               overflowY: 'auto',
             }}
           >
-            <div style={{ position: 'relative', width: '100%', height: '240px', background: '#050608' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', maxHeight: '380px', background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {selected.is_video && imgIdx === 0 ? (
-                <video src={modalImages[0]} controls autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <video src={modalImages[0]} controls autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               ) : (
                 <img
                   src={modalImages[imgIdx] || '/logo-cansbetta.jpg'}
                   alt={getTitle(selected)}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
               )}
               <button

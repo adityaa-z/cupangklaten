@@ -170,15 +170,15 @@ export default function PrestasiPage() {
             }}
           >
             <div style={{ position: 'relative' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', background: '#050608' }}>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#050608', overflow: 'hidden' }}>
-                  <img src={selected.fish_img || '/logo-cansbetta.jpg'} alt={`Ikan Juara ${selected.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', background: '#000000' }}>
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
+                  <img src={selected.fish_img || '/logo-cansbetta.jpg'} alt={`Ikan Juara ${selected.title}`} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
                   <span style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(9,10,13,0.82)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px' }}>
                     Foto Ikan Juara
                   </span>
                 </div>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#050608', overflow: 'hidden' }}>
-                  <img src={selected.trophy_img || '/galeri-cupang-klaten.jpg'} alt={`Piala ${selected.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
+                  <img src={selected.trophy_img || '/galeri-cupang-klaten.jpg'} alt={`Piala ${selected.title}`} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
                   <span style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(9,10,13,0.82)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px' }}>
                     Foto Piala
                   </span>

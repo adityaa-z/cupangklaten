@@ -150,12 +150,12 @@ export default function AchievementStrip() {
             }}
           >
             <div style={{ position: 'relative' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', background: '#050608' }}>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#050608', overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', background: '#000000' }}>
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
                   <img
                     src={selected.fish_img || '/logo-cansbetta.jpg'}
                     alt={`Ikan Juara ${selected.title}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                   />
                   <span style={{
                     position: 'absolute', bottom: '8px', left: '8px',
@@ -165,11 +165,11 @@ export default function AchievementStrip() {
                     Foto Ikan Juara
                   </span>
                 </div>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#050608', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
                   <img
                     src={selected.trophy_img || '/galeri-cupang-klaten.jpg'}
                     alt={`Piala ${selected.title}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                   />
                   <span style={{
                     position: 'absolute', bottom: '8px', left: '8px',
