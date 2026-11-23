@@ -9,7 +9,7 @@ const Footer = () => {
                 <div className="ck-footer-grid">
                     {/* Brand Info */}
                     <div>
-                        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '12px' }}>
+                        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
                             <img
                                 src="/logo-cansbetta.jpg"
                                 alt="cans.betta x cupangklaten"
@@ -22,9 +22,6 @@ const Footer = () => {
                                 cans.betta x cupangklaten
                             </span>
                         </Link>
-                        <p style={{ color: 'var(--ck-text-2)', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
-                            Galeri ikan cupang hias Kelas Kompetisi di Klaten sejak Desember 2022. Informasi stok, kisaran harga mulai Rp 50rb, dan simulasi edukatif Soliter Virtual.
-                        </p>
                     </div>
 
                     {/* WhatsApp & Lokasi Google Maps */}
@@ -38,7 +35,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fab fa-whatsapp" style={{ color: '#22c55e' }} />
-                                <span>WhatsApp: 08992020444</span>
+                                <span>08992020444</span>
                             </a>
                             <a
                                 href="https://maps.app.goo.gl/TscpLknP1zpLHmod7"
@@ -47,7 +44,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fas fa-map-marker-alt" style={{ color: '#ef4444' }} />
-                                <span>Cupang Klaten - Ikan Cupang Depo (Google Maps)</span>
+                                <span>Cupang Klaten - Ikan Cupang Depo</span>
                             </a>
                         </div>
                     </div>
@@ -63,7 +60,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fab fa-instagram" />
-                                <span>Instagram: @cans.betta</span>
+                                <span>@cans.betta</span>
                             </a>
                             <a
                                 href="https://www.instagram.com/cupangklaten"
@@ -72,7 +69,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fab fa-instagram" />
-                                <span>Instagram: @cupangklaten</span>
+                                <span>@cupangklaten</span>
                             </a>
                             <a
                                 href="https://www.tiktok.com/@cans.betta"
@@ -81,7 +78,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fab fa-tiktok" />
-                                <span>TikTok: @cans.betta</span>
+                                <span>@cans.betta</span>
                             </a>
                             <a
                                 href="https://www.tiktok.com/@cupangklaten"
@@ -90,7 +87,7 @@ const Footer = () => {
                                 className="ck-footer-link"
                             >
                                 <i className="fab fa-tiktok" />
-                                <span>TikTok: @cupangklaten</span>
+                                <span>@cupangklaten</span>
                             </a>
                         </div>
                     </div>
