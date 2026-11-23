@@ -5,7 +5,6 @@ import Navbar from '@/components/Navbar';
 import StudioHero from '@/components/StudioHero';
 import AchievementStrip from '@/components/AchievementStrip';
 import ProductStrip from '@/components/ProductStrip';
-import SoliterGame from '@/app/game/SoliterGame';
 import Footer from '@/components/Footer';
 
 export const dynamic = 'force-dynamic';
@@ -21,13 +20,8 @@ export default function Home() {
       {/* PRESTASI KONTES: Foto Ikan Juara + Foto Piala (Di Atas Etalase) */}
       <AchievementStrip />
 
-      {/* ZONA ATAS: Strip Etalase Produk 1 Baris Horizontal Scroll */}
+      {/* ETALASE KELAS: Grade A, Grade B, Grade C, Kolektor, Uniq Form, Uniq Color */}
       <ProductStrip />
-
-      {/* ZONA BAWAH: Arena Game Soliter Virtual */}
-      <div id="soliter-virtual">
-        <SoliterGame embedded />
-      </div>
 
       {/* Bagian Paling Bawah: WhatsApp, Instagram (2), TikTok (2), & Google Maps */}
       <Footer />

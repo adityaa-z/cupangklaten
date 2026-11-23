@@ -1883,27 +1883,25 @@ export default function AdminPage() {
                                             <input type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} placeholder="Contoh: PK-001" required />
                                         </div>
                                         <div className="form-group">
-                                            <label>Kategori</label>
+                                            <label>Kelas / Kategori</label>
                                             <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required>
-                                                <option value="">Pilih...</option>
-                                                <option value="Plakat">Plakat</option>
-                                                <option value="Halfmoon">Halfmoon</option>
-                                                <option value="HMPK">HMPK</option>
-                                                <option value="Double Tail">Double Tail</option>
-                                                <option value="Crowntail">Crowntail</option>
-                                                <option value="Giant">Giant</option>
-                                                <option value="Dumbo Ear">Dumbo Ear</option>
-                                                <option value="Veiltail">Veiltail</option>
-                                                <option value="Rosetail">Rosetail</option>
-                                                <option value="Wild Betta">Wild Betta</option>
-                                                <option value="Kebutuhan Ikan">Kebutuhan Ikan</option>
+                                                <option value="">Pilih Kelas...</option>
+                                                <option value="Grade A">Grade A</option>
+                                                <option value="Grade B">Grade B</option>
+                                                <option value="Grade C">Grade C</option>
+                                                <option value="Kolektor">Kolektor</option>
+                                                <option value="Uniq Form">Uniq Form</option>
+                                                <option value="Uniq Color">Uniq Color</option>
+                                                {formData.category && !['Grade A', 'Grade B', 'Grade C', 'Kolektor', 'Uniq Form', 'Uniq Color'].includes(formData.category) && (
+                                                    <option value={formData.category}>{formData.category} (Kategori Lama)</option>
+                                                )}
                                             </select>
                                         </div>
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Varian (Warna/Jenis)</label>
-                                            <input type="text" value={formData.variant} onChange={e => setFormData({ ...formData, variant: e.target.value })} placeholder="Contoh: Nemo, Galaxy" />
+                                            <label>Nama / Jenis & Warna Ikan</label>
+                                            <input type="text" value={formData.variant} onChange={e => setFormData({ ...formData, variant: e.target.value })} placeholder="Contoh: Plakat Multicolour, Halfmoon Red" />
                                         </div>
                                         <div className="form-group">
                                             <label>Gender</label>

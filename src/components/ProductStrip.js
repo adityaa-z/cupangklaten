@@ -4,6 +4,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '@/app/game/soliter.css';
 
+export const ETALASE_CATEGORIES = [
+  { id: 'Grade A',    label: 'Grade A',    icon: 'fa-award',   subtitle: 'Kualitas pilihan kelas kompetisi' },
+  { id: 'Grade B',    label: 'Grade B',    icon: 'fa-star',    subtitle: 'Form rapi & warna seimbang' },
+  { id: 'Grade C',    label: 'Grade C',    icon: 'fa-fish',    subtitle: 'Pilihan sehat & terjangkau' },
+  { id: 'Kolektor',   label: 'Kolektor',   icon: 'fa-gem',     subtitle: 'Line eksklusif & simpanan' },
+  { id: 'Uniq Form',  label: 'Uniq Form',  icon: 'fa-shapes',  subtitle: 'Bentuk sirip & tubuh unik' },
+  { id: 'Uniq Color', label: 'Uniq Color', icon: 'fa-palette', subtitle: 'Corak & perpecahan warna langka' },
+];
+
 function formatShortRupiah(num) {
   const n = Number(num) || 0;
   if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(1).replace(/\.0$/, '')}jt`;
@@ -37,44 +46,14 @@ function formatPriceRangeFull(minPrice, maxPrice) {
   return formatFullRupiah(min);
 }
 
-export default function ProductStrip() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
-  const [imgIdx, setImgIdx] = useState(0);
+function getTitle(p) {
+  if (p.variant && p.variant.trim() !== '') return p.variant;
+  return p.category || 'Koleksi Cupang';
+}
+
+/* ─── Single Category Horizontal Row ──────────────────────────────────────── */
+function CategoryRow({ category, items, loading, onSelect, viewAllHref }) {
   const scrollRef = useRef(null);
-
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        const res = await fetch('/api/products/');
-        if (!res.ok) throw new Error('Failed');
-        const data = await res.json();
-        if (!active) return;
-
-        const sorted = [...(data || [])].sort((a, b) => {
-          const aReady = a.is_available && a.stock > 0 ? 1 : 0;
-          const bReady = b.is_available && b.stock > 0 ? 1 : 0;
-          if (bReady !== aReady) return bReady - aReady;
-          return (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0);
-        });
-        setProducts(sorted.slice(0, 24));
-      } catch (err) {
-        console.error('ProductStrip fetch error:', err);
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    load();
-    return () => { active = false; };
-  }, []);
-
-  useEffect(() => {
-    if (selected) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [selected]);
 
   function scrollByAmount(dir) {
     if (!scrollRef.current) return;
@@ -82,49 +61,68 @@ export default function ProductStrip() {
     scrollRef.current.scrollBy({ left: dir * step, behavior: 'smooth' });
   }
 
-  function getTitle(p) {
-    const isKebutuhan = p.category?.toLowerCase() === 'kebutuhan ikan';
-    const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
-    const isFishBreed = fishBreeds.includes(p.category?.toLowerCase());
-    if (isKebutuhan || isFishBreed) return p.variant || p.category || 'Koleksi Cupang';
-    return p.variant ? `${p.category} - ${p.variant}` : p.category || 'Koleksi Cupang';
-  }
-
-  const modalImages = selected
-    ? [selected.img, selected.img2, selected.img3, selected.img4].filter((x) => x && x.trim() !== '')
-    : [];
-
   return (
-    <section aria-label="Etalase Koleksi Cupang Klaten" className="ck-strip-section">
+    <section aria-label={`Etalase ${category.label}`} className="ck-strip-section">
       <div className="ck-strip-inner">
         <div className="ck-strip-header">
-          <div className="ck-strip-title">
-            <i className="fas fa-layer-group" style={{ fontSize: '11px', color: 'var(--ck-accent)' }} />
-            <span>Etalase Stok & Kisaran Harga</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div className="ck-strip-title">
+              <i className={`fas ${category.icon}`} style={{ fontSize: '11.5px', color: 'var(--ck-accent)' }} />
+              <span>Etalase {category.label}</span>
+              {!loading && items.length > 0 && (
+                <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--ck-text-muted)', textTransform: 'none', letterSpacing: 0 }}>
+                  ({items.length})
+                </span>
+              )}
+            </div>
+            {category.subtitle && (
+              <span style={{ fontSize: '11px', color: 'var(--ck-text-muted)' }}>{category.subtitle}</span>
+            )}
           </div>
-          <Link href="/stok" className="ck-strip-link">
+          <Link href={viewAllHref} className="ck-strip-link">
             <span>Lihat Semua</span>
             <i className="fas fa-arrow-right" style={{ fontSize: '10px' }} />
           </Link>
         </div>
 
         <div className="ck-strip-track-wrap">
-          <button type="button" className="ck-strip-arrow left" onClick={() => scrollByAmount(-1)} aria-label="Geser kiri">
-            <i className="fas fa-chevron-left" style={{ fontSize: '11px' }} />
-          </button>
+          {items.length > 2 && (
+            <button type="button" className="ck-strip-arrow left" onClick={() => scrollByAmount(-1)} aria-label="Geser kiri">
+              <i className="fas fa-chevron-left" style={{ fontSize: '11px' }} />
+            </button>
+          )}
 
           <div ref={scrollRef} className="ck-strip-scroll">
             {loading ? (
-              [...Array(7)].map((_, i) => <div key={i} className="ck-strip-skeleton" />)
-            ) : products.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--ck-text-muted)', padding: '12px 4px' }}>
-                Koleksi stok sedang diperbarui.{' '}
-                <a href="https://wa.me/628992020444" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ck-accent)', fontWeight: 700 }}>
-                  Hubungi via WhatsApp
+              [...Array(5)].map((_, i) => <div key={i} className="ck-strip-skeleton" />)
+            ) : items.length === 0 ? (
+              <div style={{
+                width: '100%',
+                background: 'var(--ck-surface)',
+                border: '1px dashed var(--ck-border-strong)',
+                borderRadius: '10px',
+                padding: '13px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}>
+                <span style={{ fontSize: '12.5px', color: 'var(--ck-text-muted)' }}>
+                  Stok kelas <strong style={{ color: 'var(--ck-text)' }}>{category.label}</strong> sedang disiapkan.
+                </span>
+                <a
+                  href={`https://wa.me/628992020444?text=${encodeURIComponent(`Halo Admin cans.betta x cupangklaten, apakah ada stok ikan kelas ${category.label}?`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ck-text)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                >
+                  <i className="fab fa-whatsapp" style={{ color: '#22c55e' }} />
+                  <span>Tanya Stok WA</span>
                 </a>
               </div>
             ) : (
-              products.map((item) => {
+              items.map((item) => {
                 const isHabis = !item.is_available || item.stock <= 0;
                 const title = getTitle(item);
                 return (
@@ -132,7 +130,7 @@ export default function ProductStrip() {
                     key={item.id}
                     type="button"
                     className="ck-strip-card"
-                    onClick={() => { setSelected(item); setImgIdx(0); }}
+                    onClick={() => onSelect(item)}
                   >
                     <div className="ck-strip-thumb">
                       {item.is_video ? (
@@ -192,11 +190,94 @@ export default function ProductStrip() {
             )}
           </div>
 
-          <button type="button" className="ck-strip-arrow right" onClick={() => scrollByAmount(1)} aria-label="Geser kanan">
-            <i className="fas fa-chevron-right" style={{ fontSize: '11px' }} />
-          </button>
+          {items.length > 2 && (
+            <button type="button" className="ck-strip-arrow right" onClick={() => scrollByAmount(1)} aria-label="Geser kanan">
+              <i className="fas fa-chevron-right" style={{ fontSize: '11px' }} />
+            </button>
+          )}
         </div>
       </div>
+    </section>
+  );
+}
+
+export default function ProductStrip() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null);
+  const [imgIdx, setImgIdx] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      try {
+        const res = await fetch('/api/products/');
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        if (!active) return;
+
+        const sorted = [...(data || [])].sort((a, b) => {
+          const aReady = a.is_available && a.stock > 0 ? 1 : 0;
+          const bReady = b.is_available && b.stock > 0 ? 1 : 0;
+          if (bReady !== aReady) return bReady - aReady;
+          return (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0);
+        });
+        setProducts(sorted);
+      } catch (err) {
+        console.error('ProductStrip fetch error:', err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (selected) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [selected]);
+
+  const knownLower = ETALASE_CATEGORIES.map((c) => c.id.toLowerCase());
+  const legacyItems = products.filter((p) => {
+    const cat = (p.category || '').toLowerCase().trim();
+    const isSupply = cat.includes('kebutuhan') || cat.includes('pakan') || cat.includes('obat') || cat.includes('alat') || cat.includes('aksesoris');
+    return !isSupply && !knownLower.includes(cat);
+  });
+
+  const modalImages = selected
+    ? [selected.img, selected.img2, selected.img3, selected.img4].filter((x) => x && x.trim() !== '')
+    : [];
+
+  return (
+    <div>
+      {ETALASE_CATEGORIES.map((cat) => {
+        const catItems = products.filter(
+          (p) => (p.category || '').toLowerCase().trim() === cat.id.toLowerCase()
+        );
+        return (
+          <CategoryRow
+            key={cat.id}
+            category={cat}
+            items={catItems}
+            loading={loading}
+            viewAllHref={`/stok?category=${encodeURIComponent(cat.id)}`}
+            onSelect={(item) => { setSelected(item); setImgIdx(0); }}
+          />
+        );
+      })}
+
+      {/* Tampilkan ikan lama yang belum dipindah kategorinya agar tidak hilang dari halaman utama */}
+      {!loading && legacyItems.length > 0 && (
+        <CategoryRow
+          category={{ id: 'lainnya', label: 'Koleksi Lainnya', icon: 'fa-layer-group', subtitle: 'Koleksi ikan cupang lainnya' }}
+          items={legacyItems}
+          loading={false}
+          viewAllHref="/stok"
+          onSelect={(item) => { setSelected(item); setImgIdx(0); }}
+        />
+      )}
 
       {/* Info Detail Modal */}
       {selected && (
@@ -275,7 +356,7 @@ export default function ProductStrip() {
 
             <div style={{ padding: '16px' }}>
               <div style={{ fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ck-text-muted)', marginBottom: '3px' }}>
-                {selected.category}
+                Kelas · {selected.category}
               </div>
               <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: 700, color: 'var(--ck-text)' }}>
                 {getTitle(selected)}
@@ -309,7 +390,7 @@ export default function ProductStrip() {
 
               <a
                 href={`https://wa.me/628992020444?text=${encodeURIComponent(
-                  `Halo Admin cans.betta cupangklaten, saya ingin menanyakan info mengenai ${getTitle(selected)} (Kode: ${selected.code || '-'}).`
+                  `Halo Admin cans.betta x cupangklaten, saya ingin menanyakan info mengenai ${getTitle(selected)} (${selected.category} · Kode: ${selected.code || '-'}).`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -335,6 +416,6 @@ export default function ProductStrip() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }

@@ -13,12 +13,12 @@ const ProductCard = ({ product }) => {
     const cardClass = isStokHabis ? 'product-card sold-out' : 'product-card';
     
     const isKebutuhanIkan = product.category?.toLowerCase() === 'kebutuhan ikan';
-    const fishBreeds = ['plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
-    const isFishBreed = fishBreeds.includes(product.category?.toLowerCase());
+    const knownCategories = ['grade a', 'grade b', 'grade c', 'kolektor', 'uniq form', 'uniq color', 'plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
+    const isKnownCat = knownCategories.includes(product.category?.toLowerCase());
     
     const variantDisplay = product.variant ? ` - ${product.variant}` : '';
-    const titleDisplay = (isKebutuhanIkan || isFishBreed)
-        ? (product.variant || 'Koleksi Terbaik') 
+    const titleDisplay = (isKebutuhanIkan || isKnownCat)
+        ? (product.variant || product.category || 'Koleksi Terbaik') 
         : `${product.category}${variantDisplay}`;
 
     const formatRupiah = (number) => {

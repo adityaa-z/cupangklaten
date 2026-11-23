@@ -103,13 +103,23 @@ const StokContent = () => {
                         </h2>
                     </div>
                     <div className="filter-tabs">
-                        {['all', ...Array.from(new Set(products.map(p => p.category?.toLowerCase()).filter(Boolean)))].map(cat => (
+                        {[
+                            'all',
+                            'Grade A',
+                            'Grade B',
+                            'Grade C',
+                            'Kolektor',
+                            'Uniq Form',
+                            'Uniq Color',
+                            ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))
+                                .filter(c => !['grade a', 'grade b', 'grade c', 'kolektor', 'uniq form', 'uniq color'].includes(c.toLowerCase()))
+                        ].map(cat => (
                             <button 
                                 key={cat}
-                                className={`filter-btn ${currentCategory === cat ? 'active' : ''}`}
+                                className={`filter-btn ${currentCategory.toLowerCase() === cat.toLowerCase() ? 'active' : ''}`}
                                 onClick={() => setCurrentCategory(cat)}
                             >
-                                {cat === 'all' ? 'Semua' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                                {cat === 'all' ? 'Semua' : cat}
                             </button>
                         ))}
                     </div>
