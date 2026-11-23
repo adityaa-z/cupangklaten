@@ -106,7 +106,7 @@ const Footer = () => {
                             </Link>
                             <Link href="/game" className="ck-footer-link">
                                 <i className="fas fa-gamepad" />
-                                <span>Soliter Virtual</span>
+                                <span>Memory Match Game</span>
                             </Link>
                             <Link href="/tips-perawatan" className="ck-footer-link">
                                 <i className="fas fa-book-open" />

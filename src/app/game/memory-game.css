@@ -1,0 +1,767 @@
+/* ==========================================================================
+   MEMORY MATCH GAME — cans.betta x cupangklaten
+   3D Card Flip, Studio Dark & Light Theme Adaptive
+   ========================================================================== */
+
+.mm-page {
+  min-height: 100vh;
+  background: var(--ck-bg);
+  color: var(--ck-text);
+  display: flex;
+  flex-direction: column;
+}
+
+.mm-main {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 16px 52px;
+}
+
+/* ─── Hero / Title Bar ──────────────────────────────────────────────────── */
+.mm-hero {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.mm-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ck-text-muted);
+  margin-bottom: 6px;
+}
+
+.mm-title {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 4vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ck-text);
+  line-height: 1.15;
+}
+
+.mm-subtitle {
+  margin: 0 auto;
+  max-width: 560px;
+  font-size: 13px;
+  color: var(--ck-text-2);
+  line-height: 1.55;
+}
+
+/* ─── Control & HUD Header Panel ────────────────────────────────────────── */
+.mm-hud-panel {
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  box-shadow: var(--ck-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mm-hud-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mm-mode-switch {
+  display: inline-flex;
+  background: var(--ck-surface-2);
+  border: 1px solid var(--ck-border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.mm-mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--ck-text-2);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.mm-mode-btn:hover {
+  color: var(--ck-text);
+}
+
+.mm-mode-btn.active {
+  background: var(--ck-text);
+  color: var(--ck-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.mm-mode-badge {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.78;
+}
+
+.mm-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-icon-btn {
+  height: 34px;
+  padding: 0 11px;
+  border-radius: 9px;
+  border: 1px solid var(--ck-border-strong);
+  background: var(--ck-surface-2);
+  color: var(--ck-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.14s ease, background 0.16s ease, border-color 0.16s ease;
+}
+
+.mm-icon-btn:hover {
+  background: var(--ck-surface-3);
+  border-color: var(--ck-text-muted);
+}
+
+.mm-icon-btn:active {
+  transform: scale(0.96);
+}
+
+.mm-restart-btn {
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.mm-restart-btn:hover {
+  filter: brightness(1.08);
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+}
+
+/* ─── Stats Bar ─────────────────────────────────────────────────────────── */
+.mm-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.mm-stat-card {
+  background: var(--ck-surface-2);
+  border: 1px solid var(--ck-border);
+  border-radius: 11px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+
+.mm-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ck-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.mm-stat-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ck-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Edukasi Match Banner (Above Board) ────────────────────────────────── */
+.mm-banner-slot {
+  min-height: 54px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mm-edu-banner {
+  width: 100%;
+  border-radius: 13px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--ck-border);
+  background: var(--ck-surface);
+  transition: all 0.22s ease;
+}
+
+.mm-edu-banner.matched {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(16, 185, 129, 0.06));
+  animation: mmBannerPop 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mm-edu-banner.mismatch {
+  border-color: rgba(244, 63, 94, 0.42);
+  background: rgba(244, 63, 94, 0.08);
+}
+
+.mm-edu-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  flex-shrink: 0;
+  background: #000000;
+}
+
+.mm-edu-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ck-surface-2);
+  color: var(--ck-text-2);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.mm-edu-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.mm-edu-headline {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ck-text);
+  line-height: 1.25;
+}
+
+.mm-edu-banner.matched .mm-edu-headline {
+  color: #22c55e;
+}
+
+[data-theme='light'] .mm-edu-banner.matched .mm-edu-headline {
+  color: #15803d;
+}
+
+.mm-edu-fact {
+  font-size: 11.5px;
+  color: var(--ck-text-2);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+@keyframes mmBannerPop {
+  0% { transform: scale(0.97); opacity: 0.65; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Card Board Grid ───────────────────────────────────────────────────── */
+.mm-board {
+  display: grid;
+  gap: 10px;
+  margin: 0 auto;
+  width: 100%;
+  perspective: 1100px;
+}
+
+.mm-board.mode-quick {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 540px;
+}
+
+.mm-board.mode-standard {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 680px;
+}
+
+@media (min-width: 680px) {
+  .mm-board {
+    gap: 14px;
+  }
+  .mm-board.mode-quick {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 680px;
+  }
+}
+
+/* ─── Individual 3D Flip Card ───────────────────────────────────────────── */
+.mm-card-btn {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  perspective: 1000px;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.mm-card-btn:disabled {
+  cursor: default;
+}
+
+.mm-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 14px;
+}
+
+.mm-card-btn.flipped .mm-card-inner,
+.mm-card-btn.matched .mm-card-inner {
+  transform: rotateY(180deg);
+}
+
+.mm-card-btn.mismatch .mm-card-front {
+  border-color: #f43f5e;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.35), 0 10px 22px rgba(244, 63, 94, 0.2);
+}
+
+.mm-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* ─── Card Back (Closed State) ──────────────────────────────────────────── */
+.mm-card-back {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 46, 85, 0.2), transparent 52%),
+    radial-gradient(circle at 82% 84%, rgba(0, 200, 255, 0.2), transparent 52%),
+    linear-gradient(145deg, #151821 0%, #0b0d13 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
+}
+
+[data-theme='light'] .mm-card-back {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 46, 85, 0.14), transparent 54%),
+    radial-gradient(circle at 82% 84%, rgba(0, 200, 255, 0.16), transparent 54%),
+    linear-gradient(145deg, #1c2230 0%, #10141f 100%);
+  border-color: rgba(15, 23, 42, 0.22);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+}
+
+.mm-card-btn:not(.flipped):not(.matched):hover .mm-card-back {
+  border-color: rgba(217, 38, 255, 0.65);
+  box-shadow: 0 12px 26px rgba(217, 38, 255, 0.18);
+  transform: translateY(-2px);
+}
+
+.mm-card-back::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+
+.mm-back-logo {
+  width: 44%;
+  max-width: 56px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.mm-back-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #ff5e7e 0%, #e06bff 50%, #5ee0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ─── Card Front (Revealed Fish Photo) ──────────────────────────────────── */
+.mm-card-front {
+  transform: rotateY(180deg);
+  background: #000000;
+  border: 2px solid var(--ck-border-strong);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.mm-card-btn.matched .mm-card-front {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.28), 0 10px 22px rgba(34, 197, 94, 0.18);
+  animation: mmMatchPulse 0.45s ease;
+}
+
+@keyframes mmMatchPulse {
+  0% { transform: rotateY(180deg) scale(1); }
+  45% { transform: rotateY(180deg) scale(1.045); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+
+.mm-fish-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mm-card-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 6px 6px;
+  background: linear-gradient(to top, rgba(5, 7, 11, 0.92) 35%, rgba(5, 7, 11, 0.4) 72%, transparent);
+  color: #ffffff;
+  font-size: clamp(9.5px, 2.2vw, 11.5px);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+
+.mm-matched-check {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #ffffff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ─── Discovered Fish Gallery Strip (Educational) ───────────────────────── */
+.mm-guide-section {
+  margin-top: 26px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.mm-guide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mm-guide-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ck-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-guide-count {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ck-text-muted);
+}
+
+.mm-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 680px) {
+  .mm-guide-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.mm-guide-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 11px;
+  border: 1px solid var(--ck-border);
+  background: var(--ck-surface-2);
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.mm-guide-item.locked {
+  opacity: 0.48;
+}
+
+.mm-guide-item.found {
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.mm-guide-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #000000;
+}
+
+.mm-guide-item.locked .mm-guide-thumb {
+  filter: grayscale(100%) brightness(0.45);
+}
+
+.mm-guide-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ck-text);
+  line-height: 1.2;
+}
+
+.mm-guide-cat {
+  font-size: 10.5px;
+  color: var(--ck-text-muted);
+  margin-top: 2px;
+}
+
+/* ─── Victory Modal Overlay ─────────────────────────────────────────────── */
+.mm-win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(5, 7, 12, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: mmFadeIn 0.24s ease;
+}
+
+@keyframes mmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mm-win-modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--ck-modal-bg);
+  border: 1px solid var(--ck-border-strong);
+  border-radius: 18px;
+  padding: 24px 20px 20px;
+  text-align: center;
+  color: var(--ck-text);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+  animation: mmModalPop 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+@keyframes mmModalPop {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.mm-win-trophy {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 46, 85, 0.16), rgba(0, 200, 255, 0.16));
+  border: 1px solid var(--ck-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: var(--ck-text);
+}
+
+.mm-win-stars {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.mm-win-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ck-text);
+}
+
+.mm-win-sub {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--ck-text-2);
+  line-height: 1.5;
+}
+
+.mm-win-record-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  color: #22c55e;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+[data-theme='light'] .mm-win-record-pill {
+  color: #15803d;
+}
+
+.mm-win-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.mm-win-stat {
+  background: var(--ck-surface-2);
+  border: 1px solid var(--ck-border);
+  border-radius: 11px;
+  padding: 10px 6px;
+}
+
+.mm-win-stat-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ck-text-muted);
+  margin-bottom: 2px;
+}
+
+.mm-win-stat-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ck-text);
+}
+
+.mm-win-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mm-cta-btn {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: filter 0.15s ease, transform 0.14s ease, background 0.15s ease;
+}
+
+.mm-cta-btn:active {
+  transform: scale(0.98);
+}
+
+.mm-cta-primary {
+  background: linear-gradient(90deg, #ff2e55 0%, #d926ff 52%, #00c8ff 100%);
+  color: #ffffff;
+}
+
+.mm-cta-primary:hover {
+  filter: brightness(1.08);
+}
+
+.mm-cta-secondary {
+  background: var(--ck-surface-2);
+  border: 1px solid var(--ck-border-strong);
+  color: var(--ck-text);
+}
+
+.mm-cta-secondary:hover {
+  background: var(--ck-surface-3);
+}
+
+.mm-cta-wa {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.mm-cta-wa:hover {
+  filter: brightness(1.08);
+}
+
+.mm-cta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .mm-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .mm-hud-top {
+    justify-content: center;
+  }
+  .mm-back-label {
+    display: none;
+  }
+  .mm-back-logo {
+    width: 52%;
+  }
+}
