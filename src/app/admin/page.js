@@ -58,6 +58,7 @@ export default function AdminPage() {
     const [authLoading, setAuthLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Produk');
     const [products, setProducts] = useState([]);
+    const [achievements, setAchievements] = useState([]);
     const [faqs, setFaqs] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [members, setMembers] = useState([]);
@@ -123,8 +124,9 @@ export default function AdminPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [pRes, fRes, rRes, mRes, aRes, artRes] = await Promise.all([
+            const [pRes, achRes, fRes, rRes, mRes, aRes, artRes] = await Promise.all([
                 fetch('/api/admin/products/'),
+                fetch('/api/admin/achievements/'),
                 fetch('/api/admin/faq/'),
                 fetch('/api/admin/reviews/'),
                 fetch('/api/admin/members/'),
@@ -133,6 +135,7 @@ export default function AdminPage() {
             ]);
 
             if (pRes.ok) setProducts(await pRes.json());
+            if (achRes && achRes.ok) setAchievements(await achRes.json());
             if (fRes.ok) setFaqs(await fRes.json());
             if (rRes.ok) setReviews(await rRes.json());
             if (mRes.ok) setMembers(await mRes.json());
@@ -444,6 +447,12 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
             });
+        } else if (modalType === 'achievement') {
+            res = await fetch('/api/admin/achievements/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+            });
         }
 
         if (res && res.status === 401) return handleLogout();
@@ -453,13 +462,30 @@ export default function AdminPage() {
             fetchData();
             setToast({ 
                 show: true, 
-                message: modalType === 'product' ? 'Produk berhasil disimpan!' : modalType === 'faq' ? 'FAQ berhasil disimpan!' : modalType === 'article' ? 'Artikel berhasil disimpan!' : 'Data berhasil disimpan!', 
+                message: modalType === 'product' ? 'Produk berhasil disimpan!' : modalType === 'achievement' ? 'Prestasi berhasil disimpan!' : modalType === 'faq' ? 'FAQ berhasil disimpan!' : modalType === 'article' ? 'Artikel berhasil disimpan!' : 'Data berhasil disimpan!', 
                 type: 'success' 
             });
             setTimeout(() => setToast({ ...toast, show: false }), 3000);
         } else {
             alert('Gagal menyimpan data!');
         }
+    };
+
+    const toggleAchievementPin = async (item) => {
+        const res = await fetch('/api/admin/achievements/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: item.id, is_pinned: !item.is_pinned })
+        });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
+    };
+
+    const deleteAchievement = async (id) => {
+        if (!confirm('Hapus data prestasi ini?')) return;
+        const res = await fetch(`/api/admin/achievements/?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
     };
 
     const deleteFaq = async (id) => {
@@ -533,9 +559,9 @@ export default function AdminPage() {
                     CK Admin
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
+                    {['Produk', 'Prestasi', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Prestasi' ? 'trophy' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
                             {tab}
                         </div>
                     ))}
@@ -628,6 +654,106 @@ export default function AdminPage() {
                                                 <td className="action-btns" data-label="Aksi">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData({ ...p, price_max: p.price_max || '' }); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'Prestasi' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls">
+                                <button
+                                    className="btn btn-primary"
+                                    style={{ width: 'auto' }}
+                                    onClick={() => {
+                                        setEditingItem(null);
+                                        setFormData({
+                                            title: '',
+                                            rank_label: 'Juara 1',
+                                            event_name: '',
+                                            event_date: '',
+                                            fish_img: '',
+                                            trophy_img: '',
+                                            description: '',
+                                            is_pinned: false
+                                        });
+                                        setModalType('achievement');
+                                        setIsModalOpen(true);
+                                    }}
+                                >
+                                    <i className="fas fa-trophy"></i> Tambah Prestasi
+                                </button>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Pin</th>
+                                            <th>Foto Ikan & Piala</th>
+                                            <th>Nama Ikan</th>
+                                            <th>Juara</th>
+                                            <th>Kontes & Tanggal</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {achievements.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                                                    Belum ada data prestasi kontes. Klik &quot;Tambah Prestasi&quot; untuk memposting ikan juara & foto pialanya.
+                                                </td>
+                                            </tr>
+                                        ) : achievements.map(item => (
+                                            <tr key={item.id}>
+                                                <td data-label="Pin" style={{ textAlign: 'center' }}>
+                                                    <button
+                                                        className={`btn-icon ${item.is_pinned ? 'pinned' : ''}`}
+                                                        onClick={() => toggleAchievementPin(item)}
+                                                        title={item.is_pinned ? 'Unpin' : 'Pin di paling depan'}
+                                                        style={{ color: item.is_pinned ? '#f59e0b' : '#cbd5e1', fontSize: '1.2rem' }}
+                                                    >
+                                                        <i className="fas fa-star"></i>
+                                                    </button>
+                                                </td>
+                                                <td data-label="Foto Ikan & Piala">
+                                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                                        <img
+                                                            src={item.fish_img || '/logo-cansbetta.jpg'}
+                                                            alt="Ikan"
+                                                            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                                        />
+                                                        <img
+                                                            src={item.trophy_img || '/galeri-cupang-klaten.jpg'}
+                                                            alt="Piala"
+                                                            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                                        />
+                                                    </div>
+                                                </td>
+                                                <td data-label="Nama Ikan" style={{ fontWeight: 700 }}>{item.title}</td>
+                                                <td data-label="Juara">{item.rank_label}</td>
+                                                <td data-label="Kontes & Tanggal">
+                                                    <div>{item.event_name || '-'}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.event_date || ''}</div>
+                                                </td>
+                                                <td className="action-btns" data-label="Aksi">
+                                                    <button
+                                                        className="btn-icon"
+                                                        onClick={() => {
+                                                            setEditingItem(item);
+                                                            setFormData(item);
+                                                            setModalType('achievement');
+                                                            setIsModalOpen(true);
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-edit"></i>
+                                                    </button>
+                                                    <button className="btn-icon delete" onClick={() => deleteAchievement(item.id)}>
+                                                        <i className="fas fa-trash"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -1392,13 +1518,117 @@ export default function AdminPage() {
 
             {isModalOpen && (
                 <div className="modal-overlay">
-                    <div className="modal-container" style={{ maxWidth: modalType === 'product' || modalType === 'auction' || modalType === 'article' ? '900px' : '600px' }}>
+                    <div className="modal-container" style={{ maxWidth: modalType === 'product' || modalType === 'auction' || modalType === 'article' || modalType === 'achievement' ? '900px' : '600px' }}>
                         <div className="modal-header">
-                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : modalType === 'article' ? 'Artikel' : 'Ulasan'}</h3>
+                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'achievement' ? 'Prestasi Kontes' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : modalType === 'article' ? 'Artikel' : 'Ulasan'}</h3>
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            {modalType === 'article' ? (
+                            {modalType === 'achievement' ? (
+                                <form onSubmit={saveProduct}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+                                        {[
+                                            { label: 'Foto Ikan Juara (Kiri)', field: 'fish_img' },
+                                            { label: 'Foto Piala (Kanan / Sampingnya)', field: 'trophy_img' }
+                                        ].map((slot) => (
+                                            <div key={slot.field} className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: 0 }}>
+                                                <label style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: '700' }}>{slot.label}</label>
+                                                <div style={{ width: '100%', aspectRatio: '4 / 3', background: '#fff', borderRadius: '8px', overflow: 'hidden', margin: '0.5rem 0', border: '2px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                                    {uploadingField === slot.field ? (
+                                                        <div className="spinner"></div>
+                                                    ) : formData[slot.field] ? (
+                                                        <>
+                                                            <img src={formData[slot.field]} alt={slot.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setFormData({ ...formData, [slot.field]: '' })}
+                                                                style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', fontSize: '10px' }}
+                                                            >
+                                                                <i className="fas fa-times"></i>
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                                                            <i className="fas fa-cloud-upload-alt" style={{ fontSize: '1.6rem', marginBottom: '0.4rem' }}></i>
+                                                            <div style={{ fontSize: '0.75rem' }}>Upload {slot.label}</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    disabled={uploadingField !== null}
+                                                    accept="image/*"
+                                                    onChange={(e) => handleFileUpload(e, slot.field, false)}
+                                                    style={{ fontSize: '0.75rem', width: '100%' }}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={formData[slot.field] || ''}
+                                                    onChange={(e) => setFormData({ ...formData, [slot.field]: e.target.value })}
+                                                    placeholder="Atau paste URL foto..."
+                                                    style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Nama / Jenis Ikan Juara</label>
+                                            <input
+                                                type="text"
+                                                value={formData.title || ''}
+                                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                                placeholder="Contoh: Plakat Multicolour / Halfmoon Red"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Peringkat / Juara</label>
+                                            <input
+                                                type="text"
+                                                value={formData.rank_label || ''}
+                                                onChange={(e) => setFormData({ ...formData, rank_label: e.target.value })}
+                                                placeholder="Contoh: Juara 1 · Kelas Plakat"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Nama Kontes / Event (Opsional)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.event_name || ''}
+                                                onChange={(e) => setFormData({ ...formData, event_name: e.target.value })}
+                                                placeholder="Contoh: Kontes Cupang Nasional Solo"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Bulan / Tahun (Opsional)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.event_date || ''}
+                                                onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                                                placeholder="Contoh: Mei 2025"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Catatan / Keterangan Singkat (Opsional)</label>
+                                        <textarea
+                                            value={formData.description || ''}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Ceritakan singkat kelas lomba atau keunggulan ikan..."
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', minHeight: '80px' }}
+                                        />
+                                    </div>
+
+                                    <button type="submit" className="btn btn-primary">Simpan Data Prestasi</button>
+                                </form>
+                            ) : modalType === 'article' ? (
                                 <form onSubmit={saveProduct}>
                                     <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
                                         <label style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', fontWeight: '700' }}>Gambar Thumbnail</label>

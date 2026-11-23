@@ -941,3 +941,134 @@
   .ck-footer-section { padding: 40px 32px 36px; }
   .ck-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.1fr; gap: 28px; }
 }
+
+/* ─── Prestasi Kontes Strip & Page Grid (Foto Ikan + Foto Piala) ────────── */
+.ck-ach-card {
+  flex: 0 0 228px;
+  scroll-snap-align: start;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ck-text);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.ck-ach-card:hover {
+  border-color: var(--ck-border-strong);
+  background: var(--ck-surface-2);
+  transform: translateY(-2px);
+}
+
+.ck-ach-skeleton {
+  flex: 0 0 228px;
+  height: 176px;
+  border-radius: 12px;
+  background: var(--ck-surface-2);
+  border: 1px solid var(--ck-border);
+  scroll-snap-align: start;
+}
+
+.ck-ach-split-media {
+  position: relative;
+  width: 100%;
+  height: 118px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: #050608;
+  overflow: hidden;
+}
+
+.ck-ach-half {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #090a0d;
+}
+
+.ck-ach-half img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ck-ach-tag-mini {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: rgba(9, 10, 13, 0.78);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+
+.ck-ach-rank-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(9, 10, 13, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 12px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ck-ach-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.ck-ach-page-card {
+  width: 100%;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ck-text);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.ck-ach-page-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ck-border-strong);
+  background: var(--ck-surface-2);
+}
+
+@media (min-width: 640px) {
+  .ck-ach-card { flex: 0 0 264px; }
+  .ck-ach-split-media { height: 138px; }
+  .ck-ach-skeleton { flex: 0 0 264px; height: 200px; }
+  .ck-ach-page-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+}
+
+@media (min-width: 960px) {
+  .ck-ach-card { flex: 0 0 292px; }
+  .ck-ach-split-media { height: 156px; }
+  .ck-ach-skeleton { flex: 0 0 292px; height: 222px; }
+  .ck-ach-page-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}

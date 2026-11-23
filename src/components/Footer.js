@@ -96,6 +96,10 @@ const Footer = () => {
                     <div>
                         <h4 className="ck-footer-heading">Navigasi</h4>
                         <div className="ck-footer-list">
+                            <Link href="/prestasi" className="ck-footer-link">
+                                <i className="fas fa-trophy" />
+                                <span>Prestasi Kontes</span>
+                            </Link>
                             <Link href="/stok" className="ck-footer-link">
                                 <i className="fas fa-fish" />
                                 <span>Informasi Stok & Harga</span>

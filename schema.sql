@@ -221,6 +221,23 @@ CREATE TABLE IF NOT EXISTS order_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Tabel: achievements (Prestasi Kontes)
+-- ============================================
+CREATE TABLE IF NOT EXISTS achievements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    rank_label VARCHAR(100) NOT NULL,
+    event_name VARCHAR(200) DEFAULT NULL,
+    event_date VARCHAR(100) DEFAULT NULL,
+    fish_img TEXT DEFAULT NULL,
+    trophy_img TEXT DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    is_pinned TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Buat user database (opsional, ganti password)
 -- ============================================
 -- CREATE USER 'cupang_user'@'localhost' IDENTIFIED BY 'GANTI_PASSWORD_DISINI';

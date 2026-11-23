@@ -81,11 +81,14 @@ const Navbar = () => {
                     </button>
 
                     <div className={`nav-dropdown-menu ${menuOpen ? 'active' : ''}`} id="mainMenu">
-                        <Link href="/game" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-gamepad"></i> Soliter Virtual
+                        <Link href="/prestasi" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-trophy"></i> Prestasi Kontes
                         </Link>
                         <Link href="/stok" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-fish"></i> Stok & Harga Ikan
+                        </Link>
+                        <Link href="/game" className="menu-item" onClick={() => setMenuOpen(false)}>
+                            <i className="fas fa-gamepad"></i> Soliter Virtual
                         </Link>
                         <Link href="/tips-perawatan" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-book-open"></i> Tips & Edukasi
