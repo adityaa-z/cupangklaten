@@ -7,7 +7,6 @@ import '@/app/game/soliter.css';
 export const ETALASE_CATEGORIES = [
   { id: 'Grade A',    label: 'Grade A',    icon: 'fa-award',   subtitle: 'Kualitas pilihan kelas kompetisi' },
   { id: 'Grade B',    label: 'Grade B',    icon: 'fa-star',    subtitle: 'Form rapi & warna seimbang' },
-  { id: 'Grade C',    label: 'Grade C',    icon: 'fa-fish',    subtitle: 'Pilihan sehat & terjangkau' },
   { id: 'Kolektor',   label: 'Kolektor',   icon: 'fa-gem',     subtitle: 'Line eksklusif & simpanan' },
   { id: 'Uniq Form',  label: 'Uniq Form',  icon: 'fa-shapes',  subtitle: 'Bentuk sirip & tubuh unik' },
   { id: 'Uniq Color', label: 'Uniq Color', icon: 'fa-palette', subtitle: 'Corak & perpecahan warna langka' },
@@ -245,6 +244,7 @@ export default function ProductStrip() {
     const isSupply = cat.includes('kebutuhan') || cat.includes('pakan') || cat.includes('obat') || cat.includes('alat') || cat.includes('aksesoris');
     return !isSupply && !knownLower.includes(cat);
   });
+  const legacyHasStock = legacyItems.some((p) => p.is_available && p.stock > 0);
 
   const modalImages = selected
     ? [selected.img, selected.img2, selected.img3, selected.img4].filter((x) => x && x.trim() !== '')
@@ -252,31 +252,46 @@ export default function ProductStrip() {
 
   return (
     <div>
-      {ETALASE_CATEGORIES.map((cat) => {
-        const catItems = products.filter(
-          (p) => (p.category || '').toLowerCase().trim() === cat.id.toLowerCase()
-        );
-        return (
-          <CategoryRow
-            key={cat.id}
-            category={cat}
-            items={catItems}
-            loading={loading}
-            viewAllHref={`/stok?category=${encodeURIComponent(cat.id)}`}
-            onSelect={(item) => { setSelected(item); setImgIdx(0); }}
-          />
-        );
-      })}
-
-      {/* Tampilkan ikan lama yang belum dipindah kategorinya agar tidak hilang dari halaman utama */}
-      {!loading && legacyItems.length > 0 && (
+      {loading ? (
         <CategoryRow
-          category={{ id: 'lainnya', label: 'Koleksi Lainnya', icon: 'fa-layer-group', subtitle: 'Koleksi ikan cupang lainnya' }}
-          items={legacyItems}
-          loading={false}
+          category={{ id: 'loading', label: 'Stok Ikan', icon: 'fa-layer-group', subtitle: 'Memuat koleksi tersedia...' }}
+          items={[]}
+          loading
           viewAllHref="/stok"
-          onSelect={(item) => { setSelected(item); setImgIdx(0); }}
+          onSelect={() => {}}
         />
+      ) : (
+        <>
+          {ETALASE_CATEGORIES.map((cat) => {
+            const catItems = products.filter(
+              (p) => (p.category || '').toLowerCase().trim() === cat.id.toLowerCase()
+            );
+            const hasStock = catItems.some((p) => p.is_available && p.stock > 0);
+            if (!hasStock) return null;
+
+            return (
+              <CategoryRow
+                key={cat.id}
+                category={cat}
+                items={catItems}
+                loading={false}
+                viewAllHref={`/stok?category=${encodeURIComponent(cat.id)}`}
+                onSelect={(item) => { setSelected(item); setImgIdx(0); }}
+              />
+            );
+          })}
+
+          {/* Tampilkan ikan kategori lama jika masih ada yang stoknya ready */}
+          {legacyHasStock && (
+            <CategoryRow
+              category={{ id: 'lainnya', label: 'Koleksi Lainnya', icon: 'fa-layer-group', subtitle: 'Koleksi ikan cupang lainnya' }}
+              items={legacyItems}
+              loading={false}
+              viewAllHref="/stok"
+              onSelect={(item) => { setSelected(item); setImgIdx(0); }}
+            />
+          )}
+        </>
       )}
 
       {/* Info Detail Modal */}

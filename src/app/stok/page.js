@@ -107,12 +107,11 @@ const StokContent = () => {
                             'all',
                             'Grade A',
                             'Grade B',
-                            'Grade C',
                             'Kolektor',
                             'Uniq Form',
                             'Uniq Color',
                             ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))
-                                .filter(c => !['grade a', 'grade b', 'grade c', 'kolektor', 'uniq form', 'uniq color'].includes(c.toLowerCase()))
+                                .filter(c => !['grade a', 'grade b', 'kolektor', 'uniq form', 'uniq color'].includes(c.toLowerCase()))
                         ].map(cat => (
                             <button 
                                 key={cat}

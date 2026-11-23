@@ -1888,11 +1888,10 @@ export default function AdminPage() {
                                                 <option value="">Pilih Kelas...</option>
                                                 <option value="Grade A">Grade A</option>
                                                 <option value="Grade B">Grade B</option>
-                                                <option value="Grade C">Grade C</option>
                                                 <option value="Kolektor">Kolektor</option>
                                                 <option value="Uniq Form">Uniq Form</option>
                                                 <option value="Uniq Color">Uniq Color</option>
-                                                {formData.category && !['Grade A', 'Grade B', 'Grade C', 'Kolektor', 'Uniq Form', 'Uniq Color'].includes(formData.category) && (
+                                                {formData.category && !['Grade A', 'Grade B', 'Kolektor', 'Uniq Form', 'Uniq Color'].includes(formData.category) && (
                                                     <option value={formData.category}>{formData.category} (Kategori Lama)</option>
                                                 )}
                                             </select>
