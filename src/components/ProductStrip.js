@@ -5,11 +5,10 @@ import Link from 'next/link';
 import '@/app/game/soliter.css';
 
 export const ETALASE_CATEGORIES = [
-  { id: 'Grade A',    label: 'Grade A',    icon: 'fa-award' },
-  { id: 'Grade B',    label: 'Grade B',    icon: 'fa-star' },
-  { id: 'Kolektor',   label: 'Kolektor',   icon: 'fa-gem' },
-  { id: 'Uniq Form',  label: 'Uniq Form',  icon: 'fa-shapes' },
-  { id: 'Uniq Color', label: 'Uniq Color', icon: 'fa-palette' },
+  { id: 'Grade A',  label: 'Grade A',  icon: 'fa-award' },
+  { id: 'Grade B',  label: 'Grade B',  icon: 'fa-star' },
+  { id: 'Grade C',  label: 'Grade C',  icon: 'fa-fish' },
+  { id: 'Kolektor', label: 'Kolektor', icon: 'fa-gem' },
 ];
 
 function formatShortRupiah(num) {

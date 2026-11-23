@@ -20,7 +20,7 @@ export default function Home() {
       {/* PRESTASI KONTES: Foto Ikan Juara + Foto Piala (Di Atas Etalase) */}
       <AchievementStrip />
 
-      {/* ETALASE KELAS: Grade A, Grade B, Grade C, Kolektor, Uniq Form, Uniq Color */}
+      {/* ETALASE KELAS: Grade A, Grade B, Grade C, Kolektor */}
       <ProductStrip />
 
       {/* Bagian Paling Bawah: WhatsApp, Instagram (2), TikTok (2), & Google Maps */}

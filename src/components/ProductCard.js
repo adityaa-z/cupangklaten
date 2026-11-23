@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
     const cardClass = isStokHabis ? 'product-card sold-out' : 'product-card';
     
     const isKebutuhanIkan = product.category?.toLowerCase() === 'kebutuhan ikan';
-    const knownCategories = ['grade a', 'grade b', 'kolektor', 'uniq form', 'uniq color', 'plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
+    const knownCategories = ['grade a', 'grade b', 'grade c', 'kolektor', 'plakat', 'halfmoon', 'hmpk', 'crowntail', 'giant', 'double tail', 'dumbo ear', 'veiltail', 'rosetail'];
     const isKnownCat = knownCategories.includes(product.category?.toLowerCase());
     
     const variantDisplay = product.variant ? ` - ${product.variant}` : '';
