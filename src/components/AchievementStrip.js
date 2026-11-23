@@ -40,6 +40,10 @@ export default function AchievementStrip() {
     scrollRef.current.scrollBy({ left: dir * step, behavior: 'smooth' });
   }
 
+  if (loading || items.length === 0) {
+    return null;
+  }
+
   return (
     <section aria-label="Prestasi Kontes cans.betta x cupangklaten" className="ck-strip-section">
       <div className="ck-strip-inner">
@@ -55,36 +59,14 @@ export default function AchievementStrip() {
         </div>
 
         <div className="ck-strip-track-wrap">
-          <button type="button" className="ck-strip-arrow left" onClick={() => scrollByAmount(-1)} aria-label="Geser kiri">
-            <i className="fas fa-chevron-left" style={{ fontSize: '11px' }} />
-          </button>
+          {items.length > 2 && (
+            <button type="button" className="ck-strip-arrow left" onClick={() => scrollByAmount(-1)} aria-label="Geser kiri">
+              <i className="fas fa-chevron-left" style={{ fontSize: '11px' }} />
+            </button>
+          )}
 
           <div ref={scrollRef} className="ck-strip-scroll">
-            {loading ? (
-              [...Array(5)].map((_, i) => <div key={i} className="ck-ach-skeleton" />)
-            ) : items.length === 0 ? (
-              <div style={{
-                width: '100%',
-                background: 'var(--ck-surface)',
-                border: '1px dashed var(--ck-border-strong)',
-                borderRadius: '10px',
-                padding: '14px 16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px',
-                flexWrap: 'wrap',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12.5px', color: 'var(--ck-text-2)' }}>
-                  <i className="fas fa-trophy" style={{ color: 'var(--ck-text-muted)' }} />
-                  <span>Galeri prestasi kontes (foto ikan juara berdampingan dengan foto piala) siap diisi dari Admin Panel.</span>
-                </div>
-                <Link href="/prestasi" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ck-text)', textDecoration: 'none' }}>
-                  Buka Halaman Prestasi →
-                </Link>
-              </div>
-            ) : (
-              items.map((item) => (
+            {items.map((item) => (
                 <button
                   key={item.id}
                   type="button"
@@ -138,13 +120,14 @@ export default function AchievementStrip() {
                     </div>
                   </div>
                 </button>
-              ))
-            )}
+              ))}
           </div>
 
-          <button type="button" className="ck-strip-arrow right" onClick={() => scrollByAmount(1)} aria-label="Geser kanan">
-            <i className="fas fa-chevron-right" style={{ fontSize: '11px' }} />
-          </button>
+          {items.length > 2 && (
+            <button type="button" className="ck-strip-arrow right" onClick={() => scrollByAmount(1)} aria-label="Geser kanan">
+              <i className="fas fa-chevron-right" style={{ fontSize: '11px' }} />
+            </button>
+          )}
         </div>
       </div>
 
