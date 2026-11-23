@@ -8,6 +8,10 @@ import MemoryMatchGame from './MemoryMatchGame';
 import QuizGame from './QuizGame';
 import SpotDiffGame from './SpotDiffGame';
 import SlidePuzzleGame from './SlidePuzzleGame';
+import SerokTimingGame from './SerokTimingGame';
+import TossPelletGame from './TossPelletGame';
+import GachaCardGame from './GachaCardGame';
+import CleanTankGame from './CleanTankGame';
 import '@/app/game/soliter.css';
 import './memory-game.css';
 import './arena.css';
@@ -45,6 +49,38 @@ const ARENA_GAMES = [
     icon: 'fa-th',
     preview: '/hm-012.png',
   },
+  {
+    id: 'serok',
+    title: 'Tarik Ulur Serok',
+    badge: 'Timing Bar',
+    description: 'Tangkap ikan dengan serokan tepat saat jarum berada di zona hijau.',
+    icon: 'fa-bullseye',
+    preview: '/memory-game/plakat-nemo.jpg',
+  },
+  {
+    id: 'toss',
+    title: 'Lempar Pelet',
+    badge: 'Toss & Aim',
+    description: 'Usap pelet ke atas agar masuk tepat ke mulut toples ikan cupang.',
+    icon: 'fa-dot-circle',
+    preview: '/gt-005.png',
+  },
+  {
+    id: 'gacha',
+    title: 'Gacha Kartu Koleksi',
+    badge: 'Mystery Pack TCG',
+    description: 'Sobek booster pack & koleksi kartu cupang Common hingga Ultra Rare.',
+    icon: 'fa-gem',
+    preview: '/memory-game/black-samurai.jpg',
+  },
+  {
+    id: 'clean',
+    title: 'Bersihkan Kaca',
+    badge: 'Quick Swipe Clean',
+    description: 'Gosok lumut di kaca akuarium sampai 95% bersih sebelum 15 detik habis.',
+    icon: 'fa-hand-sparkles',
+    preview: '/memory-game/double-tail.jpg',
+  },
 ];
 
 export default function BettaMiniGameArena() {
@@ -64,18 +100,40 @@ export default function BettaMiniGameArena() {
     }
   };
 
+  const renderActiveGame = () => {
+    switch (activeGame) {
+      case 'memory':
+        return <MemoryMatchGame onBack={handleBackToHub} />;
+      case 'quiz':
+        return <QuizGame onBack={handleBackToHub} />;
+      case 'spotdiff':
+        return <SpotDiffGame onBack={handleBackToHub} />;
+      case 'puzzle':
+        return <SlidePuzzleGame onBack={handleBackToHub} />;
+      case 'serok':
+        return <SerokTimingGame onBack={handleBackToHub} />;
+      case 'toss':
+        return <TossPelletGame onBack={handleBackToHub} />;
+      case 'gacha':
+        return <GachaCardGame onBack={handleBackToHub} />;
+      case 'clean':
+        return <CleanTankGame onBack={handleBackToHub} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="arena-page">
       <Navbar />
 
       <main className="arena-shell">
         {!activeGame ? (
-          /* ─── LOBBY MENU UTAMA HUB (2x2 GRID) ───────────────────────── */
           <div>
             <section className="arena-lobby-hero">
               <div className="arena-eyebrow">
                 <i className="fas fa-gamepad" />
-                <span>CANS.BETTA X CUPANGKLATEN · 4 GAME DALAM 1 ARENA</span>
+                <span>CANS.BETTA X CUPANGKLATEN · {ARENA_GAMES.length} GAME DALAM 1 ARENA</span>
               </div>
               <h1 className="arena-title">Betta Mini-Game Arena</h1>
               <p className="arena-subtitle">
@@ -137,14 +195,8 @@ export default function BettaMiniGameArena() {
               </div>
             </div>
           </div>
-        ) : activeGame === 'memory' ? (
-          <MemoryMatchGame onBack={handleBackToHub} />
-        ) : activeGame === 'quiz' ? (
-          <QuizGame onBack={handleBackToHub} />
-        ) : activeGame === 'spotdiff' ? (
-          <SpotDiffGame onBack={handleBackToHub} />
         ) : (
-          <SlidePuzzleGame onBack={handleBackToHub} />
+          renderActiveGame()
         )}
       </main>
 
