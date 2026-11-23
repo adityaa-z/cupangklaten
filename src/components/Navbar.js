@@ -88,7 +88,7 @@ const Navbar = () => {
                             <i className="fas fa-fish"></i> Stok & Harga Ikan
                         </Link>
                         <Link href="/game" className="menu-item" onClick={() => setMenuOpen(false)}>
-                            <i className="fas fa-gamepad"></i> Memory Match Game
+                            <i className="fas fa-gamepad"></i> Mini-Game Arena
                         </Link>
                         <Link href="/tips-perawatan" className="menu-item" onClick={() => setMenuOpen(false)}>
                             <i className="fas fa-book-open"></i> Tips & Edukasi

@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import MemoryMatchGame from './MemoryMatchGame';
+import BettaMiniGameArena from './BettaMiniGameArena';
 
 export default function GamePage() {
-  return <MemoryMatchGame />;
+  return <BettaMiniGameArena />;
 }
