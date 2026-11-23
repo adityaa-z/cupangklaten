@@ -94,12 +94,14 @@ export default function PrestasiPage() {
             color: 'var(--ck-text-2)',
           }}>
             <i className="fas fa-trophy" style={{ fontSize: '36px', color: 'var(--ck-text-muted)', marginBottom: '12px', display: 'block' }} />
-            <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--ck-text)', marginBottom: '4px' }}>
-              {searchTerm ? 'Prestasi tidak ditemukan' : 'Belum ada data prestasi'}
+            <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--ck-text)', marginBottom: searchTerm ? '4px' : 0 }}>
+              {searchTerm ? 'Prestasi tidak ditemukan' : 'Data belum di upload admin'}
             </div>
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--ck-text-muted)' }}>
-              {searchTerm ? 'Coba kata kunci lain.' : 'Admin dapat menambahkan foto ikan juara & piala melalui menu Prestasi di Admin Panel.'}
-            </p>
+            {searchTerm && (
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--ck-text-muted)' }}>
+                Coba kata kunci lain.
+              </p>
+            )}
           </div>
         ) : (
           <div className="ck-ach-page-grid">
