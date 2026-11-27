@@ -40,6 +40,15 @@ const Footer = () => {
             <h4 className="ed-footer-heading">Kontak &amp; Lokasi</h4>
             <div className="ed-footer-list">
               <a
+                href="https://www.instagram.com/adityaa.cb"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ed-footer-link"
+              >
+                <i className="fab fa-instagram" />
+                <span>@adityaa.cb (Owner)</span>
+              </a>
+              <a
                 href="https://wa.me/628992020444"
                 target="_blank"
                 rel="noopener noreferrer"
