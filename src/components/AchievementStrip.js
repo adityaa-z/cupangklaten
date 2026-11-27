@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import '@/app/game/soliter.css';
+import '@/app/homepage.css';
 
 export default function AchievementStrip() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef(null);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -29,6 +31,26 @@ export default function AchievementStrip() {
   }, []);
 
   useEffect(() => {
+    if (loading || items.length === 0) return;
+    const node = sectionRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loading, items.length]);
+
+  useEffect(() => {
     if (selected) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
     return () => { document.body.style.overflow = ''; };
@@ -36,7 +58,7 @@ export default function AchievementStrip() {
 
   function scrollByAmount(dir) {
     if (!scrollRef.current) return;
-    const step = Math.max(260, scrollRef.current.clientWidth * 0.65);
+    const step = Math.max(280, scrollRef.current.clientWidth * 0.65);
     scrollRef.current.scrollBy({ left: dir * step, behavior: 'smooth' });
   }
 
@@ -45,137 +67,116 @@ export default function AchievementStrip() {
   }
 
   return (
-    <section aria-label="Prestasi Kontes cans.betta x cupangklaten" className="ck-strip-section">
-      <div className="ck-strip-inner">
-        <div className="ck-strip-header">
-          <div className="ck-strip-title">
-            <i className="fas fa-trophy" style={{ fontSize: '11px', color: 'var(--ck-accent)' }} />
-            <span>Prestasi Kontes & Piala</span>
+    <section
+      ref={sectionRef}
+      aria-label="Prestasi Kontes cans.betta x cupangklaten"
+      className="ed-strip-section"
+    >
+      <div className={`ed-strip-inner ed-reveal ${visible ? 'is-visible' : ''}`}>
+        <div className="ed-strip-head">
+          <div className="ed-strip-title-group">
+            <span className="ed-strip-kicker">
+              <i className="fas fa-trophy" style={{ fontSize: '9.5px' }} />
+              <span>ARSIP JUARA · {String(items.length).padStart(2, '0')} PRESTASI</span>
+            </span>
+            <h2 className="ed-strip-heading">Prestasi Kontes &amp; Piala</h2>
           </div>
-          <Link href="/prestasi" className="ck-strip-link">
+
+          <Link href="/prestasi" className="ed-strip-more">
             <span>Lihat Semua</span>
-            <i className="fas fa-arrow-right" style={{ fontSize: '10px' }} />
+            <i className="fas fa-arrow-right" />
           </Link>
         </div>
 
-        <div className="ck-strip-track-wrap">
+        <div className="ed-track-wrap">
           {items.length > 2 && (
-            <button type="button" className="ck-strip-arrow left" onClick={() => scrollByAmount(-1)} aria-label="Geser kiri">
+            <button
+              type="button"
+              className="ed-track-arrow left"
+              onClick={() => scrollByAmount(-1)}
+              aria-label="Geser kiri"
+            >
               <i className="fas fa-chevron-left" style={{ fontSize: '11px' }} />
             </button>
           )}
 
-          <div ref={scrollRef} className="ck-strip-scroll">
+          <div ref={scrollRef} className="ed-scroll-track">
             {items.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="ck-ach-card"
-                  onClick={() => setSelected(item)}
-                >
-                  {/* Side-by-side: Foto Ikan (Kiri) + Foto Piala (Kanan) */}
-                  <div className="ck-ach-split-media">
-                    <div className="ck-ach-half">
-                      <img
-                        src={item.fish_img || '/logo-cansbetta.jpg'}
-                        alt={`Ikan Juara ${item.title}`}
-                        loading="lazy"
-                      />
-                      <span className="ck-ach-tag-mini">Ikan</span>
-                    </div>
-                    <div className="ck-ach-half">
-                      <img
-                        src={item.trophy_img || '/galeri-cupang-klaten.jpg'}
-                        alt={`Piala ${item.title}`}
-                        loading="lazy"
-                      />
-                      <span className="ck-ach-tag-mini">Piala</span>
-                    </div>
-                    <span className="ck-ach-rank-badge">
-                      <i className="fas fa-trophy" style={{ fontSize: '9px' }} />
-                      <span>{item.rank_label}</span>
-                    </span>
+              <button
+                key={item.id}
+                type="button"
+                className="ed-ach-card"
+                onClick={() => setSelected(item)}
+              >
+                <div className="ed-ach-split">
+                  <div className="ed-ach-pane">
+                    <img
+                      src={item.fish_img || '/logo-cansbetta.jpg'}
+                      alt={`Ikan Juara ${item.title}`}
+                      loading="lazy"
+                    />
+                    <span className="ed-ach-pane-tag">Ikan</span>
                   </div>
+                  <div className="ed-ach-pane">
+                    <img
+                      src={item.trophy_img || '/galeri-cupang-klaten.jpg'}
+                      alt={`Piala ${item.title}`}
+                      loading="lazy"
+                    />
+                    <span className="ed-ach-pane-tag">Piala</span>
+                  </div>
+                  <span className="ed-ach-rank">
+                    <i className="fas fa-trophy" style={{ fontSize: '8.5px' }} />
+                    <span>{item.rank_label}</span>
+                  </span>
+                </div>
 
-                  <div style={{ padding: '9px 10px 10px' }}>
-                    <div style={{
-                      fontSize: '12.5px',
-                      fontWeight: 700,
-                      color: 'var(--ck-text)',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      marginBottom: '2px',
-                    }}>
-                      {item.title}
-                    </div>
-                    <div style={{
-                      fontSize: '11px',
-                      color: 'var(--ck-text-muted)',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}>
-                      {[item.event_name, item.event_date].filter(Boolean).join(' · ') || 'Prestasi Kontes Cupang'}
-                    </div>
+                <div className="ed-ach-body">
+                  <div className="ed-ach-title">{item.title}</div>
+                  <div className="ed-ach-meta">
+                    {[item.event_name, item.event_date].filter(Boolean).join(' · ') || 'Prestasi Kontes Cupang'}
                   </div>
-                </button>
-              ))}
+                </div>
+              </button>
+            ))}
           </div>
 
           {items.length > 2 && (
-            <button type="button" className="ck-strip-arrow right" onClick={() => scrollByAmount(1)} aria-label="Geser kanan">
+            <button
+              type="button"
+              className="ed-track-arrow right"
+              onClick={() => scrollByAmount(1)}
+              aria-label="Geser kanan"
+            >
               <i className="fas fa-chevron-right" style={{ fontSize: '11px' }} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Achievement Detail Modal (Side-by-Side Ikan + Piala) */}
+      {/* Museum Lightbox Detail Modal */}
       {selected && (
-        <div className="ck-modal-overlay" onClick={() => setSelected(null)}>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: '520px',
-              background: 'var(--ck-modal-bg)',
-              border: '1px solid var(--ck-border-strong)',
-              borderRadius: '14px',
-              overflow: 'hidden',
-              color: 'var(--ck-text)',
-              boxShadow: '0 28px 70px rgba(0,0,0,0.5)',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-            }}
-          >
+        <div className="ed-modal-backdrop" onClick={() => setSelected(null)}>
+          <div className="ed-modal-dialog wide" onClick={(e) => e.stopPropagation()}>
             <div style={{ position: 'relative' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', background: '#000000' }}>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--ed-rule)', borderBottom: '1px solid var(--ed-rule)' }}>
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: 'var(--ed-media-bg)', overflow: 'hidden' }}>
                   <img
                     src={selected.fish_img || '/logo-cansbetta.jpg'}
                     alt={`Ikan Juara ${selected.title}`}
                     style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                   />
-                  <span style={{
-                    position: 'absolute', bottom: '8px', left: '8px',
-                    background: 'rgba(9,10,13,0.82)', color: '#ffffff',
-                    fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px',
-                  }}>
+                  <span className="ed-ach-pane-tag" style={{ bottom: '10px', left: '10px', fontSize: '9.5px' }}>
                     Foto Ikan Juara
                   </span>
                 </div>
-                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: '#000000', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', aspectRatio: '4 / 5', background: 'var(--ed-media-bg)', overflow: 'hidden' }}>
                   <img
                     src={selected.trophy_img || '/galeri-cupang-klaten.jpg'}
                     alt={`Piala ${selected.title}`}
                     style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                   />
-                  <span style={{
-                    position: 'absolute', bottom: '8px', left: '8px',
-                    background: 'rgba(9,10,13,0.82)', color: '#ffffff',
-                    fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px',
-                  }}>
+                  <span className="ed-ach-pane-tag" style={{ bottom: '10px', left: '10px', fontSize: '9.5px' }}>
                     Foto Piala
                   </span>
                 </div>
@@ -183,49 +184,30 @@ export default function AchievementStrip() {
 
               <button
                 type="button"
+                className="ed-modal-close"
                 onClick={() => setSelected(null)}
                 aria-label="Tutup"
-                style={{
-                  position: 'absolute', top: '10px', right: '10px',
-                  width: '32px', height: '32px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)',
-                  background: 'rgba(9,10,13,0.82)', color: '#ffffff', fontSize: '14px', cursor: 'pointer',
-                }}
               >
                 <i className="fas fa-times" />
               </button>
             </div>
 
-            <div style={{ padding: '16px' }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'var(--ck-surface-2)',
-                border: '1px solid var(--ck-border-strong)',
-                borderRadius: '6px',
-                padding: '3px 9px',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: 'var(--ck-text)',
-                marginBottom: '8px',
-              }}>
-                <i className="fas fa-trophy" style={{ fontSize: '10.5px' }} />
-                <span>{selected.rank_label}</span>
+            <div className="ed-modal-content">
+              <div className="ed-modal-kicker">
+                <i className="fas fa-trophy" style={{ marginRight: '6px' }} />
+                {selected.rank_label}
               </div>
 
-              <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: 800, color: 'var(--ck-text)' }}>
-                {selected.title}
-              </h3>
+              <h3 className="ed-modal-title">{selected.title}</h3>
 
               {(selected.event_name || selected.event_date) && (
-                <div style={{ fontSize: '12.5px', color: 'var(--ck-text-2)', marginBottom: '10px' }}>
-                  <i className="fas fa-calendar-alt" style={{ marginRight: '6px', color: 'var(--ck-text-muted)' }} />
+                <div className="ed-mono" style={{ fontSize: '11.5px', color: 'var(--ed-ink-muted)', marginBottom: '12px' }}>
                   {[selected.event_name, selected.event_date].filter(Boolean).join(' · ')}
                 </div>
               )}
 
               {selected.description && (
-                <p style={{ margin: '0 0 14px', fontSize: '13px', lineHeight: 1.55, color: 'var(--ck-text-2)' }}>
+                <p style={{ margin: '0 0 16px', fontSize: '13.5px', lineHeight: 1.65, color: 'var(--ed-ink-2)' }}>
                   {selected.description}
                 </p>
               )}
@@ -236,20 +218,7 @@ export default function AchievementStrip() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  width: '100%',
-                  padding: '11px',
-                  borderRadius: '9px',
-                  background: '#16a34a',
-                  color: '#ffffff',
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  textDecoration: 'none',
-                }}
+                className="ed-wa-btn"
               >
                 <i className="fab fa-whatsapp" style={{ fontSize: '15px' }} />
                 Tanya Line / Anakan via WhatsApp

@@ -1,12 +1,25 @@
-import { Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Providers from "@/components/Providers";
 
-const outfit = Outfit({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700", "800"],
-  variable: "--font-outfit",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
 });
 
 export const metadata = {
@@ -53,7 +66,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id" data-theme="dark">
+    <html
+      lang="id"
+      data-theme="dark"
+      className={`${plusJakarta.variable} ${cormorant.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         {/* Google Analytics */}
         <Script
@@ -117,7 +134,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={outfit.className}>
+      <body className={plusJakarta.className}>
         <Providers>
           {children}
         </Providers>
