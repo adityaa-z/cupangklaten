@@ -132,7 +132,7 @@ export default function PrestasiPage() {
                     {item.title}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--ck-text-muted)', marginBottom: item.description ? '6px' : 0 }}>
-                    {[item.event_name, item.event_date].filter(Boolean).join(' · ') || 'Prestasi Kontes Cupang'}
+                    {[item.event_name, item.event_date].filter(Boolean).join(' · ')}
                   </div>
                   {item.description && (
                     <div style={{

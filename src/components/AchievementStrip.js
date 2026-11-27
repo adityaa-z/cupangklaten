@@ -133,9 +133,11 @@ export default function AchievementStrip() {
 
                 <div className="ed-ach-body">
                   <div className="ed-ach-title">{item.title}</div>
-                  <div className="ed-ach-meta">
-                    {[item.event_name, item.event_date].filter(Boolean).join(' · ') || 'Prestasi Kontes Cupang'}
-                  </div>
+                  {(item.event_name || item.event_date) && (
+                    <div className="ed-ach-meta">
+                      {[item.event_name, item.event_date].filter(Boolean).join(' · ')}
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
