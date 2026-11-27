@@ -68,7 +68,6 @@ export default function StudioHero() {
                   <i className="fas fa-trophy" style={{ fontSize: '10px' }} />
                   <span>Galeri Soliter &amp; Prestasi · Klaten</span>
                 </span>
-                <span>01 / GALERI</span>
               </div>
             </div>
           </div>
