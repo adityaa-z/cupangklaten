@@ -244,3 +244,14 @@ CREATE TABLE IF NOT EXISTS achievements (
 -- GRANT ALL PRIVILEGES ON cupang_klaten.* TO 'cupang_user'@'localhost';
 -- FLUSH PRIVILEGES;
 
+
+-- Hero Gallery Photos (Galeri Soliter & Prestasi · Klaten)
+CREATE TABLE IF NOT EXISTS hero_gallery (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image_url TEXT NOT NULL,
+    caption VARCHAR(200) DEFAULT 'Galeri Soliter & Prestasi · Klaten',
+    sort_order INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

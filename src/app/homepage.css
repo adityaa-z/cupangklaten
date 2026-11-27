@@ -349,7 +349,71 @@
   object-fit: cover;
   object-position: center 42%;
   display: block;
-  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s ease;
+}
+
+.ed-hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ed-hero-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ed-hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(8, 9, 12, 0.56);
+  backdrop-filter: blur(6px);
+  color: #f3f1ec;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: background 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+}
+
+.ed-hero-nav:hover {
+  background: rgba(8, 9, 12, 0.88);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.ed-hero-nav.prev { left: 10px; }
+.ed-hero-nav.next { right: 10px; }
+
+.ed-hero-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ed-hero-dot-btn {
+  width: 16px;
+  height: 3px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: rgba(243, 241, 236, 0.35);
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.ed-hero-dot-btn.active {
+  width: 24px;
+  background: #f3f1ec;
 }
 
 .ed-hero-frame:hover .ed-hero-photo {

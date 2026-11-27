@@ -59,6 +59,7 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState('Produk');
     const [products, setProducts] = useState([]);
     const [achievements, setAchievements] = useState([]);
+    const [heroGallery, setHeroGallery] = useState([]);
     const [faqs, setFaqs] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [members, setMembers] = useState([]);
@@ -124,9 +125,10 @@ export default function AdminPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [pRes, achRes, fRes, rRes, mRes, aRes, artRes] = await Promise.all([
+            const [pRes, achRes, hgRes, fRes, rRes, mRes, aRes, artRes] = await Promise.all([
                 fetch('/api/admin/products/'),
                 fetch('/api/admin/achievements/'),
+                fetch('/api/admin/hero-gallery/'),
                 fetch('/api/admin/faq/'),
                 fetch('/api/admin/reviews/'),
                 fetch('/api/admin/members/'),
@@ -136,6 +138,7 @@ export default function AdminPage() {
 
             if (pRes.ok) setProducts(await pRes.json());
             if (achRes && achRes.ok) setAchievements(await achRes.json());
+            if (hgRes && hgRes.ok) setHeroGallery(await hgRes.json());
             if (fRes.ok) setFaqs(await fRes.json());
             if (rRes.ok) setReviews(await rRes.json());
             if (mRes.ok) setMembers(await mRes.json());
@@ -453,6 +456,16 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
             });
+        } else if (modalType === 'hero_gallery') {
+            if (!formData.image_url) {
+                alert('Silakan upload foto atau masukkan URL foto terlebih dahulu!');
+                return;
+            }
+            res = await fetch('/api/admin/hero-gallery/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+            });
         }
 
         if (res && res.status === 401) return handleLogout();
@@ -462,13 +475,30 @@ export default function AdminPage() {
             fetchData();
             setToast({ 
                 show: true, 
-                message: modalType === 'product' ? 'Produk berhasil disimpan!' : modalType === 'achievement' ? 'Prestasi berhasil disimpan!' : modalType === 'faq' ? 'FAQ berhasil disimpan!' : modalType === 'article' ? 'Artikel berhasil disimpan!' : 'Data berhasil disimpan!', 
+                message: modalType === 'product' ? 'Produk berhasil disimpan!' : modalType === 'achievement' ? 'Prestasi berhasil disimpan!' : modalType === 'hero_gallery' ? 'Foto Galeri Hero berhasil disimpan!' : modalType === 'faq' ? 'FAQ berhasil disimpan!' : modalType === 'article' ? 'Artikel berhasil disimpan!' : 'Data berhasil disimpan!', 
                 type: 'success' 
             });
             setTimeout(() => setToast({ ...toast, show: false }), 3000);
         } else {
             alert('Gagal menyimpan data!');
         }
+    };
+
+    const toggleHeroGalleryActive = async (item) => {
+        const res = await fetch('/api/admin/hero-gallery/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: item.id, is_active: !item.is_active })
+        });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
+    };
+
+    const deleteHeroGallery = async (id) => {
+        if (!confirm('Hapus foto dari Galeri Soliter & Prestasi?')) return;
+        const res = await fetch(`/api/admin/hero-gallery/?id=${id}`, { method: 'DELETE' });
+        if (res.status === 401) return handleLogout();
+        if (res.ok) fetchData();
     };
 
     const toggleAchievementPin = async (item) => {
@@ -559,9 +589,9 @@ export default function AdminPage() {
                     CK Admin
                 </div>
                 <div className="sidebar-nav">
-                    {['Produk', 'Prestasi', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
+                    {['Produk', 'Prestasi', 'Galeri Hero', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Prestasi' ? 'trophy' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
+                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Prestasi' ? 'trophy' : tab === 'Galeri Hero' ? 'images' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
                             {tab}
                         </div>
                     ))}
@@ -654,6 +684,107 @@ export default function AdminPage() {
                                                 <td className="action-btns" data-label="Aksi">
                                                     <button className="btn-icon" onClick={() => { setEditingItem(p); setFormData({ ...p, price_max: p.price_max || '' }); setModalType('product'); setIsModalOpen(true); }}><i className="fas fa-edit"></i></button>
                                                     <button className="btn-icon delete" onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'Galeri Hero' && (
+                        <div className="tab-view">
+                            <div className="dashboard-controls" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{ width: 'auto' }}
+                                    onClick={() => {
+                                        setEditingItem(null);
+                                        setFormData({
+                                            image_url: '',
+                                            caption: 'Galeri Soliter & Prestasi · Klaten',
+                                            sort_order: heroGallery.length + 1,
+                                            is_active: true
+                                        });
+                                        setModalType('hero_gallery');
+                                        setIsModalOpen(true);
+                                    }}
+                                >
+                                    <i className="fas fa-plus"></i> Tambah / Ganti Foto Galeri
+                                </button>
+                                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                                    Tambahkan 1 foto untuk mengganti foto bawaan, atau beberapa foto agar tampil bergantian (slide) di halaman utama.
+                                </span>
+                            </div>
+
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Urutan</th>
+                                            <th>Foto</th>
+                                            <th>Caption</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {heroGallery.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                                                    Belum ada foto khusus. Halaman utama saat ini menampilkan foto bawaan (<code>/galeri-cupang-klaten.jpg</code>). Klik &quot;Tambah / Ganti Foto Galeri&quot; untuk menambahkan foto baru.
+                                                </td>
+                                            </tr>
+                                        ) : heroGallery.map((item, idx) => (
+                                            <tr key={item.id}>
+                                                <td data-label="Urutan" style={{ fontWeight: 700 }}>#{item.sort_order ?? idx + 1}</td>
+                                                <td data-label="Foto">
+                                                    <img
+                                                        src={item.image_url || '/galeri-cupang-klaten.jpg'}
+                                                        alt={item.caption || 'Galeri Hero'}
+                                                        style={{ width: '96px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                                                    />
+                                                </td>
+                                                <td data-label="Caption" style={{ fontWeight: 600 }}>
+                                                    {item.caption || 'Galeri Soliter & Prestasi · Klaten'}
+                                                </td>
+                                                <td data-label="Status">
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                                        <label className="switch">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!item.is_active}
+                                                                onChange={() => toggleHeroGalleryActive(item)}
+                                                            />
+                                                            <span className="slider"></span>
+                                                        </label>
+                                                        <span className={`status-badge ${item.is_active ? 'status-tersedia' : 'status-terjual'}`}>
+                                                            {item.is_active ? 'Aktif' : 'Nonaktif'}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="action-btns" data-label="Aksi">
+                                                    <button
+                                                        className="btn-icon"
+                                                        title="Edit / Ganti Foto"
+                                                        onClick={() => {
+                                                            setEditingItem(item);
+                                                            setFormData({
+                                                                image_url: item.image_url || '',
+                                                                caption: item.caption || 'Galeri Soliter & Prestasi · Klaten',
+                                                                sort_order: item.sort_order ?? 0,
+                                                                is_active: !!item.is_active
+                                                            });
+                                                            setModalType('hero_gallery');
+                                                            setIsModalOpen(true);
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-edit"></i>
+                                                    </button>
+                                                    <button className="btn-icon delete" onClick={() => deleteHeroGallery(item.id)}>
+                                                        <i className="fas fa-trash"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -1520,11 +1651,90 @@ export default function AdminPage() {
                 <div className="modal-overlay">
                     <div className="modal-container" style={{ maxWidth: modalType === 'product' || modalType === 'auction' || modalType === 'article' || modalType === 'achievement' ? '900px' : '600px' }}>
                         <div className="modal-header">
-                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'achievement' ? 'Prestasi Kontes' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : modalType === 'article' ? 'Artikel' : 'Ulasan'}</h3>
+                            <h3 className="modal-title">{editingItem ? 'Edit' : 'Tambah'} {modalType === 'product' ? 'Ikan' : modalType === 'achievement' ? 'Prestasi Kontes' : modalType === 'hero_gallery' ? 'Foto Galeri Hero' : modalType === 'faq' ? 'FAQ' : modalType === 'auction' ? 'Lelang' : modalType === 'article' ? 'Artikel' : 'Ulasan'}</h3>
                             <button className="btn-close" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            {modalType === 'achievement' ? (
+                            {modalType === 'hero_gallery' ? (
+                                <form onSubmit={saveProduct}>
+                                    <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1.25rem' }}>
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: '700' }}>Foto Galeri Soliter &amp; Prestasi</label>
+                                        <div style={{ width: '100%', aspectRatio: '16 / 10', background: '#090a0d', borderRadius: '8px', overflow: 'hidden', margin: '0.6rem 0', border: '2px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                            {uploadingField === 'image_url' ? (
+                                                <div className="spinner"></div>
+                                            ) : formData.image_url ? (
+                                                <>
+                                                    <img src={formData.image_url} alt="Preview Galeri Hero" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                                                        style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '26px', height: '26px', cursor: 'pointer', fontSize: '11px' }}
+                                                    >
+                                                        <i className="fas fa-times"></i>
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                                                    <i className="fas fa-cloud-upload-alt" style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}></i>
+                                                    <div style={{ fontSize: '0.8rem' }}>Pilih foto rak soliter / piala (Landscape disarankan)</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="file"
+                                            disabled={uploadingField !== null}
+                                            accept="image/*"
+                                            onChange={(e) => handleFileUpload(e, 'image_url', false)}
+                                            style={{ fontSize: '0.8rem', width: '100%' }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={formData.image_url || ''}
+                                            onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                            placeholder="Atau paste URL foto..."
+                                            style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}
+                                        />
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Caption Foto (Bawah Kiri)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.caption || ''}
+                                                onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                                                placeholder="Galeri Soliter & Prestasi · Klaten"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Urutan Tampil</label>
+                                            <input
+                                                type="number"
+                                                value={formData.sort_order ?? 1}
+                                                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value, 10) || 0 })}
+                                                min="0"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                        <input
+                                            id="heroGalleryActive"
+                                            type="checkbox"
+                                            checked={formData.is_active !== false}
+                                            onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                            style={{ width: 'auto' }}
+                                        />
+                                        <label htmlFor="heroGalleryActive" style={{ margin: 0, cursor: 'pointer' }}>
+                                            Tampilkan foto ini di halaman utama
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" className="btn btn-primary" disabled={uploadingField !== null}>
+                                        Simpan Foto Galeri
+                                    </button>
+                                </form>
+                            ) : modalType === 'achievement' ? (
                                 <form onSubmit={saveProduct}>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
                                         {[
