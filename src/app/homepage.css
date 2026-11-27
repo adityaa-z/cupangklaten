@@ -114,11 +114,12 @@
 
 .ed-brand-wordmark {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 2px 0 4px;
 }
 
 .ed-brand-name {
@@ -127,7 +128,9 @@
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ed-ink);
-  line-height: 1;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ed-brand-cross {
