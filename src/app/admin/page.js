@@ -54,6 +54,7 @@ const compressImage = async (file) => {
 
 export default function AdminPage() {
     const [isMounted, setIsMounted] = useState(false);
+    const [theme, setTheme] = useState('dark');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [authLoading, setAuthLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Produk');
@@ -119,8 +120,20 @@ export default function AdminPage() {
 
     useEffect(() => {
         setIsMounted(true);
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.body.setAttribute('data-theme', savedTheme);
         fetchData();
     }, []);
+
+    const toggleAdminTheme = () => {
+        const nextTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        document.body.setAttribute('data-theme', nextTheme);
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -581,18 +594,38 @@ export default function AdminPage() {
         );
     }
 
+    const readyStockCount = products.filter(p => p.is_available && p.stock > 0).length;
+    const activeHeroCount = heroGallery.filter(h => h.is_active).length;
+
+    const tabCounts = {
+        'Produk': products.length,
+        'Prestasi': achievements.length,
+        'Galeri Hero': heroGallery.length,
+        'FAQ': faqs.length,
+        'Ulasan': reviews.length,
+        'Blog': articles.length,
+    };
+
     return (
         <div className="dashboard-container">
             <aside className="sidebar">
                 <div className="sidebar-header">
-                    <img src="/logo.png" alt="Logo" style={{ height: '30px', borderRadius: '4px' }} />
-                    CK Admin
+                    <img src="/logo-cansbetta.jpg" alt="cans.betta" className="adm-brand-avatar" />
+                    <div className="adm-brand-meta">
+                        <span className="adm-brand-title">cans.betta</span>
+                        <span className="adm-brand-sub">Studio CMS · Admin</span>
+                    </div>
                 </div>
                 <div className="sidebar-nav">
                     {['Produk', 'Prestasi', 'Galeri Hero', 'Lelang', 'Member', 'Pesanan', 'Promo', 'FAQ', 'Statistik', 'Ulasan', 'Blog'].map(tab => (
                         <div key={tab} className={`nav-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                            <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Prestasi' ? 'trophy' : tab === 'Galeri Hero' ? 'images' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
-                            {tab}
+                            <span className="nav-item-left">
+                                <i className={`fas fa-${tab === 'Produk' ? 'box' : tab === 'Prestasi' ? 'trophy' : tab === 'Galeri Hero' ? 'images' : tab === 'Lelang' ? 'gavel' : tab === 'Member' ? 'users' : tab === 'Pesanan' ? 'shopping-cart' : tab === 'Promo' ? 'bullhorn' : tab === 'FAQ' ? 'question-circle' : tab === 'Statistik' ? 'chart-line' : tab === 'Ulasan' ? 'star' : 'newspaper'}`}></i>
+                                <span>{tab}</span>
+                            </span>
+                            {tabCounts[tab] !== undefined && (
+                                <span className="nav-badge">{tabCounts[tab]}</span>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -600,17 +633,48 @@ export default function AdminPage() {
 
             <main className="main-content">
                 <header className="main-header">
-                    <h2>{activeTab} Management</h2>
-                    <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <a href="/" className="btn btn-outline" style={{ color: 'var(--primary-dark)', borderColor: 'var(--border-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                            <i className="fas fa-home"></i> Beranda
+                    <div className="adm-header-title-wrap">
+                        <span className="adm-header-kicker">STUDIO CMS / {activeTab.toUpperCase()}</span>
+                        <h2>Manajemen {activeTab}</h2>
+                    </div>
+                    <div className="user-profile">
+                        <button
+                            type="button"
+                            className="adm-icon-toggle"
+                            onClick={toggleAdminTheme}
+                            title={theme === 'dark' ? 'Ubah ke Tema Terang' : 'Ubah ke Tema Gelap'}
+                            aria-label="Ganti Tema"
+                        >
+                            <i className={theme === 'light' ? 'fas fa-moon' : 'fas fa-sun'}></i>
+                        </button>
+                        <a href="/" className="btn btn-outline" style={{ padding: '7px 12px', fontSize: '12.5px' }}>
+                            <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '11px' }}></i> Beranda
                         </a>
-                        <span style={{ fontWeight: '600' }}>Admin</span>
-                        <button className="btn btn-outline btn-logout" onClick={handleLogout} style={{ color: '#dc2626', borderColor: '#fca5a5', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Logout</button>
+                        <button className="btn btn-outline btn-logout" onClick={handleLogout} style={{ color: 'var(--adm-danger)', borderColor: 'var(--adm-rule-strong)', padding: '7px 12px', fontSize: '12.5px' }}>
+                            Logout
+                        </button>
                     </div>
                 </header>
 
                 <div className="content-body">
+                    <div className="adm-kpi-strip">
+                        <div className="adm-kpi-card">
+                            <span className="adm-kpi-label">Stok Ready</span>
+                            <strong className="adm-kpi-val">{readyStockCount}</strong>
+                        </div>
+                        <div className="adm-kpi-card">
+                            <span className="adm-kpi-label">Total Katalog</span>
+                            <strong className="adm-kpi-val">{products.length}</strong>
+                        </div>
+                        <div className="adm-kpi-card">
+                            <span className="adm-kpi-label">Prestasi Kontes</span>
+                            <strong className="adm-kpi-val">{achievements.length}</strong>
+                        </div>
+                        <div className="adm-kpi-card">
+                            <span className="adm-kpi-label">Foto Galeri Hero</span>
+                            <strong className="adm-kpi-val">{activeHeroCount}</strong>
+                        </div>
+                    </div>
                     {activeTab === 'Produk' && (
                         <div className="tab-view">
                             <div className="dashboard-controls">
